@@ -1,34 +1,3 @@
-# RETORCH FullTeaching End-to-End Test Suite
-
-This repo contains a detached fork of 
-[FullTeaching]([****](https://github.com/elastest/full-teaching/tree/no-Elastest/e2e-test))
-that is used as a System Test and as a demonstrator of the 
-[RETORCH Framework](https://github.com/giis-uniovi/retorch).
-
-*FullTeaching* is an educational platform developed as a demonstrator of the [ElasTest EU Project](https://elastest.eu/).
-
-## Quick Start
-
-To run FullTeaching integrated with the RETORCH scheduling:
-
-- Fork this repo (only main branch, preferably)
-- Create a multibranch job in Jenkins
-- Configure the integration between the Jenkins job and the forked repo 
-  (you need to configure the credentials in a Jenkins/GitHub integration plugin and a GitHub webhook).
-
-To integrate Jenkins with GitHub you may use one of these jenkins plugins:
-  - [GitHub Branch Source Plugin](https://plugins.jenkins.io/github-branch-source/)
-    and a webhook  `https://<your-jenkins-url>/github-webhook/`
-  - [[Scan Webhook Trigger](https://plugins.jenkins.io/multibranch-scan-webhook-trigger/)](https://plugins.jenkins.io/multibranch-scan-webhook-trigger/),
-    and a webhook `https://<your-jenkins-url>/multibranch-webhook-trigger/invoke?token=TOKEN`
-    (this token with the one configure in the job configuration at Scan multibranch pipeline triggers -> scan by webhook)
-
-After doing this, every push to a branch in your fork will start the Jenkins job for that branch.
-
-## FullTeaching orginal README.md
-
-Below, the contents of the original README.md is included.
-
 # FullTeaching Experiment
 
 [![Build Status](https://travis-ci.org/pabloFuente/full-teaching.png?branch=master)](https://travis-ci.org/pabloFuente/full-teaching)
