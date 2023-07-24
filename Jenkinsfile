@@ -1,5 +1,5 @@
 pipeline {
-  agent {label 'slave-xretorch'}
+  agent {label 'xretorch-agent'}
   environment {
         ET_EUS_API = "http://selenoid:4444/wd/hub"
         CURRENT_DATE = " date +\'[%m-%d-%y] %T - \'"
