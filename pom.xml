@@ -44,7 +44,7 @@
         <selenium-jupiter.version>4.3.6</selenium-jupiter.version>
         <slf4j.version>2.0.7</slf4j.version>
         <junit-jupiter-engine.version>5.9.3</junit-jupiter-engine.version>
-        <junit-jupiter-params.version>5.9.3</junit-jupiter-params.version>
+        <junit-jupiter-params.version>5.10.0</junit-jupiter-params.version>
         <junit.version>4.13.2</junit.version>
         <webdrivermanager.version>5.4.1</webdrivermanager.version>
         <retorch.version>1.1.0</retorch.version>
