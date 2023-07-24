@@ -1,4 +1,4 @@
-name: test-all
+name: build
 on:
   push:
     branches-ignore:

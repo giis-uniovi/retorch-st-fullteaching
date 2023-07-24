@@ -1,10 +1,10 @@
-[![Status](https://github.com/giis-uniovi/retorch-st-fullteaching/actions/workflows/build.yml/badge.svg)](https://github.com/giis-uniovi/retorch-st-fullteaching/actions)
-[![Jenkins CI Status]](https://in2test.lsi.uniovi.es/badges/retorch-st-fulteaching.svg)
+[![Build Status](https://github.com/giis-uniovi/retorch-st-fullteaching/actions/workflows/build.yml/badge.svg)](https://github.com/giis-uniovi/retorch-st-fullteaching/actions)
+![CI Status](https://in2test.lsi.uniovi.es/badges/retorch-st-fullteaching-status.svg "Number of CI branches by status")
 
 # RETORCH FullTeaching End-to-End Test Suite
 
 This repo contains a detached fork of 
-[FullTeaching]([****](https://github.com/elastest/full-teaching/tree/no-Elastest/e2e-test))
+[FullTeaching](https://github.com/elastest/full-teaching/tree/no-Elastest/e2e-test)
 that is used as a System Test and as a demonstrator of the 
 [RETORCH Framework](https://github.com/giis-uniovi/retorch).
 
