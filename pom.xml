@@ -5,7 +5,7 @@
 
     <groupId>com.fullteaching</groupId>
     <artifactId>e2e.no-elastest</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Non Elastest E2E (end-to-end) for FullTeaching.</description>
