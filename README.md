@@ -4,7 +4,7 @@
 # RETORCH FullTeaching End-to-End Test Suite
 
 This repo contains a detached fork of 
-[FullTeaching](https://github.com/elastest/full-teaching/tree/no-Elastest/e2e-test)
+[FullTeaching](https://github.com/elastest/full-teaching)
 that is used as a System Test and as a demonstrator of the 
 [RETORCH Framework](https://github.com/giis-uniovi/retorch).
 
