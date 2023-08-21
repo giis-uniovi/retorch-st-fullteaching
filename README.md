@@ -1,5 +1,5 @@
 [![Build Status](https://github.com/giis-uniovi/retorch-st-fullteaching/actions/workflows/build.yml/badge.svg)](https://github.com/giis-uniovi/retorch-st-fullteaching/actions)
-![CI Status](https://in2test.lsi.uniovi.es/badges/retorch-st-fullteaching-status.svg "Number of CI branches by status")
+
 
 # RETORCH FullTeaching End-to-End Test Suite
 
