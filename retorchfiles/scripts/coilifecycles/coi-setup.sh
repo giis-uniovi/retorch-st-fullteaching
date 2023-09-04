@@ -15,7 +15,7 @@ find /opt/selenoid/logs/ | wc -l
 mkdir -p "./src/retorchcostestimationdata/exec$BUILD_NUMBER"
 mkdir -p "./artifacts"
 echo "Pulling the Docker Images required by Selenoid (if are not pulled)"
-docker pull selenoid/vnc_chrome:94.0
+docker pull selenoid/vnc_chrome:116.0
 docker pull selenoid/video-recorder:latest-release
 echo "Pulling the Docker Images requirede by the Test suite"
 docker pull eexit/mirror-http-server
