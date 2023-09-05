@@ -14,7 +14,9 @@ echo 'Remove older logs (7days)! The number of logs prior remove : '
 find /opt/selenoid/logs/ | wc -l
 mkdir -p "./src/retorchcostestimationdata/exec$BUILD_NUMBER"
 mkdir -p "./artifacts"
-
+echo "Pulling the Docker Images required by Selenoid (if are not pulled)"
+docker pull selenoid/vnc_chrome:116.0
+docker pull selenoid/video-recorder:latest-release
 echo "Pulling the Docker Images requirede by the Test suite"
 docker pull eexit/mirror-http-server
 docker pull mysql:5.7.21
