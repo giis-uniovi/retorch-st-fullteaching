@@ -45,7 +45,7 @@
         
         <selenium-jupiter.version>4.3.7</selenium-jupiter.version>
         
-        <slf4j.version>2.0.7</slf4j.version>
+        <slf4j.version>2.0.9</slf4j.version>
         
         <junit-jupiter-engine.version>5.10.0</junit-jupiter-engine.version>
         
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.12.0</version>
+            <version>4.12.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
