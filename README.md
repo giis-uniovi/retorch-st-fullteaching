@@ -1,5 +1,5 @@
 [![Build Status](https://github.com/giis-uniovi/retorch-st-fullteaching/actions/workflows/build.yml/badge.svg)](https://github.com/giis-uniovi/retorch-st-fullteaching/actions)
-
+test
 # RETORCH FullTeaching End-to-End Test Suite
 
 This repo contains a detached fork of 
