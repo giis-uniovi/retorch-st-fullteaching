@@ -43,7 +43,7 @@
         
         <junit.platform.version>1.0.0</junit.platform.version>
         
-        <selenium-jupiter.version>4.3.7</selenium-jupiter.version>
+        <selenium-jupiter.version>5.0.0</selenium-jupiter.version>
         
         <slf4j.version>2.0.9</slf4j.version>
         
@@ -53,11 +53,11 @@
         
         <junit.version>4.13.2</junit.version>
         
-        <webdrivermanager.version>5.5.3</webdrivermanager.version>
+        <webdrivermanager.version>5.6.0</webdrivermanager.version>
         
         <retorch.version>1.1.0</retorch.version>
         
-        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
         
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.14.1</version>
+            <version>4.15.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -302,7 +302,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
