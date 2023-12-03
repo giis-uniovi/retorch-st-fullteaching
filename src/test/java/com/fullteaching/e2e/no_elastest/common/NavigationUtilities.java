@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 
 import java.util.List;
 
-import static com.fullteaching.e2e.no_elastest.common.Constants.COURSES_BUTTON;
-import static com.fullteaching.e2e.no_elastest.common.Constants.COURSES_DASHBOARD_TITLE;
+import static com.fullteaching.e2e.no_elastest.common.BaseLoggedTest.HOST;
+import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -19,17 +19,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class NavigationUtilities {
     final static Logger log = getLogger(lookup().lookupClass());
 
-    public static boolean amINotHere(WebDriver wd, String url) {//9lines
-        log.info("Checking if the browser its in the URL: {}", url);
+    public static boolean amINotHere(WebDriver wd, String url) {
+        log.info("Checking if the browser is in the URL: {}", url);
         String currentUrl = wd.getCurrentUrl().trim();
-        log.debug("The current url is: {}", currentUrl);
-        String compareUrl = url;
-        if (currentUrl.endsWith("/") && !compareUrl.trim().endsWith("/")) {
-            compareUrl = compareUrl.trim() + "/";
-        }
-        if (!currentUrl.endsWith("/") && compareUrl.trim().endsWith("/")) {
+        log.debug("The current URL is: {}", currentUrl);
+        String compareUrl = url.trim();
 
-            compareUrl = compareUrl.substring(0, compareUrl.length() - 2);
+        if (currentUrl.endsWith("/") && !compareUrl.endsWith("/")) {
+            compareUrl += "/";
+        } else if (!currentUrl.endsWith("/") && compareUrl.endsWith("/")) {
+            compareUrl = compareUrl.substring(0, compareUrl.length() - 1);
         }
 
         return (!currentUrl.equals(compareUrl));
@@ -51,12 +50,17 @@ public class NavigationUtilities {
     }
 
     public static WebDriver toCoursesHome(WebDriver wd) throws ElementNotFoundException { //3lines
-        log.debug("Waiting for the element COURSES BUTTON");
-        Wait.aLittle(wd).until(ExpectedConditions.presenceOfElementLocated(COURSES_BUTTON));
-        log.info("Click into the CoursesButton");
-        Click.element(wd, COURSES_BUTTON);
-        Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(COURSES_DASHBOARD_TITLE));
-        log.debug("Waiting for the element COURSE_DASHBOARD_TITLE");
+        if (NavigationUtilities.amINotHere(wd, COURSES_URL.replace("__HOST__", HOST))) {
+            log.debug("Waiting for the element COURSES BUTTON");
+            Wait.aLittle(wd).until(ExpectedConditions.presenceOfElementLocated(COURSES_BUTTON));
+            log.info("Click into the CoursesButton");
+            Click.element(wd, COURSES_BUTTON);
+            Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(COURSES_DASHBOARD_TITLE));
+            log.debug("Waiting for the element COURSE_DASHBOARD_TITLE");
+        }
+        else{
+            log.debug("The user was in the Course Tab");
+        }
         return wd;
     }
 

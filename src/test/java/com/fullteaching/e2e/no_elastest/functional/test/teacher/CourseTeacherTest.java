@@ -26,17 +26,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
+import static com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities.checkIfCourseExists;
 import static org.junit.jupiter.api.Assertions.*;
-
 
 @ExtendWith(SeleniumJupiter.class)
 class CourseTeacherTest extends BaseLoggedTest {
 
-
     public static Stream<Arguments> data() throws IOException {
         return ParameterLoader.getTestTeachers();
     }
-
 
     /**
      * This test get the login the user, go  the courses and select the default
@@ -52,12 +50,11 @@ class CourseTeacherTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     void teacherCourseMainTest(String mail, String password, String role) {//39+80+ 28 set up +13 lines teardown =160
-        String courseName = properties.getProperty("forum.test.course");
         this.slowLogin(user, mail, password);
         try {
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST)))//9 lines
-                NavigationUtilities.toCoursesHome(driver); //4lines
-            WebElement course_button = Wait.notTooMuch(driver).until(ExpectedConditions.presenceOfElementLocated(By.xpath(FIRST_COURSE_XPATH)));
+
+            NavigationUtilities.toCoursesHome(driver); //4lines
+            Wait.notTooMuch(driver).until(ExpectedConditions.presenceOfElementLocated(By.xpath(FIRST_COURSE_XPATH)));
             Click.element(driver, By.xpath(FIRST_COURSE_XPATH));
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
         } catch (Exception e) {
@@ -107,41 +104,28 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "DYNAMIC")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {//58+93+28 set up +13 lines teardown =192
-        this.slowLogin(user, mail, password); //24 lines
-        boolean found = false;
-        int numberOfCourses = 0;
-        try {
-            // navigate to course tab if not there
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) //9lines
-                NavigationUtilities.toCoursesHome(driver); //3lines
-        } catch (Exception e) {
-            fail("Failed to go to Courses " + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        try {
-            //Count number of courses
-            WebElement courses_list = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
-            //find the newly create course
-            List<WebElement> courses = courses_list.findElements(By.tagName("li"));
-            numberOfCourses = courses.size();
+    void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {
+        // Setup
+        this.slowLogin(user, mail, password);
 
-        } catch (Exception e) {
-            fail("Not possible get the number of courses " + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        course_title = "Test Course_" + System.currentTimeMillis();
+        // Create a new course
+        String courseTitle = "Test Course_" + System.currentTimeMillis();
+        CourseNavigationUtilities.newCourse(user.getDriver(), courseTitle);
 
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, course_title);
-        user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.cssSelector("#course-list .course-list-item"),
-                numberOfCourses + 1), "Unexpected number of courses");
-        assertTrue(CourseNavigationUtilities.checkIfCourseExists(user.getDriver(), course_title), "The course title hasn't been found in the list ¿Have been created?");
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), course_title, HOST);
-        user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.cssSelector("#course-list .course-list-item"),
-                numberOfCourses), "Unexpected number of courses");
-        assertFalse(CourseNavigationUtilities.checkIfCourseExists(user.getDriver(), course_title), "the course still exists");//15lines
-        //Return to the mainpage
+        // Verify the course has been created
+        assertTrue(checkIfCourseExists(driver, courseTitle));
+
+        // Delete the course
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), courseTitle);
+
+        // Verify the course has been deleted
+        assertFalse(checkIfCourseExists(driver, courseTitle));
+
+        // Teardown
         user.getDriver().get(APP_URL);
-        //Well done!!!
     }
+
+
 
     /**
      * This test get the login the user, go to the courses  and in first place, edits the
@@ -164,10 +148,8 @@ class CourseTeacherTest extends BaseLoggedTest {
         String courseName = properties.getProperty("forum.test.course");
         this.slowLogin(user, mail, password); //24 lines
         try {
-
             // navigate to course if not there
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST)))//9lines
-                NavigationUtilities.toCoursesHome(driver);//3lines
+            NavigationUtilities.toCoursesHome(driver);//3lines
         } catch (Exception e) {
             fail("Failed to go to Courses " + e.getClass() + ": " + e.getLocalizedMessage());
         }
@@ -176,7 +158,7 @@ class CourseTeacherTest extends BaseLoggedTest {
         //Modify name
 
         try {
-            WebElement course = CourseNavigationUtilities.getCourseElement(driver, courseName); //14lines
+            WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName); //14lines
             String old_name = course.findElement(By.className("title")).getText();
 
             String edition_name = "EDITION TEST_" + System.currentTimeMillis();
@@ -184,18 +166,18 @@ class CourseTeacherTest extends BaseLoggedTest {
             driver = CourseNavigationUtilities.changeCourseName(driver, old_name, edition_name);//21 lines
             //check if course exists
             log.info("Checking if course exists");
-            assertTrue(CourseNavigationUtilities.checkIfCourseExists(driver, edition_name, 3), "The course title hasn't been found in the list ¿Have been created?");//10 lines
+            assertTrue(checkIfCourseExists(driver, edition_name, 3), "The course title hasn't been found in the list ¿Have been created?");//10 lines
             //return to old name
             log.info("Rolling back to old name");
             driver = CourseNavigationUtilities.changeCourseName(driver, edition_name, old_name); //21 lines
-            assertTrue(CourseNavigationUtilities.checkIfCourseExists(driver, old_name, 3), "The course title hasn't been reset"); //10 lines
+            assertTrue(checkIfCourseExists(driver, old_name, 3), "The course title hasn't been reset"); //10 lines
         } catch (Exception e) {
             fail("Failed to edit course name " + e.getClass() + ": " + e.getLocalizedMessage());
         }
         //Go to details and edit them
         try {//*[@id="sticky-footer-div"]/com.fullteaching.e2e.no_elastest.main/app-dashboard/div/div[3]/div/div[1]/ul/li[1]/div/div[2]
             log.info("Going to details and edit them");
-            WebElement course = CourseNavigationUtilities.getCourseElement(driver, courseName);//14 lines
+            WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14 lines
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
         } catch (Exception e) {
@@ -301,7 +283,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             log.info("Checking attenders tab");
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(ATTENDERS_ICON));
             CourseNavigationUtilities.go2Tab(driver, ATTENDERS_ICON); // 4lines
-            WebElement attenders_tab_content = CourseNavigationUtilities.getTabContent(driver, ATTENDERS_ICON);
+            CourseNavigationUtilities.getTabContent(driver, ATTENDERS_ICON);
             log.info("Checking if the user is in attenders");
             //is user in attenders?
             assertTrue(CourseNavigationUtilities.isUserInAttendersList(driver, userName), "User isn't in the attenders list"); //15 lines
@@ -332,8 +314,7 @@ class CourseTeacherTest extends BaseLoggedTest {
         String courseName = "Test Course_" + System.currentTimeMillis();
         // navigate to course if not there
         try {
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST)))//9 lines
-                NavigationUtilities.toCoursesHome(driver);//3lines
+            NavigationUtilities.toCoursesHome(driver);//3lines
         } catch (Exception e) {
             fail("Failed to go to Courses " + e.getClass() + ": " + e.getLocalizedMessage());
         }
@@ -342,7 +323,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             log.info("Create a new \"Dummy Course\"");
             Wait.waitForPageLoaded(driver);
 
-            CourseNavigationUtilities.newCourse(driver, HOST, courseName);//37 lines
+            CourseNavigationUtilities.newCourse(driver, courseName);//37 lines
         } catch (ElementNotFoundException e) {
             fail("Failed to create course:: " + e.getClass() + ": " + e.getLocalizedMessage());
         }
@@ -353,11 +334,10 @@ class CourseTeacherTest extends BaseLoggedTest {
         // TODO: add attenders
         // delete course
         List<WebElement> allCoursesPriorDeleting = user.getDriver().findElements(By.className("course-list-item"));
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), courseName, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), courseName);
         List<WebElement> allCourses = user.getDriver().findElements(By.className("course-list-item"));
         assertEquals(allCoursesPriorDeleting.size() - 1, allCourses.size());
         //Well done!
     }
-
 
 }

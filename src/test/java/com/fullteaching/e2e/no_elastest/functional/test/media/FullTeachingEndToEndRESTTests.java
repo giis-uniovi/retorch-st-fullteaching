@@ -70,7 +70,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         // Edit course
         this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
         // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, COURSE_NAME); // Add test course //14 lines
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
         log.info("Editing course");
         COURSE_NAME = COURSE_NAME + EDITED;
         List<WebElement> l = user.getDriver().findElements(By.className("course-put-icon"));
@@ -86,7 +86,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
                         By.cssSelector("#course-list .course-list-item:last-child div.course-title span"), COURSE_NAME),
                 "Unexpected course name");
 
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
     @Resource(resID = "LoginService", replaceable = {})
@@ -100,7 +100,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         // Empty course info
         this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
         // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, COURSE_NAME); // Add test course //14 lines
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
         enterCourseAndNavigateTab(COURSE_NAME, "info-tab-icon");//16 lines
         user.waitUntil(ExpectedConditions.presenceOfNestedElementLocatedBy(By.cssSelector(".md-tab-body.md-tab-active"),
                 By.cssSelector(".card-panel.warning")), "Course info wasn't empty");
@@ -114,7 +114,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.textToBe(By.cssSelector(".ql-editor p"), TEST_COURSE_INFO),
                 "Unexpected course info");
         log.info("Course information successfully updated");
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
     @Resource(resID = "LoginService", replaceable = {})
@@ -128,7 +128,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         // Add new session
         this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
         // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, COURSE_NAME); // Add test course //14 lines
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
 
         enterCourseAndNavigateTab(COURSE_NAME, "sessions-tab-icon");//16 lines
         log.info("Adding new session");
@@ -216,7 +216,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.cssSelector("li.session-data"), 0),
                 "Unexpected number of sessions");
         log.info("Session successfully deleted");
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
     @Resource(resID = "LoginService", replaceable = {})
@@ -230,7 +230,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         // Add new entry to the forum
         this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
         // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, COURSE_NAME); // Add test course //14 lines
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
         enterCourseAndNavigateTab(COURSE_NAME, "forum-tab-icon");//16 lines
         log.info("Adding new entry to the forum");
         openDialog("#add-entry-icon", user);//8lines
@@ -291,7 +291,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.cssSelector("app-error-message .card-panel.warning")),
                 "Warning card (forum deactivated) missing");
         log.info("Forum successfully deactivated");
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
     @Resource(resID = "LoginService", replaceable = {})
@@ -304,7 +304,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     void filesRestOperations() throws ElementNotFoundException {//88+112+65 set up +60 lines teardown =325
         this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
         // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, COURSE_NAME); // Add test course //14 lines
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
         enterCourseAndNavigateTab(COURSE_NAME, "files-tab-icon");//16 lines
         log.info("Checking that there are no files in the course");
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.cssSelector("app-error-message .card-panel.warning")),
@@ -394,7 +394,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.cssSelector("app-error-message .card-panel.warning")),
                 "Warning card (course with no files) missing");
         log.info("File group successfully deleted");
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
     @Resource(resID = "LoginService", replaceable = {})
@@ -407,7 +407,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     void attendersRestOperations() throws ElementNotFoundException {//42+32+65 set up +60 lines teardown =199
         this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
         // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), HOST, COURSE_NAME); // Add test course //14 lines
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
         enterCourseAndNavigateTab(COURSE_NAME, "attenders-tab-icon");//16 lines
         log.info("Checking that there is only one attender to the course");
         user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.className("attender-row-div"), 1),
@@ -451,7 +451,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.className("attender-row-div"), 1),
                 "Unexpected number of attenders for the course");
         log.info("Attender successfully removed");
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME, HOST);
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
     /*** Auxiliary methods ***/

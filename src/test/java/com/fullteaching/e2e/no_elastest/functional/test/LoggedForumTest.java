@@ -75,17 +75,15 @@ class LoggedForumTest extends BaseLoggedTest {
         this.slowLogin(user, mail, password);//24 lines
         try {
             //navigate to courses.
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
-                NavigationUtilities.toCoursesHome(driver);//3lines
-            }
-            List<String> courses = CourseNavigationUtilities.getCoursesList(driver, HOST);//13lines
+            NavigationUtilities.toCoursesHome(driver);//3lines
+            List<String> courses = CourseNavigationUtilities.getCoursesList(driver);//13lines
             assertTrue(courses.size() > 0, "No courses in the list");
             //find course with forum activated
             boolean activated_forum_on_some_test = false;
             boolean has_comments = false;
             for (String course_name : courses) {
                 //go to each of the courses
-                WebElement course = CourseNavigationUtilities.getCourseElement(driver, course_name);//14lines
+                WebElement course = CourseNavigationUtilities.getCourseByName(driver, course_name);//14lines
                 course.findElement(COURSE_LIST_COURSE_TITLE).click();
                 Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
                 log.info("Navigating to the forum and checking if its enabled");
@@ -111,7 +109,7 @@ class LoggedForumTest extends BaseLoggedTest {
                                 has_comments = true;
                                 log.info("Comments found, saving them");
 
-                                List<WebElement> user_comments = ForumNavigationUtilities.getUserComments(driver, userName);//8lines
+                                ForumNavigationUtilities.getUserComments(driver, userName);//8lines
                             }//else go to next entry
                             Click.element(driver, DOMManager.getParent(driver, driver.findElement(BACK_TO_ENTRIES_LIST_ICON)));
                         }
@@ -161,7 +159,7 @@ class LoggedForumTest extends BaseLoggedTest {
             if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
                 NavigationUtilities.toCoursesHome(driver);//3lines
             }
-            WebElement course = CourseNavigationUtilities.getCourseElement(driver, courseName);//14lines
+            WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14lines
             log.info("Entering the course List");
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
 
@@ -231,10 +229,9 @@ class LoggedForumTest extends BaseLoggedTest {
 
         try {
             //check if one course have any entry for comment
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
-                NavigationUtilities.toCoursesHome(driver);//3lines
-            }
-            WebElement course = CourseNavigationUtilities.getCourseElement(driver, courseName);//14 lines
+            NavigationUtilities.toCoursesHome(driver);//3lines
+
+            WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14 lines
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
             CourseNavigationUtilities.go2Tab(driver, FORUM_ICON);//4lines
@@ -327,10 +324,9 @@ class LoggedForumTest extends BaseLoggedTest {
         String newEntryTitle;
         try {
             //check if one course have any entry for comment
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
-                NavigationUtilities.toCoursesHome(driver);//3lines
-            }
-            WebElement course = CourseNavigationUtilities.getCourseElement(driver, courseName);//14 lines
+            NavigationUtilities.toCoursesHome(driver);//3lines
+
+            WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14 lines
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
             CourseNavigationUtilities.go2Tab(driver, FORUM_ICON);//4 lines
@@ -347,7 +343,7 @@ class LoggedForumTest extends BaseLoggedTest {
             }
             //go to entry
             Click.element(driver, entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE));
-            WebElement commentList = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST));
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST));
             List<WebElement> comments = ForumNavigationUtilities.getComments(driver);//2lines
             //go to first comment
             WebElement comment = comments.get(0);
