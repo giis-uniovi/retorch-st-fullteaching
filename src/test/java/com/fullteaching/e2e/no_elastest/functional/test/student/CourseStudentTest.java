@@ -51,13 +51,12 @@ class CourseStudentTest extends BaseLoggedTest {
     void studentCourseMainTest(String userMail, String password, String role) {//45+ 107+28 set up +13 lines teardown =193
         this.slowLogin(user, userMail, password);//24 lines
         try {
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) //9lines
-                NavigationUtilities.toCoursesHome(driver); //3lines
+            NavigationUtilities.toCoursesHome(driver); //3lines
             //go to first course
             //get course list
-            List<String> course_list = CourseNavigationUtilities.getCoursesList(driver, HOST); //13 lines
+            List<String> course_list = CourseNavigationUtilities.getCoursesList(driver); //13 lines
             if (course_list.size() <= 0) fail("No courses available for test user");
-            WebElement course_button = CourseNavigationUtilities.getCourseElement(driver, course_list.get(0)).findElement(By.className("title")); //14 lines
+            WebElement course_button = CourseNavigationUtilities.getCourseByName(driver, course_list.get(0)).findElement(By.className("title")); //14 lines
             Click.element(driver, course_button);
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(COURSE_TABS_TAG)));
         } catch (Exception e) {

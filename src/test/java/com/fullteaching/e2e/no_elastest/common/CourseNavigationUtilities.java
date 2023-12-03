@@ -16,71 +16,48 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class CourseNavigationUtilities {
 
-    public static final Logger log = getLogger(lookup().lookupClass());
+    public static final Logger log = getLogger(CourseNavigationUtilities.class);
 
-    public static String newCourse(WebDriver wd, String host, String courseName) throws ElementNotFoundException { //37 lines
-        boolean found = false;
-        // navigate to course if not there
-        if (NavigationUtilities.amINotHere(wd, COURSES_URL.replace("__HOST__", host))) {
-            NavigationUtilities.toCoursesHome(wd);
-        }
-        List<WebElement> allCoursesPriorDeleting = wd.findElements(By.className("course-list-item"));
-        // press new course button and wait for modal course-modal
-        log.debug("Waiting for the presence of NEW COURSE BUTTON");
-        WebElement new_course_button = Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(NEW_COURSE_BUTTON));
-        log.debug("Click by JS NEW COURSE BUTTON");
-        Click.byJS(wd, new_course_button);
-        log.debug("Waiting for the presence of NEW COURSE MODAL");
+    public static String newCourse(WebDriver wd, String courseName) throws ElementNotFoundException { //37 lines
+        NavigationUtilities.toCoursesHome(wd);
+
+        log.debug("Checking existing courses...");
+        Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(By.className("course-list-item")));
+        WebElement newCourseButton = Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(NEW_COURSE_BUTTON));
+        Click.byJS(wd, newCourseButton);
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL));
 
-        //fill information
-        WebElement name_field = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL_NAME_FIELD));
-
-        log.debug("Sending COURSE TITLE");
-        name_field.sendKeys(courseName); //no duplicated courses
-        log.debug("Waiting for COURSE SAVE BUTTON");
-        Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL_SAVE));
-        log.debug("Click SAVE  BUTTON");
+        log.debug("Introducing Course Name: "+courseName);
+        WebElement nameField = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL_NAME_FIELD));
+        nameField.sendKeys(courseName);
         Click.element(wd, By.id(NEW_COURSE_MODAL_SAVE_ID));
         Wait.waitForPageLoaded(wd);
 
+        checkIfCourseExists(wd, courseName);
 
-        //check if the course appears now in the list
-        WebElement courses_list = Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
-        Wait.waitForPageLoaded(wd);
-        //find the newly create course
-        Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(By.tagName("li")));
-        log.debug("Waiting for more than one course");
-        Wait.notTooMuch(wd).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.tagName("li"), allCoursesPriorDeleting.size()));
-        if (!checkIfCourseExists(wd, courseName)) {
-            log.error("newCourse - Course hasn't been created");
-            throw new ElementNotFoundException("newCourse - Course hasn't been created");
-        }
         return courseName;
     }
 
-    public static boolean checkIfCourseExists(WebDriver wd, String course_title) {
-        WebElement courses_list = Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
-        //find the newly create course
-        log.info("Finding the newly create course");
-        List<WebElement> courses = courses_list.findElements(By.tagName("li"));
-        log.info("Iterating over the courses list");
-        for (WebElement c : courses) {
-            try {
-                WebElement title = c.findElement(By.className("title"));
-                String title_text = title.getText();
+    public static boolean checkIfCourseExists(WebDriver wd, String courseTitle) {
+        WebElement courseList = Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
 
-                if (course_title.equals(title_text)) {
-                    log.info("The course wit title {} exist!", course_title);
+        List<WebElement> courses = courseList.findElements(By.tagName("li"));
+
+        for (WebElement course : courses) {
+            try {
+                WebElement titleElement = course.findElement(By.className("title"));
+                String titleText = titleElement.getText();
+
+                if (courseTitle.equals(titleText)) {
+                    log.info("The course with title {} exists!", courseTitle);
                     return true;
                 }
-            } catch (NoSuchElementException noSuchElementException) {
-                //do nothing and look for the next item
+            } catch (NoSuchElementException ignored) {
+                // Do nothing and look for the next item
             }
         }
         return false;
@@ -100,81 +77,72 @@ public class CourseNavigationUtilities {
         return false;
     }
 
-    public static WebDriver changeCourseName(WebDriver wd, String oldName, String newName) throws ElementNotFoundException {//21lines
+    public static WebDriver changeCourseName(WebDriver wd, String oldName, String newName) throws ElementNotFoundException {
         log.info("[INI] changeCourseName({}=>{})", oldName, newName);
-
-        Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
         try {
-            //find the course
+            Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
             log.info("Looking for the course");
-            WebElement c = getCourseElement(wd, oldName);
-            WebElement edit_name_button = c.findElement(EDIT_COURSE_BUTTON);
-            Click.element(wd, edit_name_button);
-            log.info("Waiting for edit modal");
-            //wait for edit modal
-            Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_DELETE_MODAL));
-            //change name
+            WebElement courseSelected = getCourseByName(wd, oldName);
+
+            openEditCourseModal(wd, courseSelected);
+
             log.info("Changing the course Name");
-            WebElement name_field = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_MODAL_NAME_FIELD));
-            name_field.clear();
-            name_field.sendKeys(newName);
-            log.info("Click save button");
-            //save
-            wd = Click.element(wd, EDIT_COURSE_MODAL_SAVE);
+            WebElement nameField = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_MODAL_NAME_FIELD));
+            nameField.clear();
+            nameField.sendKeys(newName);
+
+            saveChanges(wd);
+
         } catch (NoSuchElementException noSuchElementException) {
-            log.info("[END] changeCourseName KO: changeCourseName - Course \"{}\" probably doesn't exists", oldName);
-            throw new ElementNotFoundException("changeCourseName - Course " + oldName + "probably doesn't exists");
+            log.info("[END] changeCourseName KO: Course \"{}\" probably doesn't exist", oldName);
+            throw new ElementNotFoundException("changeCourseName - Course " + oldName + " probably doesn't exist");
         }
+
         log.info("[END] changeCourseName OK");
         return wd;
     }
+    private static void openEditCourseModal(WebDriver wd, WebElement courseElement) throws ElementNotFoundException {
+        WebElement editNameButton = courseElement.findElement(EDIT_COURSE_BUTTON);
+        Click.element(wd, editNameButton);
+        Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_DELETE_MODAL));
+    }
 
-    public static void deleteCourse(WebDriver wd, String course_name, String host) throws ElementNotFoundException {
-        log.info("[INI] deleteCourse({})", course_name);
-        if (NavigationUtilities.amINotHere(wd, COURSES_URL.replace("__HOST__", host))) {
-            NavigationUtilities.toCoursesHome(wd);
-        }
+    private static void saveChanges(WebDriver wd) throws ElementNotFoundException {
+        log.debug("Click save button, saving changes...");
+        Click.element(wd, EDIT_COURSE_MODAL_SAVE);
+    }
 
+    public static void deleteCourse(WebDriver wd, String courseName) throws ElementNotFoundException {
+        log.info("[INI] deleteCourse({})", courseName);
+
+        NavigationUtilities.toCoursesHome(wd);
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
 
         try {
+            WebElement courseElement = getCourseByName(wd, courseName);
+            openEditCourseModal(wd, courseElement);
 
-            //find the course
-
-            WebElement c = getCourseElement(wd, course_name);
-
-            WebElement edit_name_button = c.findElement(EDIT_COURSE_BUTTON);
-
-            Click.element(wd, edit_name_button);
-
-            //wait for edit modal
-            Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_DELETE_MODAL));
             log.info("Enabling delete course");
-            //Allow deleting
-            WebElement delete_check = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_DELETE_CHECK));
-            Click.element(wd, delete_check);
+            WebElement deleteCheck = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_DELETE_CHECK));
+            Click.element(wd, deleteCheck);
+
             log.info("Click delete Course");
-            //press delete
-            WebElement delete_button = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_DELETE_BUTTON));
-            Click.element(wd, delete_button);
-            log.info("Save changes");
-            //save
-            Click.element(wd, EDIT_COURSE_MODAL_SAVE);
+            WebElement deleteButton = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_DELETE_BUTTON));
+            Click.element(wd, deleteButton);
 
-        } catch (NoSuchElementException noSuchElementException) {
-            log.info("[END] deleteCourse KO: changeCourseName - Course \"{}\" probably doesn't exists", course_name);
-            throw new ElementNotFoundException("changeCourseName - Course " + course_name + "probably doesn't exists");
+            saveChanges(wd);
+
+        } catch (NoSuchElementException e) {
+            log.error("[END] deleteCourse KO: Course \"{}\" probably doesn't exist", courseName);
+            throw new ElementNotFoundException("deleteCourse - Course " + courseName + " probably doesn't exist");
         }
-        log.info("[END] deleteCourse OK: changeCourseName - Course \"{}\" ", course_name);
 
+        log.info("[END] deleteCourse OK: Course \"{}\"", courseName);
     }
 
-
-    public static List<String> getCoursesList(WebDriver wd, String host) throws ElementNotFoundException {//13 lines
+    public static List<String> getCoursesList(WebDriver wd) throws ElementNotFoundException {//13 lines
         ArrayList<String> courses_names = new ArrayList<>();
-        if (NavigationUtilities.amINotHere(wd, COURSES_URL.replace("__HOST__", host))) {
-            NavigationUtilities.toCoursesHome(wd);
-        }
+        NavigationUtilities.toCoursesHome(wd);
         WebElement courses_list = Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(COURSE_LIST));
         List<WebElement> courses = courses_list.findElements(By.tagName("li"));
         for (WebElement c : courses) {
@@ -186,42 +154,32 @@ public class CourseNavigationUtilities {
                 //do nothing and look for the next item
             }
         }
-
         return courses_names;
-
     }
-   /* public static WebDriver removeTestCourseIfExist(WebDriver wd, String host) throws ElementNotFoundException {//13 lines
-        List<String > courses= getCoursesList(wd,  host);
-        if courses.get(courses.s)
 
-        return wd;
+    public static WebElement getCourseByName(WebDriver wd, String name) throws ElementNotFoundException { //14 lines
+        log.info("Finding the newly created course");
+        WebElement coursesList = Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(COURSE_LIST));
 
-    }*/
-
-
-    public static WebElement getCourseElement(WebDriver wd, String name) throws ElementNotFoundException { //14 lines
-        log.info("Finding the newly create course");
-        WebElement courses_list = Wait.notTooMuch(wd).until(ExpectedConditions.presenceOfElementLocated(COURSE_LIST));
-        //find the newly create course
-        List<WebElement> courses = courses_list.findElements(By.tagName("li"));
+        List<WebElement> courses = coursesList.findElements(By.tagName("li"));
         log.info("Iterating over the course lists");
-        for (WebElement c : courses) {
+
+        for (WebElement course : courses) {
             try {
-                WebElement title = c.findElement(By.className("title"));
-                String title_text = title.getText();
-                if (name.equals(title_text)) {
-                    log.info("Course with title {} found!", title_text);
-                    return c;
+                WebElement title = course.findElement(By.className("title"));
+                String titleText = title.getText();
+                if (name.equals(titleText)) {
+                    log.info("Course with title {} found!", titleText);
+                    return course;
                 }
             } catch (NoSuchElementException noSuchElementException) {
-                //do nothing and look for the next item
+                // Do nothing and look for the next item
             }
         }
-        throw new ElementNotFoundException("getCourseElement-the course doesn't exist");
+        throw new ElementNotFoundException("getCourseElement - the course doesn't exist");
     }
 
     public static WebDriver go2Tab(WebDriver wd, By icon) throws ElementNotFoundException { //4lines
-
         WebElement tab = getTabElementFromIcon(wd, icon);
         String id = tab.getAttribute("id");
         log.info("Navigating to tab with id: {}", id);
@@ -229,11 +187,9 @@ public class CourseNavigationUtilities {
         id = id.replace("label", "content");
         Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
         return wd;
-
     }
 
     public static String getTabId(WebDriver wd, By icon) {
-
         WebElement tab = getTabElementFromIcon(wd, icon);
         return tab.getAttribute("id");
     }

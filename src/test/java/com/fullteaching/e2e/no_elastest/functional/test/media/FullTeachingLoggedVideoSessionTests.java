@@ -35,7 +35,6 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
 
 
     final static Logger log = getLogger(lookup().lookupClass());
-    protected final String host = LOCALHOST;
     public String users_data;
     public String courseName;
     //1 teacher
@@ -90,10 +89,10 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         String sessionHour = "" + (mHour < 10 ? "0" + mHour : mHour) + (mMinute < 10 ? "0" + mMinute : mMinute) + (mAMPM == Calendar.AM ? "A" : "P");
         String sessionName = "Today's Session";
         try {
-            List<String> courses = CourseNavigationUtilities.getCoursesList(user.getDriver(), host); //13 lines
+            List<String> courses = CourseNavigationUtilities.getCoursesList(user.getDriver()); //13 lines
             assertTrue(courses.size() > 0, "No courses in the list");
             //Teacher go to Course and create a new session to join
-            WebElement course = CourseNavigationUtilities.getCourseElement(user.getDriver(), courseName); //14 lines
+            WebElement course = CourseNavigationUtilities.getCourseByName(user.getDriver(), courseName); //14 lines
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
             Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
             CourseNavigationUtilities.go2Tab(user.getDriver(), SESSION_ICON); //4 lines
@@ -125,13 +124,11 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
 
             for (BrowserUser student_d : studentDriver) {
                 WebDriver studentDriver = student_d.getDriver();
-                if (NavigationUtilities.amINotHere(studentDriver, COURSES_URL.replace("__HOST__", host))) {
-                    NavigationUtilities.toCoursesHome(studentDriver); //3lines
-                }
-                courses = CourseNavigationUtilities.getCoursesList(studentDriver, host);//13 lines
+                NavigationUtilities.toCoursesHome(studentDriver); //3lines
+                courses = CourseNavigationUtilities.getCoursesList(studentDriver);//13 lines
                 assertTrue(courses.size() > 0, "No courses in the list");
                 //Teacher go to Course and create a new session to join
-                course = CourseNavigationUtilities.getCourseElement(studentDriver, courseName); //14 lines
+                course = CourseNavigationUtilities.getCourseByName(studentDriver, courseName); //14 lines
                 course.findElement(COURSE_LIST_COURSE_TITLE).click();
                 Wait.notTooMuch(studentDriver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
                 CourseNavigationUtilities.go2Tab(studentDriver, SESSION_ICON);//4lines

@@ -21,17 +21,6 @@ public class SetUp {
 
     final static Logger log = getLogger(lookup().lookupClass());
 
-    protected static String host = LOCALHOST;
-
-    public static String getHost() {
-        String appHost = getProperty("fullTeachingUrl");
-        if (appHost != null) {
-            host = appHost;
-        }
-        return host;
-    }
-
-
     public static void tearDown(WebDriver driver) {
         if (driver != null) {
             log.info("url:" + driver.getCurrentUrl() + "\nScreenshot (in Base64) at the end of the test:\n{}",
@@ -64,7 +53,7 @@ public class SetUp {
 
     public static String cleanEmptyCourse(WebDriver driver) throws ElementNotFoundException {
         String course_title = "Test Course_" + System.currentTimeMillis();
-        return CourseNavigationUtilities.newCourse(driver, host, course_title);
+        return CourseNavigationUtilities.newCourse(driver, course_title);
 
     }
 }
