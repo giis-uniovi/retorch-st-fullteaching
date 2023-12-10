@@ -7,7 +7,7 @@ import org.openqa.selenium.Keys;
 public final class Constants {
     public static final int WAIT_SECONDS = 150;
     public static final String LOCALHOST = "https://localhost:5000";
-    public static final String PORT = "11811";
+    public static String PORT = "11811";
     public static final String STUDENT_NAME = "Student Imprudent";
     public static final String TEACHER_NAME = "Teacher Cheater";
 

@@ -61,15 +61,11 @@ public class ChromeUser extends BrowserUser {
             options.addArguments(argument);
         }
 
-        String eusApiURL = System.getenv("ET_EUS_API");
-
-        log.debug("The URL its ({})", eusApiURL);
-
         options.setAcceptInsecureCerts(true);
         //This capability is to store the logs of the test case
         log.debug("Added Capabilities of acceptInsecureCerts and ignore alarms");
 
-        if (eusApiURL == null) {
+        if (System.getenv("SELENOID_PRESENT") == null) {
             log.info("Using the Local WebDriver ()");
             this.driver = new ChromeDriver(options);
         } else {
@@ -102,7 +98,7 @@ public class ChromeUser extends BrowserUser {
 
                 //END CAPABILITIES FOR SELENOID RETORCH
                 log.debug("Configuring the remote WebDriver ");
-                RemoteWebDriver remote = new RemoteWebDriver(new URL(eusApiURL), options);
+                RemoteWebDriver remote = new RemoteWebDriver(new URL("http://selenoid:4444/wd/hub"), options);
                 log.debug("Configuring the Local File Detector");
                 remote.setFileDetector(new LocalFileDetector());
                 this.driver = remote;
