@@ -6,6 +6,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class SetUp {
 
-    final static Logger log = getLogger(lookup().lookupClass());
+    private static final Logger log = LoggerFactory.getLogger(SetUp.class);
 
     public static void tearDown(WebDriver driver) {
         if (driver != null) {

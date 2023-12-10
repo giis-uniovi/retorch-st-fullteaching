@@ -157,7 +157,7 @@ stage('TEARDOWN-Infrastructure') {
  post { 
       always {
           archiveArtifacts artifacts: 'artifacts/*.csv', onlyIfSuccessful: true
-          //archiveArtifacts artifacts: 'target/testlogs/**/*.*', onlyIfSuccessful: false //COMMENTED UNTIL LOGS IMPROVED
+          archiveArtifacts artifacts: 'target/testlogs/**/*.*', onlyIfSuccessful: false
           archiveArtifacts artifacts: 'target/containerlogs/**/*.*', onlyIfSuccessful: false
       }//EndAlways
  }//EndPostActions

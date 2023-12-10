@@ -25,11 +25,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 class UnLoggedLinksTests extends BaseLoggedTest {
 
-    protected final static int DEPTH = 3;
-
-    final static Logger log = getLogger(lookup().lookupClass());
-
-
     public UnLoggedLinksTests() {
         super();
     }
@@ -37,7 +32,6 @@ class UnLoggedLinksTests extends BaseLoggedTest {
     public static Stream<Arguments> data() throws IOException {
         return ParameterLoader.getTestUsers();
     }
-
 
     @ParameterizedTest
     @MethodSource("data")

@@ -2,6 +2,7 @@ package com.fullteaching.e2e.no_elastest.utils;
 
 import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -13,7 +14,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class ParameterLoader {
 
-    protected static final Logger log = getLogger(lookup().lookupClass());
+    private static final Logger log = LoggerFactory.getLogger(ParameterLoader.class);
 
     public static Stream<Arguments> getTestUsers() throws IOException {
         //Be careful! Don't change it despite the analyzer recommends that!

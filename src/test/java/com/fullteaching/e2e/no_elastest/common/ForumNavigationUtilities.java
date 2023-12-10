@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class ForumNavigationUtilities {
-    final static Logger log = getLogger(lookup().lookupClass());
+    private static final Logger log = LoggerFactory.getLogger(ForumNavigationUtilities.class);
 
     public static boolean isForumEnabled(WebElement forumTabContent) { //6lines
         log.info("Checking if the forum is enabled");

@@ -8,13 +8,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class Click {
 
-    public static final Logger log = getLogger(lookup().lookupClass());
+    private static final Logger log = LoggerFactory.getLogger(Click.class);
 
     public static WebDriver here(WebDriver wd, int x, int y) {
         Actions builder = new Actions(wd);

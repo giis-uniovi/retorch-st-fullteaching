@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class CourseNavigationUtilities {
 
-    public static final Logger log = getLogger(CourseNavigationUtilities.class);
+    private static final Logger log = LoggerFactory.getLogger(CourseNavigationUtilities.class);
 
     public static String newCourse(WebDriver wd, String courseName) throws ElementNotFoundException { //37 lines
         NavigationUtilities.toCoursesHome(wd);

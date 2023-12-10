@@ -16,6 +16,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class BaseLoggedTest {
     //protected static final String host= SetUp.getHost();
     public static final String FIREFOX = "firefox";
     public static final String EDGE = "edge";
-    protected final static Logger log = getLogger(lookup().lookupClass());
+    public static final Logger log = LoggerFactory.getLogger(BaseLoggedTest.class);
     protected static final Class<? extends WebDriver> chrome = ChromeDriver.class;
     protected static final Class<? extends WebDriver> firefox = FirefoxDriver.class;
     public static String TEACHER_BROWSER;
@@ -48,6 +49,7 @@ public class BaseLoggedTest {
     protected static Properties properties;
     protected static String TEST_NAME = "DEFAULT";
     protected static String TJOB_NAME = "TJobDef";
+    protected final static int DEPTH = 3;
 
     public WebDriver driver;
     protected BrowserUser user;

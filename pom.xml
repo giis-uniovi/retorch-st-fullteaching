@@ -44,9 +44,7 @@
         <junit.platform.version>1.0.0</junit.platform.version>
         
         <selenium-jupiter.version>5.0.0</selenium-jupiter.version>
-        
-        <slf4j.version>2.0.9</slf4j.version>
-        
+
         <junit-jupiter-engine.version>5.10.1</junit-jupiter-engine.version>
         
         <junit-jupiter-params.version>5.10.1</junit-jupiter-params.version>
@@ -60,7 +58,11 @@
         <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
         
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        
+
+        <slf4j-api.version>2.0.9</slf4j-api.version>
+
+        <log4j-slf4j2-impl.version>2.22.0</log4j-slf4j2-impl.version>
+
         <!-- Plugins Jacoco -->
         <jacoco.version>0.8.11</jacoco.version>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -114,7 +116,6 @@
             <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -127,32 +128,23 @@
             <version>${selenium-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>${webdrivermanager.version}</version>
             <scope>test</scope>
         </dependency>
-
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>test</scope>
+            <version>${slf4j-api.version}</version>
         </dependency>
-        <!-- Solution for error: https://examples.javacodegeeks.com/solving-slf4j-failed-load-class-org-slf4j-impl-staticloggerbinder/
-         SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".-->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j-slf4j2-impl.version}</version>
             <scope>test</scope>
         </dependency>
-
-
         <!-- RETORCH DEPENDENCY-->
         <dependency>
             <groupId>io.github.giis-uniovi</groupId>
