@@ -27,7 +27,6 @@ import static java.lang.invoke.MethodHandles.lookup;
 import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
-
 public class BaseLoggedTest {
 
     public static final String CHROME = "chrome";
@@ -50,47 +49,60 @@ public class BaseLoggedTest {
     protected static String TEST_NAME = "DEFAULT";
     protected static String TJOB_NAME = "TJobDef";
 
-
     public WebDriver driver;
     protected BrowserUser user;
-
 
     public BaseLoggedTest() {
     }
 
-    @BeforeAll()
-    static void setupAll() { //28 lines
+    @BeforeAll
+    static void setupAll() { // 28 lines
+        // Initialize properties
         properties = new Properties();
+
         try {
-            // load a properties file for reading
+            // Load a properties file for reading
             properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(); // Consider logging the exception instead of printing the stack trace
         }
+
+        // Check if running outside ElasTest
         if (System.getenv("ET_EUS_API") == null) {
-            // Outside ElasTest
+            // Setup drivers for Chrome and Firefox
             ChromeDriverManager.getInstance(chrome).setup();
             FirefoxDriverManager.getInstance(firefox).setup();
         }
-        if (System.getenv("ET_SUT_HOST") != null) {
-            APP_URL = "https://" + System.getenv("ET_SUT_HOST") + ":" + PORT + "/";
+
+        String envUrl = System.getProperty("SUT_URL");
+        String envPort = System.getProperty("SUT_PORT");
+        String envTJobName = System.getProperty("tjob_name");
+        log.debug("Using URL {} PORT: {} TJOB: {}", envUrl, envPort, envTJobName);
+        // Check if SUT_URL is defined in the environment variables
+        if ((envUrl != null) & (envPort != null)) {
+            TJOB_NAME = envTJobName;
+            PORT = envPort;
+            APP_URL = envUrl + TJOB_NAME + ":" + PORT + "/";
+            log.debug("The URL is" + APP_URL);
             HOST = APP_URL;
         } else {
-            APP_URL = System.getProperty("app.url");
-            if (APP_URL == null) {
-                APP_URL = LOCALHOST;
-            } else {
+            // Check if app.url system property is defined
+            APP_URL = System.getProperty("app.url", LOCALHOST);
+
+            // Set HOST if APP_URL is not null
+            if (APP_URL != null) {
                 HOST = APP_URL;
             }
         }
+
+        // Set browser types for teacher and student
         TEACHER_BROWSER = System.getenv("TEACHER_BROWSER");
         STUDENT_BROWSER = System.getenv("STUDENT_BROWSER");
-        if ((TEACHER_BROWSER == null) || (!TEACHER_BROWSER.equals(FIREFOX))) {
-            TEACHER_BROWSER = CHROME;
-        }
-        if ((STUDENT_BROWSER == null) || (!STUDENT_BROWSER.equals(FIREFOX))) {
-            STUDENT_BROWSER = CHROME;
-        }
+
+        // Default to Chrome if browser types are not defined or are not Firefox
+        TEACHER_BROWSER = (TEACHER_BROWSER == null || !TEACHER_BROWSER.equals(FIREFOX)) ? CHROME : TEACHER_BROWSER;
+        STUDENT_BROWSER = (STUDENT_BROWSER == null || !STUDENT_BROWSER.equals(FIREFOX)) ? CHROME : STUDENT_BROWSER;
+
         log.info("Using URL {} to connect to OpenVidu-app", APP_URL);
     }
 
@@ -111,7 +123,6 @@ public class BaseLoggedTest {
         BrowserUser u;
         log.info("Starting browser ({})", browser);
 
-
         switch (browser) {
             case FIREFOX:
                 BROWSER_NAME = FIREFOX;
@@ -123,7 +134,6 @@ public class BaseLoggedTest {
                 u = new EdgeUser(userIdentifier, secondsOfWait, testName,
                         userIdentifier);
                 break;
-
 
             default:
                 BROWSER_NAME = CHROME;
@@ -164,7 +174,6 @@ public class BaseLoggedTest {
             user.dispose();
         }
     }
-
 
     protected void slowLogin(BrowserUser user, String userEmail,
                              String userPass) {//24 lines
@@ -267,7 +276,6 @@ public class BaseLoggedTest {
         }
         user.setOnSession(false);
         log.info("Logging out successful for {}", user.getClientData());
-
 
     }
 

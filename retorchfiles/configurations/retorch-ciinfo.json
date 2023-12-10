@@ -1,0 +1,10 @@
+{
+  "agentCIName": "xretorch-agent",
+  "sut-wait-html": "<title>FullTeaching</title>",
+  "sut-location": "$WORKSPACE",
+  "docker-frontend-name": "https://full-teaching-",
+  "docker-frontend-port": "5000",
+  "external-binded-port": "",
+  "external-frontend-url": ""
+
+}
