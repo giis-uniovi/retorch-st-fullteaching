@@ -28,8 +28,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 @ExtendWith(SeleniumJupiter.class)
 class LoggedLinksTests extends BaseLoggedTest {
 
-    protected final static int DEPTH = 3;
-    final static Logger log = getLogger(lookup().lookupClass());
 
 
     public LoggedLinksTests() {

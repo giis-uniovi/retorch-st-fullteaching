@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class NavigationUtilities {
-    final static Logger log = getLogger(lookup().lookupClass());
+    private static final Logger log = LoggerFactory.getLogger(NavigationUtilities.class);
 
     public static boolean amINotHere(WebDriver wd, String url) {
         log.info("Checking if the browser is in the URL: {}", url);

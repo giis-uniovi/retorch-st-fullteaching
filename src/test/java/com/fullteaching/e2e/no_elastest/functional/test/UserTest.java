@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 @ExtendWith(SeleniumJupiter.class)
 class UserTest extends BaseLoggedTest {
 
-
     public static Stream<Arguments> data() throws IOException {
         return ParameterLoader.getTestUsers();
     }

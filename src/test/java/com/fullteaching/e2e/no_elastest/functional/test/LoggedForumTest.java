@@ -39,9 +39,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Tag("e2e")
 @DisplayName("E2E tests for FullTeaching Login Session")
 class LoggedForumTest extends BaseLoggedTest {
-
-
-    final static Logger log = getLogger(lookup().lookupClass());
     protected final String courseName = "Pseudoscientific course for treating the evil eye";
     protected final String[] months = {"January", "February", "March", "April",
             "May", "June", "July", "August", "September",
