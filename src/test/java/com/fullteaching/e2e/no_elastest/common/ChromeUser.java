@@ -76,16 +76,16 @@ public class ChromeUser extends BrowserUser {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
                 log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
 
-                selenoidOptions.put("testName", testName + "_" + userIdentifier + "_" + format.format(new Date()));
+                selenoidOptions.put("testName", testName + "-" + userIdentifier + "-" + format.format(new Date()));
                 //CAPABILITIES FOR SELENOID RETORCH
                 selenoidOptions.put("enableVideo", true);
                 selenoidOptions.put("enableVNC", true);
-                selenoidOptions.put("name", testName + "_" + userIdentifier);
+                selenoidOptions.put("name", testName + "-" + userIdentifier);
 
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
                 LocalDateTime now = LocalDateTime.now();
                 String logName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
-                String videoName = dtf.format(now) + "_" + testName + "_" + userIdentifier + ".mp4";
+                String videoName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".mp4";
                 log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
 
                 selenoidOptions.put("enableLog", true);
