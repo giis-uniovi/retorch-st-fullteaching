@@ -5,6 +5,7 @@ updates:
     schedule:
       interval: weekly
       day: "friday"
+      time: "02:20"
     rebase-strategy: "disabled"
     open-pull-requests-limit: 20
 
@@ -13,5 +14,6 @@ updates:
     schedule:
       interval: weekly
       day: "friday"
+      time: "02:20"
     rebase-strategy: "disabled"
     open-pull-requests-limit: 20
