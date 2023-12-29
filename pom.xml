@@ -33,7 +33,7 @@
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.compiler.version>3.11.0</maven.compiler.version>
+        <maven.compiler.version>3.12.0</maven.compiler.version>
         <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -55,7 +55,7 @@
         
         <retorch.version>1.1.0</retorch.version>
         
-        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
         
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.15.0</version>
+            <version>4.16.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -223,7 +223,7 @@
 
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
 
                 <!-- ONLY ON DEVELOPMENT -->
                 <dependencies>
@@ -294,7 +294,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
