@@ -51,7 +51,7 @@
         
         <junit.version>4.13.2</junit.version>
         
-        <webdrivermanager.version>5.6.2</webdrivermanager.version>
+        <webdrivermanager.version>5.6.3</webdrivermanager.version>
         
         <retorch.version>1.1.0</retorch.version>
         
