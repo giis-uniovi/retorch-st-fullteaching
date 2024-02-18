@@ -45,9 +45,9 @@
         
         <selenium-jupiter.version>5.0.1</selenium-jupiter.version>
 
-        <junit-jupiter-engine.version>5.10.1</junit-jupiter-engine.version>
+        <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
         
-        <junit-jupiter-params.version>5.10.1</junit-jupiter-params.version>
+        <junit-jupiter-params.version>5.10.2</junit-jupiter-params.version>
         
         <junit.version>4.13.2</junit.version>
         
@@ -59,7 +59,7 @@
         
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 
-        <slf4j-api.version>2.0.11</slf4j-api.version>
+        <slf4j-api.version>2.0.12</slf4j-api.version>
 
         <log4j-slf4j2-impl.version>2.22.1</log4j-slf4j2-impl.version>
 
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.1</version>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
