@@ -1,6 +1,9 @@
 package com.fullteaching.e2e.no_elastest.functional.test.media;
 
-import com.fullteaching.e2e.no_elastest.common.*;
+import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
+import com.fullteaching.e2e.no_elastest.common.BrowserUser;
+import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
+import com.fullteaching.e2e.no_elastest.common.SessionNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -11,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -27,24 +29,27 @@ import java.util.List;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static java.lang.invoke.MethodHandles.lookup;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
 
-
     final static Logger log = getLogger(lookup().lookupClass());
-    public String users_data;
-    public String courseName;
-    //1 teacher
-    //at least 1 student;
-    protected List<BrowserUser> studentDriver;
-    protected List<String> studentPass;
-    protected List<String> studentNames;
-    protected List<String> students;
-    String TestName = "default-test-name";
 
+    public String courseName;
+    protected List<BrowserUser> studentBrowserUserList;
+    protected List<String> studentPassList;
+    protected List<String> studentNamesList;
+    protected List<String> studentNameList;
+
+
+    /**
+     * This method tests the video session functionality of the application.
+     * It includes creating a session, joining the session as a teacher and students,
+     * leaving the session, and deleting the session.
+     */
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {})
@@ -52,195 +57,195 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
     @Resource(resID = "Course", replaceable = {"Session"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READONLY")
     @Test
-    void sessionTest() { // 160 +225+ 28 set up +13 lines teardown =426
+    void sessionTest() throws ElementNotFoundException, IOException {
+        String sessionName = "Today's Session";
         courseName = "Pseudoscientific course for treating the evil eye";
+        this.slowLogin(this.user, "teacher@gmail.com", "pass");
+        initializeStudents("src/test/resources/inputs/default_user_LoggedVideoStudents.csv");
+        createNewSession(sessionName);
+        joinSession(sessionName, this.user);
+        joinSessionStudents(sessionName);
+        leaveStudentSessions();
+        leaveSession(this.user);
+        deleteSession(sessionName);
+    }
 
-        users_data = loadStudentsData("src/test/resources/inputs/default_user_LoggedVideoStudents.csv");
-        this.user = setupBrowser(CHROME, TJOB_NAME + "_" + TEST_NAME, "TEACHER", WAIT_SECONDS);//27 lines
-        this.slowLogin(user, "teacher@gmail.com", "pass");//24 lines
-        //students setUp
-        students = new ArrayList<>();
-        studentPass = new ArrayList<>();
-        studentNames = new ArrayList<>();
-        studentDriver = new ArrayList<>();
+    /**
+     * This method initializes the students drivers for the test, reading its data from a CSV file
+     * @param pathData the path to the CSV file containing student data
+     * @throws IOException if there is an error reading the file
+     */
+    private void initializeStudents(String pathData) throws IOException {
+        String users_data = loadStudentsData(pathData);
+        studentNameList = new ArrayList<>();
+        studentPassList = new ArrayList<>();
+        studentNamesList = new ArrayList<>();
+        studentBrowserUserList = new ArrayList<>();
         String[] students_data = users_data.split(";");
+
         for (int i = 0; i < students_data.length; i++) {
             String userid = students_data[i].split(":")[0];
-            students.add(userid);
+            studentNameList.add(userid);
             String user_password = students_data[i].split(":")[1];
-            studentPass.add(user_password);
+            studentPassList.add(user_password);
             String STUDENT_BROWSER = students_data[i].split(":")[2];
-            //WebDriver studentD = UserLoader.allocateNewBrowser(students_data[i].split(":")[2]);
-            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TEST_NAME, "STUDENT" + i, WAIT_SECONDS); //27 lines
-            this.slowLogin(studentD, userid, user_password); //24 lines
-            studentNames.add(userid);
-            studentDriver.add(studentD);
+            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TEST_NAME, "STUDENT" + i, WAIT_SECONDS);
+            this.slowLogin(studentD, userid, user_password);
+            studentNamesList.add(userid);
+            studentBrowserUserList.add(studentD);
         }
+    }
+    /**
+     * This method creates a new video session with the given name, navigating to the course, opens the new session modal,
+     * filling the session details and verifying that the session was created.
+     * @param sessionName the name of the session to create
+     * @throws ElementNotFoundException if an element is not found during navigation
+     */
+    private void createNewSession(String sessionName) throws ElementNotFoundException {
+        String sessionDate = getCurrentDate();
+        String sessionHour = getCurrentTime();
+        String sessionDescription = "Wow today session will be amazing";
+
+        navigateToCourse(user, courseName);
+        Click.element(user.getDriver(), SESSION_LIST_NEW_SESSION_ICON);
+        WebElement modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_NEW_SESSION_MODAL));
+        modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TITLE).sendKeys(sessionName);
+        modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_CONTENT).sendKeys(sessionDescription);
+        modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(sessionDate);
+        modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TIME).sendKeys(sessionHour);
+        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON));
+        Wait.notTooMuch(user.getDriver());
+        // Verify session creation
+        Wait.waitForPageLoaded(user.getDriver());
+        List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
+        assertTrue(session_titles.contains(sessionName), "Session has not been created");
+    }
+    /**
+     * This method gets the current date in the format DDMMYYYY. for the video session name
+     */
+    private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int mYear = calendar.get(Calendar.YEAR);
         int mMonth = calendar.get(Calendar.MONTH);
         int mDay = calendar.get(Calendar.DAY_OF_MONTH);
+        return "" + (mDay < 10 ? "0" + mDay : mDay) + (mMonth < 10 ? "0" + mMonth : mMonth) + mYear;
+    }
+    /**
+     * This method gets the current time in the format HHmmA/P, where A/P indicates AM or PM for the video session name
+     */
+    private String getCurrentTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
         int mHour = calendar.get(Calendar.HOUR);
         if (mHour == 0) mHour = 12;
         int mAMPM = calendar.get(Calendar.AM_PM);
         int mMinute = calendar.get(Calendar.MINUTE);
-        String sessionDate = "" + (mDay < 10 ? "0" + mDay : mDay) + (mMonth < 10 ? "0" + mMonth : mMonth) + mYear;
-        String sessionHour = "" + (mHour < 10 ? "0" + mHour : mHour) + (mMinute < 10 ? "0" + mMinute : mMinute) + (mAMPM == Calendar.AM ? "A" : "P");
-        String sessionName = "Today's Session";
-        try {
-            List<String> courses = CourseNavigationUtilities.getCoursesList(user.getDriver()); //13 lines
-            assertTrue(courses.size() > 0, "No courses in the list");
-            //Teacher go to Course and create a new session to join
-            WebElement course = CourseNavigationUtilities.getCourseByName(user.getDriver(), courseName); //14 lines
-            course.findElement(COURSE_LIST_COURSE_TITLE).click();
-            Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
-            CourseNavigationUtilities.go2Tab(user.getDriver(), SESSION_ICON); //4 lines
-            Click.element(user.getDriver(), SESSION_LIST_NEW_SESSION_ICON);
-            //wait for modal
-            WebElement modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_NEW_SESSION_MODAL));
-            modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TITLE).sendKeys(sessionName);
-            String sessionDescription = "Wow today session will be amazing";
-            modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_CONTENT).sendKeys(sessionDescription);
-            modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(sessionDate);
-            modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TIME).sendKeys(sessionHour);
-            Click.element(user.getDriver(), modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON));
-            Wait.notTooMuch(user.getDriver());
-
-            //check if session has been created
-            Wait.waitForPageLoaded(user.getDriver()); //13 lines
-            List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
-            assertTrue(session_titles.contains(sessionName), "Session has not been created");
-
-            //Teacher Join Session
-
-            session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
-            assertTrue(session_titles.contains(sessionName), "Session has not been created");
-            //Teacher to: JOIN SESSION.
-            WebElement session = SessionNavigationUtilities.getSession(user.getDriver(), sessionName); //17 lines
-            Click.element(user.getDriver(), session.findElement(SESSION_LIST_SESSION_ACCESS));
-            //assertTrue(condition);
-            //Check why this is failing... maybe urls are not correct? configuration on the project?
-
-            for (BrowserUser student_d : studentDriver) {
-                WebDriver studentDriver = student_d.getDriver();
-                NavigationUtilities.toCoursesHome(studentDriver); //3lines
-                courses = CourseNavigationUtilities.getCoursesList(studentDriver);//13 lines
-                assertTrue(courses.size() > 0, "No courses in the list");
-                //Teacher go to Course and create a new session to join
-                course = CourseNavigationUtilities.getCourseByName(studentDriver, courseName); //14 lines
-                course.findElement(COURSE_LIST_COURSE_TITLE).click();
-                Wait.notTooMuch(studentDriver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
-                CourseNavigationUtilities.go2Tab(studentDriver, SESSION_ICON);//4lines
-                session_titles = SessionNavigationUtilities.getFullSessionList(studentDriver);//7 lines
-                assertTrue(session_titles.contains(sessionName), "Session has not been created");
-                //Student to: JOIN SESSION.
-                session = SessionNavigationUtilities.getSession(studentDriver, sessionName);//17 lines
-                Click.element(studentDriver, session.findElement(SESSION_LIST_SESSION_ACCESS));
-                //assertTrue(condition);
-                //Check why this is failing... maybe urls are not correct? configuration on the project?
-            }
-        } catch (ElementNotFoundException e) {
-            fail("Error while creating new SESSION");
+        return "" + (mHour < 10 ? "0" + mHour : mHour) + (mMinute < 10 ? "0" + mMinute : mMinute) + (mAMPM == Calendar.AM ? "A" : "P");
+    }
+    /**
+     * This method navigates and joins the session, checking that it exist
+     */
+    private void joinSession(String sessionName, BrowserUser usr) throws ElementNotFoundException {
+        List<String> session_titles = SessionNavigationUtilities.getFullSessionList(usr.getDriver());
+        assertTrue(session_titles.contains(sessionName), "Session has not been created");
+        WebElement session = SessionNavigationUtilities.getSession(usr.getDriver(), sessionName);
+        Click.element(usr.getDriver(), session.findElement(SESSION_LIST_SESSION_ACCESS));
+    }
+    /**
+     * Makes each student driver navigate into the selected course and join the video session
+     */
+    private void joinSessionStudents(String sessionName) throws ElementNotFoundException {
+        for (BrowserUser student : studentBrowserUserList) {
+            navigateToCourse(student, courseName);
+            joinSession(sessionName, student);
         }
-        //Students Leave Sessions
-        try {
-            for (BrowserUser student : studentDriver) {
-                WebDriver studentDriver = student.getDriver();
-                Wait.notTooMuch(studentDriver);
-                //student to: LEAVE SESSION.
-                studentDriver = Click.element(studentDriver, SESSION_LEFT_MENU_BUTTON);
-                Wait.notTooMuch(studentDriver).until(ExpectedConditions.visibilityOfElementLocated(SESSION_EXIT_ICON));
-                WebElement exitButton = studentDriver.findElement(SESSION_EXIT_ICON);
-                JavascriptExecutor executor = (JavascriptExecutor) studentDriver;
-                executor.executeScript("arguments[0].click();", exitButton);
-                // studentDriver.findElement(By.id("exit-icon")).click();
-                //  studentDriver = Click.element(studentDriver, By.className("right material-icons video-icon"));
-                //Wait for something
-                Wait.notTooMuch(studentDriver).until(ExpectedConditions.visibilityOfElementLocated(COURSE_TABS));
-                //assertTrue(condition);
-                //Check why this is failing... maybe urls are not correct? configuration on the project?
-            }
-
-            //Teacher Leave Session
-
-            //student to: LEAVE SESSION.
-            Click.element(user.getDriver(), SESSION_LEFT_MENU_BUTTON);
-            WebElement exitButton = user.getDriver().findElement(SESSION_EXIT_ICON);
-            JavascriptExecutor executor = (JavascriptExecutor) user.getDriver();
-            executor.executeScript("arguments[0].click();", exitButton);
-            Wait.waitForPageLoaded(user.getDriver());//13 lines
-            //Wait for something
-            Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(COURSE_TABS));
-            //assertTrue(condition);
-            //Check why this is failing... maybe urls are not correct? configuration on the project?
-        } catch (ElementNotFoundException e) {
-            fail("Error while leaving SESSION");
+    }
+    /**
+     * From all pages, go to course tab and navigates to the selected course
+     */
+    private void navigateToCourse(BrowserUser usr, String courseName) throws ElementNotFoundException {
+        List<String> courses = CourseNavigationUtilities.getCoursesList(usr.getDriver());
+        assertFalse(courses.isEmpty(), "No courses in the list");
+        WebElement course = CourseNavigationUtilities.getCourseByName(usr.getDriver(), courseName);
+        course.findElement(COURSE_LIST_COURSE_TITLE).click();
+        Wait.notTooMuch(usr.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
+        CourseNavigationUtilities.go2Tab(usr.getDriver(), SESSION_ICON);
+    }
+    /**
+     * Makes all the students leave the video session and return to the course main page
+     */
+    private void leaveStudentSessions() throws ElementNotFoundException {
+        for (BrowserUser student : studentBrowserUserList) {
+            Wait.notTooMuch(student.getDriver());
+            leaveSession(student);
         }
-        try {
-            //delete session by teacher
-            WebElement session = SessionNavigationUtilities.getSession(user.getDriver(), sessionName);
-            Click.element(user.getDriver(), session.findElement(SESSION_LIST_SESSION_EDIT_ICON));
-            WebElement modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_EDIT_MODAL));
-            Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("label")));
-            Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("a")));
-            Wait.waitForPageLoaded(user.getDriver());//13 lines
-            List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver()); //7 lines
-            assertFalse(session_titles.contains(sessionName), "Session has not been deleted");
-        } catch (ElementNotFoundException e) {
-
-            e.printStackTrace();
-        }
-
+    }
+    /**
+     * Given a user leaves the video session and returns to the course main page
+     */
+    private void leaveSession(BrowserUser usr) throws ElementNotFoundException {
+        Click.element(usr.getDriver(), SESSION_LEFT_MENU_BUTTON);
+        WebElement exitButton = usr.getDriver().findElement(SESSION_EXIT_ICON);
+        JavascriptExecutor executor = (JavascriptExecutor) usr.getDriver();
+        executor.executeScript("arguments[0].click();", exitButton);
+        Wait.waitForPageLoaded(usr.getDriver());//13 lines
+        //Wait for something
+        Wait.notTooMuch(usr.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(COURSE_TABS));
+    }
+    /**
+     * Removes the video session specified by parameter
+     * @param sessionName string with the session name
+     */
+    private void deleteSession(String sessionName) throws ElementNotFoundException {
+        List<String> session_titles;
+        WebElement modal;
+        WebElement session;
+        session = SessionNavigationUtilities.getSession(user.getDriver(), sessionName);
+        Click.element(user.getDriver(), session.findElement(SESSION_LIST_SESSION_EDIT_ICON));
+        modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_EDIT_MODAL));
+        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("label")));
+        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("a")));
+        Wait.waitForPageLoaded(user.getDriver());//13 lines
+        session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver()); //7 lines
+        assertFalse(session_titles.contains(sessionName), "Session has not been deleted");
     }
 
-
-    public String loadStudentsData(String path) { //17 lines
+    public String loadStudentsData(String path) throws IOException {
         FileReader file;
         StringBuilder key = new StringBuilder();
-        try {
-            file = new FileReader(path);
-            BufferedReader reader = new BufferedReader(file);
-            // **** key is declared here in this block of code
-            String line = reader.readLine();
-            while (line != null) {
-                key.append(line);
-                line = reader.readLine();
-            }
-            System.out.println(key); // so key works
-        } catch (IOException e) {
-
-            e.printStackTrace();
+        file = new FileReader(path);
+        BufferedReader reader = new BufferedReader(file);
+        String line = reader.readLine();
+        while (line != null) {
+            key.append(line);
+            line = reader.readLine();
         }
+        System.out.println(key);
         return key.toString();
     }
-
     @AfterEach
-    void tearDown(TestInfo testInfo) { //13 lines
-
-        if (testInfo.getTestMethod().isPresent()) {
-            TestName = testInfo.getTestMethod().get().getName();
+    void tearDown(TestInfo testInfo) {
+        //Logout and exit students
+        if (studentBrowserUserList!=null) {
+            for (BrowserUser student : studentBrowserUserList) {
+                if (student.isOnSession()) {
+                    this.logout(student);
+                }
+                student.dispose();
+            }
         }
         if (user != null) {
-            log.info("##### Finishing OpenVidu Video test: {} - Driver {}", TestName, this.user.getDriver());
+            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
             log.info("Browser console at the end of the test");
             LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
             logEntries.forEach((entry) -> log.info("[{}] {} {}",
                     new Date(entry.getTimestamp()), entry.getLevel(),
                     entry.getMessage()));
-            //TO-DO- ERROR with the logout
-
-
-            //Logout and exit students
-            for (BrowserUser student : studentDriver) {
-                if (student.isOnSession()) {
-                    this.logout(student);
-                }
-
-                student.dispose();
+            if (user.isOnSession()) {
+                this.logout(user);
             }
-            //logout and exist teacher
-            this.logout(user);
+
             user.dispose();
         }
     }
