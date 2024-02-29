@@ -28,7 +28,7 @@ import static java.lang.invoke.MethodHandles.lookup;
 import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public abstract class BaseLoggedTest {
+public class BaseLoggedTest {
 
     public static final String CHROME = "chrome";
     // For use another host
