@@ -32,6 +32,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -66,27 +69,31 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @Resource(resID = "Course", replaceable = {"Configuration"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @Test
-    void courseRestOperations() throws ElementNotFoundException { //14+22+65 set up +60 lines teardown =161
-        // Edit course
-        this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
-        // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
-        log.info("Editing course");
-        COURSE_NAME = COURSE_NAME + EDITED;
-        List<WebElement> l = user.getDriver().findElements(By.className("course-put-icon"));
-        openDialog(l.get(l.size() - 1), user);//8lines
-        user.waitUntil(ExpectedConditions.elementToBeClickable(By.id(("input-put-course-name"))),
-                "Input for course name not clickable");
-        user.getDriver().findElement(By.id("input-put-course-name")).clear();
-        user.getDriver().findElement(By.id("input-put-course-name")).sendKeys(COURSE_NAME);
-        user.getDriver().findElement(By.id("submit-put-course-btn")).click();
-        waitForDialogClosed("course-modal", "Edition of course failed", user);//14lines
-        user.waitUntil(
-                ExpectedConditions.textToBe(
-                        By.cssSelector("#course-list .course-list-item:last-child div.course-title span"), COURSE_NAME),
-                "Unexpected course name");
+    void courseRestOperations() throws ElementNotFoundException {
+        loginAndCreateNewCourse();
 
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
+        editCourse();
+
+        CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME + EDITED); // Tear down
+    }
+
+    private void loginAndCreateNewCourse() throws ElementNotFoundException {
+        slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
+        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME);
+    }
+
+    private void editCourse() {
+        log.info("Editing course");
+        String editedCourseName = COURSE_NAME + EDITED;
+        List<WebElement> editIcons = user.getDriver().findElements(By.className("course-put-icon"));
+        openDialog(editIcons.get(editIcons.size() - 1), user);
+        user.waitUntil(ExpectedConditions.elementToBeClickable(By.id("input-put-course-name")), "Input for course name not clickable");
+        WebElement courseNameInput = user.getDriver().findElement(By.id("input-put-course-name"));
+        courseNameInput.clear();
+        courseNameInput.sendKeys(editedCourseName);
+        user.getDriver().findElement(By.id("submit-put-course-btn")).click();
+        waitForDialogClosed("course-modal", "Edition of course failed", user);
+        user.waitUntil(ExpectedConditions.textToBe(By.cssSelector("#course-list .course-list-item:last-child div.course-title span"), editedCourseName), "Unexpected course name");
     }
 
     @Resource(resID = "LoginService", replaceable = {})
@@ -97,26 +104,19 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @Test
     void courseInfoRestOperations() throws ElementNotFoundException { //12+16+65 set up +60 lines teardown =153
-        // Empty course info
-        this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
-        // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
+        loginAndCreateNewCourse();
         enterCourseAndNavigateTab(COURSE_NAME, "info-tab-icon");//16 lines
-        user.waitUntil(ExpectedConditions.presenceOfNestedElementLocatedBy(By.cssSelector(".md-tab-body.md-tab-active"),
-                By.cssSelector(".card-panel.warning")), "Course info wasn't empty");
+        user.waitUntil(ExpectedConditions.presenceOfNestedElementLocatedBy(By.cssSelector(".md-tab-body.md-tab-active"), By.cssSelector(".card-panel.warning")), "Course info wasn't empty");
         log.info("Editing course information");
-        // Edit course info
+
         user.getDriver().findElement(By.id("edit-course-info")).click();
         user.getDriver().findElement(By.className("ql-editor")).sendKeys(TEST_COURSE_INFO);
         user.getDriver().findElement(By.id("send-info-btn")).click();
 
-
-        user.waitUntil(ExpectedConditions.textToBe(By.cssSelector(".ql-editor p"), TEST_COURSE_INFO),
-                "Unexpected course info");
+        user.waitUntil(ExpectedConditions.textToBe(By.cssSelector(".ql-editor p"), TEST_COURSE_INFO), "Unexpected course info");
         log.info("Course information successfully updated");
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
-
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
@@ -124,101 +124,77 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @Resource(resID = "Course", replaceable = {"Session"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @Test
-    void sessionRestOperations() throws ElementNotFoundException { //77+66+65 set up +60 lines teardown = 268
-        // Add new session
-        this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
-        // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
+    void sessionRestOperations() throws ElementNotFoundException {
+        loginAndCreateNewCourse();
 
-        enterCourseAndNavigateTab(COURSE_NAME, "sessions-tab-icon");//16 lines
-        log.info("Adding new session");
-        openDialog("#add-session-icon", user);//8lines
-        // Find form elements
-        WebElement titleField = user.getDriver().findElement(By.id("input-post-title"));
-        WebElement commentField = user.getDriver().findElement(By.id("input-post-comment"));
-        WebElement dateField = user.getDriver().findElement(By.id("input-post-date"));
-        WebElement timeField = user.getDriver().findElement(By.id("input-post-time"));
-        String title = "TEST LESSON NAME";
-        String comment = "TEST LESSON COMMENT";
-        // Fill input fields
-        titleField.sendKeys(title);
-        commentField.sendKeys(comment);
-        if (BROWSER_NAME.equals("chrome")) {
-            dateField.sendKeys("03/01/2018");
-            timeField.sendKeys("03:10PM");
-        } else if (BROWSER_NAME.equals("firefox")) {
-            dateField.sendKeys("2018/03/01");
-            timeField.sendKeys("15:10");
-        }
-        user.getDriver().findElement(By.id("post-modal-btn")).click();
-        waitForDialogClosed("course-details-modal", "Addition of session failed", user);//14 lines
-        // Check fields of added session
-        //Changed, this is more adequate for check de error
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-title")),
-                "Unexpected session title");
-        Assertions.assertEquals(user.getDriver().findElement(By.cssSelector("li.session-data .session-title")).getText(), title);
+        addNewSession();
 
+        editSession();
 
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-description")), "The element located by css li.session-data .session-description is not visible");
-        Assertions.assertEquals(user.getDriver().findElement(By.cssSelector("li.session-data .session-description")).getText(), comment);
+        deleteSession();
 
-
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-datetime")), "The element located by css li.session-data .session-datetime is not visible");
-        Assertions.assertTrue(user.getDriver().findElement(By.cssSelector("li.session-data .session-datetime")).getText().equals("Jan 3, 2018 - 03:10") || user.getDriver().findElement(By.cssSelector("li.session-data .session-datetime")).getText().equals("Mar 1, 2018 - 15:10"));
-
-
-        log.info("New session successfully added");
-        // Edit session
-        log.info("Editing session");
-        openDialog(".edit-session-icon", user);//8lines
-        // Find form elements
-        titleField = user.getDriver().findElement(By.id("input-put-title"));
-        commentField = user.getDriver().findElement(By.id("input-put-comment"));
-        dateField = user.getDriver().findElement(By.id("input-put-date"));
-        timeField = user.getDriver().findElement(By.id("input-put-time"));
-        // Clear elements
-        titleField.clear();
-        commentField.clear();
-        // Fill edited input fields
-        titleField.sendKeys(title + EDITED);
-        commentField.sendKeys(comment + EDITED);
-        if (BROWSER_NAME.equals("chrome")) {
-            dateField.sendKeys("04/02/2019");
-            timeField.sendKeys("05:10AM");
-        } else if (BROWSER_NAME.equals("firefox")) {
-            dateField.sendKeys("2019-04-02");
-            timeField.sendKeys("05:10");
-        }
-        user.getDriver().findElement(By.id("put-modal-btn")).click();
-        waitForDialogClosed("put-delete-modal", "Edition of session failed", user);//14 lines
-        // Check fields of edited session
-        log.info("Checking title of the edited session");
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-title")), "The element located by css li.session-data .session-title is not visible");
-        Assertions.assertEquals(title + EDITED, user.getDriver().findElement(By.cssSelector("li.session-data .session-title")).getText());
-
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-description")), "The element located by css \"li.session-data .session-description\" is not visible");
-        Assertions.assertEquals(comment + EDITED, user.getDriver().findElement(By.cssSelector("li.session-data .session-description")).getText());
-
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-datetime")), "The element located by css \"li.session-data .session-datetime\" is not visible");
-        Assertions.assertTrue(user.getDriver().findElement(By.cssSelector("li.session-data .session-datetime")).getText().equals("Feb 4, 2019 - 05:10") || user.getDriver().findElement(By.cssSelector("li.session-data .session-datetime")).getText().equals("Apr 2, 2019 - 05:10"));
-
-        log.info("Session successfully edited");
-        // Delete session
-        log.info("Deleting session");
-        openDialog(".edit-session-icon", user);//8lines
-        user.waitUntil(ExpectedConditions.elementToBeClickable(By.id(("label-delete-checkbox"))),
-                "Checkbox for session deletion not clickable");
-        user.getDriver().findElement(By.id("label-delete-checkbox")).click();
-        user.waitUntil(ExpectedConditions.elementToBeClickable(By.id(("delete-session-btn"))),
-                "Button for session deletion not clickable");
-        user.getDriver().findElement(By.id("delete-session-btn")).click();
-        waitForDialogClosed("put-delete-modal", "Deletion of session failed", user);//14 lines
-        user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.cssSelector("li.session-data"), 0),
-                "Unexpected number of sessions");
-        log.info("Session successfully deleted");
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
+    private void addNewSession() {
+        enterCourseAndNavigateTab(COURSE_NAME, "sessions-tab-icon");
+        log.info("Adding new session");
+        openDialog("#add-session-icon", user);
+        fillSessionForm("TEST LESSON NAME", "TEST LESSON COMMENT", LocalDate.parse("2018-03-01"), LocalTime.parse("15:10"), false);
+        waitForDialogClosed("course-details-modal", "Addition of session failed", user);
+        verifySessionDetails("TEST LESSON NAME", "TEST LESSON COMMENT", "Jan 3, 2018 - 03:10", "Mar 1, 2018 - 15:10");
+    }
+    private void editSession() {
+        log.info("Editing session");
+        openDialog(".edit-session-icon", user);
+        fillSessionForm("TEST LESSON NAME EDITED", "TEST LESSON COMMENT EDITED", LocalDate.parse("2019-04-02"), LocalTime.parse("05:10"), true);
+        waitForDialogClosed("put-delete-modal", "Edition of session failed", user);
+        verifySessionDetails("TEST LESSON NAME EDITED", "TEST LESSON COMMENT EDITED", "Feb 4, 2019 - 05:10", "Apr 2, 2019 - 05:10");
+    }
 
+    private void deleteSession() {
+        log.info("Deleting session");
+        openDialog(".edit-session-icon", user);
+        user.waitUntil(ExpectedConditions.elementToBeClickable(By.id(("label-delete-checkbox"))), "Checkbox for session deletion not clickable");
+        user.getDriver().findElement(By.id("label-delete-checkbox")).click();
+        user.waitUntil(ExpectedConditions.elementToBeClickable(By.id(("delete-session-btn"))), "Button for session deletion not clickable");
+        user.getDriver().findElement(By.id("delete-session-btn")).click();
+        waitForDialogClosed("put-delete-modal", "Deletion of session failed", user);
+        user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.cssSelector("li.session-data"), 0), "Unexpected number of sessions");
+        log.info("Session successfully deleted");
+    }
+
+    private void fillSessionForm(String title, String comment, LocalDate date, LocalTime hour, boolean edit) {
+        // Get the different fields depending on if it's editing the Session or not
+        WebElement titleField = user.getDriver().findElement(By.id(edit ? "input-put-title" : "input-post-title"));
+        WebElement commentField = user.getDriver().findElement(By.id(edit ? "input-put-comment" : "input-post-comment"));
+        WebElement dateField = user.getDriver().findElement(By.id(edit ? "input-put-date" : "input-post-date"));
+        WebElement timeField = user.getDriver().findElement(By.id(edit ? "input-put-time" : "input-post-time"));
+        if (edit) { //If its editing previously clear the fields content
+            titleField.clear();
+            commentField.clear();
+        }
+        titleField.sendKeys(title);
+        commentField.sendKeys(comment);
+        // Create the correct date depending on the browser and submitting into teh form
+        DateTimeFormatter dateFormatter = BROWSER_NAME.equals("chrome") ? DateTimeFormatter.ofPattern("MM/dd/yyyy") : DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        DateTimeFormatter timeFormatter = BROWSER_NAME.equals("chrome") ? DateTimeFormatter.ofPattern("hh:mma") : DateTimeFormatter.ofPattern("HH:mm");
+        dateField.sendKeys(date.format(dateFormatter));
+        timeField.sendKeys(hour.format(timeFormatter));
+        // Submit session form
+        user.getDriver().findElement(By.id(edit ? "put-modal-btn" : "post-modal-btn")).click();
+    }
+
+    private void verifySessionDetails(String expectedTitle, String expectedComment, String expectedDateTime1, String expectedDateTime2) {
+        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-title")), "Unexpected session title");
+        Assertions.assertEquals(expectedTitle, user.getDriver().findElement(By.cssSelector("li.session-data .session-title")).getText());
+
+        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-description")), "The element located by css li.session-data .session-description is not visible");
+        Assertions.assertEquals(expectedComment, user.getDriver().findElement(By.cssSelector("li.session-data .session-description")).getText());
+
+        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.session-data .session-datetime")), "The element located by css li.session-data .session-datetime is not visible");
+        String actualDateTime = user.getDriver().findElement(By.cssSelector("li.session-data .session-datetime")).getText();
+        Assertions.assertTrue(actualDateTime.equals(expectedDateTime1) || actualDateTime.equals(expectedDateTime2));
+    }
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
@@ -227,10 +203,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @Test
     void forumRestOperations() throws ElementNotFoundException { //60+66+65 set up +60 lines teardown =251
-        // Add new entry to the forum
-        this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
-        // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
+        loginAndCreateNewCourse();
         enterCourseAndNavigateTab(COURSE_NAME, "forum-tab-icon");//16 lines
         log.info("Adding new entry to the forum");
         openDialog("#add-entry-icon", user);//8lines
@@ -302,9 +275,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @Test
     void filesRestOperations() throws ElementNotFoundException {//88+112+65 set up +60 lines teardown =325
-        this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
-        // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
+        loginAndCreateNewCourse();
         enterCourseAndNavigateTab(COURSE_NAME, "files-tab-icon");//16 lines
         log.info("Checking that there are no files in the course");
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.cssSelector("app-error-message .card-panel.warning")),
@@ -405,9 +376,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @Test
     void attendersRestOperations() throws ElementNotFoundException {//42+32+65 set up +60 lines teardown =199
-        this.slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
-        // Teacher login//51lines
-        CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME); // Add test course //14 lines
+        loginAndCreateNewCourse();
         enterCourseAndNavigateTab(COURSE_NAME, "attenders-tab-icon");//16 lines
         log.info("Checking that there is only one attender to the course");
         user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.className("attender-row-div"), 1),

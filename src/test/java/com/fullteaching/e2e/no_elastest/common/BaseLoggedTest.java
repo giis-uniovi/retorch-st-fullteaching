@@ -76,10 +76,10 @@ public class BaseLoggedTest {
             FirefoxDriverManager.getInstance(firefox).setup();
         }
 
-        String envUrl = System.getProperty("SUT_URL");
-        String envPort = System.getProperty("SUT_PORT");
-        String envTJobName = System.getProperty("tjob_name");
-        log.debug("Using URL {} PORT: {} TJOB: {}", envUrl, envPort, envTJobName);
+        String envUrl = System.getProperty("SUT_URL") != null ? System.getProperty("SUT_URL") : System.getenv("SUT_URL");
+        String envPort = System.getProperty("SUT_PORT") != null ? System.getProperty("SUT_PORT") : System.getenv("SUT_PORT");
+        String envTJobName = System.getProperty("tjob_name") != null ? System.getProperty("tjob_name") : System.getenv("tjob_name");
+        log.info("Using URL {} PORT: {} TJOB: {}", envUrl, envPort, envTJobName);
         // Check if SUT_URL is defined in the environment variables
         if ((envUrl != null) & (envPort != null)) {
             TJOB_NAME = envTJobName;
@@ -382,5 +382,6 @@ public class BaseLoggedTest {
         return userName;
 
     }
+
 
 }
