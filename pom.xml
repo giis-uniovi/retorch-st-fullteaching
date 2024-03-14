@@ -49,8 +49,6 @@
         
         <junit-jupiter-params.version>5.10.2</junit-jupiter-params.version>
         
-        <junit.version>4.13.2</junit.version>
-        
         <webdrivermanager.version>5.6.3</webdrivermanager.version>
         
         <retorch.version>1.1.0</retorch.version>
@@ -114,12 +112,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
