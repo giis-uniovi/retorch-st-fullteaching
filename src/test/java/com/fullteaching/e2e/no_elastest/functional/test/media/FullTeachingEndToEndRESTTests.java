@@ -20,6 +20,7 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import dev.failsafe.internal.util.Assert;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
 import io.github.bonigarcia.seljup.SeleniumJupiter;
@@ -36,6 +37,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * E2E tests for FullTeaching REST CRUD operations.
@@ -117,6 +121,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         log.info("Course information successfully updated");
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
+
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
@@ -135,6 +140,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
 
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
+
     private void addNewSession() {
         enterCourseAndNavigateTab(COURSE_NAME, "sessions-tab-icon");
         log.info("Adding new session");
@@ -143,6 +149,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         waitForDialogClosed("course-details-modal", "Addition of session failed", user);
         verifySessionDetails("TEST LESSON NAME", "TEST LESSON COMMENT", "Jan 3, 2018 - 03:10", "Mar 1, 2018 - 15:10");
     }
+
     private void editSession() {
         log.info("Editing session");
         openDialog(".edit-session-icon", user);
@@ -195,6 +202,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         String actualDateTime = user.getDriver().findElement(By.cssSelector("li.session-data .session-datetime")).getText();
         Assertions.assertTrue(actualDateTime.equals(expectedDateTime1) || actualDateTime.equals(expectedDateTime2));
     }
+
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
@@ -428,6 +436,8 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
 
     private void enterCourseAndNavigateTab(String courseName, String tabId) { //16 lines
         log.info("Entering course {}", courseName);
+        //All these tests always create a new course, so we wait for 3-courses in the main page (more than 2)
+        user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("#course-list .course-list-item div.course-title span"), 2), "The number of courses should be 3");
         List<WebElement> allCourses = user.getDriver()
                 .findElements(By.cssSelector("#course-list .course-list-item div.course-title span"));
         WebElement courseSpan = null;
@@ -437,7 +447,8 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
                 break;
             }
         }
-        assert courseSpan != null;
+
+        assertNotNull(courseSpan, "The course with the name '" + courseName + "' could not be found. Total courses available: " + allCourses.size());
         courseSpan.click();
         user.waitUntil(ExpectedConditions.textToBe(By.id("main-course-title"), courseName), "Unexpected course title");
         log.info("Navigating to tab by clicking icon with id '{}'", tabId);
