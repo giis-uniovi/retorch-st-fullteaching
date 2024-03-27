@@ -20,7 +20,6 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
-import dev.failsafe.internal.util.Assert;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
 import io.github.bonigarcia.seljup.SeleniumJupiter;
@@ -39,7 +38,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * E2E tests for FullTeaching REST CRUD operations.
