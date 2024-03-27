@@ -117,6 +117,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         Wait.notTooMuch(user.getDriver());
         // Verify session creation
         Wait.waitForPageLoaded(user.getDriver());
+        user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(SESSION_LIST_SESSION_ROW,3),"Incorrect number of sessions (never more than 2)");
         List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
         assertTrue(session_titles.contains(sessionName), "Session has not been created");
     }
