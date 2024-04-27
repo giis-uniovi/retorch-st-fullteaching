@@ -215,8 +215,7 @@
 
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.2.4</version>
-
+                <version>3.2.5</version>
                 <!-- ONLY ON DEVELOPMENT -->
                 <dependencies>
                     <dependency>
