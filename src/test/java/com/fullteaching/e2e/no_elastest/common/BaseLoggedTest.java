@@ -24,18 +24,14 @@ import java.util.Date;
 import java.util.Properties;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.openqa.selenium.logging.LogType.BROWSER;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BaseLoggedTest {
 
     public static final String CHROME = "chrome";
-    // For use another host
-    //protected static final String host= SetUp.getHost();
     public static final String FIREFOX = "firefox";
     public static final String EDGE = "edge";
-    public static final Logger log = LoggerFactory.getLogger(BaseLoggedTest.class);
+
     protected static final Class<? extends WebDriver> chrome = ChromeDriver.class;
     protected static final Class<? extends WebDriver> firefox = FirefoxDriver.class;
     public static String TEACHER_BROWSER;
@@ -50,7 +46,7 @@ public class BaseLoggedTest {
     protected static String TEST_NAME = "DEFAULT";
     protected static String TJOB_NAME = "TJobDef";
     protected final static int DEPTH = 3;
-
+    public static final Logger log = LoggerFactory.getLogger(BaseLoggedTest.class);
     public WebDriver driver;
     protected BrowserUser user;
 
@@ -85,7 +81,7 @@ public class BaseLoggedTest {
             TJOB_NAME = envTJobName;
             PORT = envPort;
             APP_URL = envUrl + TJOB_NAME + ":" + PORT + "/";
-            log.debug("The URL is" + APP_URL);
+            log.debug("The URL is {}" , APP_URL);
             HOST = APP_URL;
         } else {
             // Check if app.url system property is defined
@@ -110,13 +106,14 @@ public class BaseLoggedTest {
 
     @BeforeEach
     void setup(TestInfo info) { //65 lines
+
         if (info.getTestMethod().isPresent()) {
             TEST_NAME = info.getTestMethod().get().getName();
         }
-        log.info("##### Start test: " + TEST_NAME);
-        TJOB_NAME = System.getProperty("dirtarget");
 
-        user = setupBrowser("chrome", TJOB_NAME + "_" + TEST_NAME, userMail, WAIT_SECONDS);
+        log.info("##### Start test: {}", TEST_NAME);
+        TJOB_NAME = System.getProperty("dirtarget");
+        user = setupBrowser("chrome", TEST_NAME, userMail, WAIT_SECONDS);
         driver = user.getDriver();
     }
 
@@ -160,19 +157,18 @@ public class BaseLoggedTest {
     }
 
     @AfterEach
-    void tearDown(TestInfo testInfo) { //13 lines
+    void tearDown(TestInfo info) { //13 lines
 
         if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
+            log.info("##### Finish test: {} - Driver {}", info.getTestMethod().get().getName(), this.user.getDriver());
             log.info("Browser console at the end of the test");
             LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
+            logEntries.forEach(entry -> log.info("[{}] {} {}",
                     new Date(entry.getTimestamp()), entry.getLevel(),
                     entry.getMessage()));
             if (user.isOnSession()) {
                 this.logout(user);
             }
-
             user.dispose();
         }
     }
@@ -233,7 +229,7 @@ public class BaseLoggedTest {
     }
 
     protected void logout(BrowserUser user) { //43 lines
-        //   log.info("Logging out {}", user.getClientData());
+        log.info("Logging out {}", user.getClientData());
 
         if (user.getDriver().findElements(By.cssSelector("#fixed-icon"))
                 .size() > 0) {
@@ -241,7 +237,6 @@ public class BaseLoggedTest {
             if (!isClickable("#exit-icon", user)) { // Side menu not opened
                 user.getDriver().findElement(By.cssSelector("#fixed-icon"))
                         .click();
-
             }
             user.getWaiter().until(ExpectedConditions
                     .elementToBeClickable(By.cssSelector("#exit-icon")));
@@ -249,11 +244,9 @@ public class BaseLoggedTest {
         }
         try {
             // Up bar menu
-
             user.getWaiter()
                     .until(ExpectedConditions.elementToBeClickable(
                             By.cssSelector("#arrow-drop-down")));
-
             user.getDriver().findElement(By.cssSelector("#arrow-drop-down"))
                     .click();
 
@@ -372,14 +365,14 @@ public class BaseLoggedTest {
 
         WebElement name_placeholder = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(USERNAME_XPATH)));
 
-        String userName = name_placeholder.getText().trim();
+        String userUIName = name_placeholder.getText().trim();
 
         if (goBack) {
             user.getDriver().navigate().back();
         }
         //Check if the username is the expected
         log.info("[END] getUserName");
-        return userName;
+        return userUIName;
 
     }
 
