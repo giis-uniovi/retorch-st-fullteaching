@@ -43,7 +43,7 @@
         
         <junit.platform.version>1.0.0</junit.platform.version>
         
-        <selenium-jupiter.version>5.1.0</selenium-jupiter.version>
+        <selenium-jupiter.version>5.1.1</selenium-jupiter.version>
 
         <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
         
