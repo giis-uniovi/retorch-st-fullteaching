@@ -24,7 +24,8 @@ import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,8 +36,8 @@ import java.util.Map;
 public class FirefoxUser extends BrowserUser {
     FirefoxOptions options = new FirefoxOptions();
 
-    public FirefoxUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) {
-        super(userName, timeOfWaitInSeconds);
+    public FirefoxUser(int timeOfWaitInSeconds, String testName, String userIdentifier) {
+        super(timeOfWaitInSeconds);
         //TO-DO Firefox configuration has changed, review it.
         FirefoxProfile profile = new FirefoxProfile();
         // This flag avoids granting the access to the camera
@@ -74,7 +75,7 @@ public class FirefoxUser extends BrowserUser {
                 LocalDateTime now = LocalDateTime.now();
                 String logName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
                 String videoName = dtf.format(now) + "_" + testName + "_" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
+                log.debug("The data of this test would be stored into: video name {} and the log is {}", videoName, logName);
 
                 selenoidOptions.put("enableLog", true);
                 selenoidOptions.put("logName ", logName);
@@ -85,8 +86,8 @@ public class FirefoxUser extends BrowserUser {
                 options.setCapability("selenoid:options", selenoidOptions);
 
                 //END CAPABILITIES FOR SELENOID RETORCH
+                RemoteWebDriver remote = new RemoteWebDriver((new URI(eusApiURL)).toURL(), options);
 
-                RemoteWebDriver remote = new RemoteWebDriver(new URL(eusApiURL), options);
                 remote.setFileDetector(new LocalFileDetector());
 
 
@@ -94,7 +95,7 @@ public class FirefoxUser extends BrowserUser {
 
                 remote.setFileDetector(new LocalFileDetector());
                 this.driver = remote;
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException("Exception creating eusApiURL", e);
             }
         }

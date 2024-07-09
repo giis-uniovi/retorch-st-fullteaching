@@ -25,7 +25,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -41,8 +42,8 @@ import static org.openqa.selenium.logging.LogType.BROWSER;
 public class ChromeUser extends BrowserUser {
     ChromeOptions options = new ChromeOptions();
 
-    public ChromeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) {
-        super(userName, timeOfWaitInSeconds);
+    public ChromeUser(int timeOfWaitInSeconds, String testName, String userIdentifier) {
+        super(timeOfWaitInSeconds);
         log.info("Starting the configuration of the web browser");
         log.debug(String.format("The Test names are: %s", testName));
 
@@ -85,7 +86,7 @@ public class ChromeUser extends BrowserUser {
                 LocalDateTime now = LocalDateTime.now();
                 String logName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
                 String videoName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
+                log.debug("The data of this test would be stored into: video name {} and the log is {}", videoName, logName);
 
                 selenoidOptions.put("enableLog", true);
                 selenoidOptions.put("logName ", logName);
@@ -97,11 +98,11 @@ public class ChromeUser extends BrowserUser {
 
                 //END CAPABILITIES FOR SELENOID RETORCH
                 log.debug("Configuring the remote WebDriver ");
-                RemoteWebDriver remote = new RemoteWebDriver(new URL("http://selenoid:4444/wd/hub"), options);
+                RemoteWebDriver remote = new RemoteWebDriver((new URI("http://selenoid:4444/wd/hub")).toURL(), options);
                 log.debug("Configuring the Local File Detector");
                 remote.setFileDetector(new LocalFileDetector());
                 this.driver = remote;
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException("Exception creating eusApiURL", e);
             }
         }
