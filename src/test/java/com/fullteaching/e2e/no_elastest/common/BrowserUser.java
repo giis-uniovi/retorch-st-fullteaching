@@ -26,20 +26,17 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
-import static java.lang.invoke.MethodHandles.lookup;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BrowserUser {
 
     public static final Logger log = LoggerFactory.getLogger(BrowserUser.class);
-    protected final String clientData;
+    protected  String clientData;
     protected final int timeOfWaitInSeconds;
     protected WebDriver driver;
     protected boolean isOnSession;
     protected WebDriverWait waiter;
 
-    public BrowserUser(String clientData, int timeOfWaitInSeconds) {
-        this.clientData = clientData;
+    public BrowserUser( int timeOfWaitInSeconds) {
         this.timeOfWaitInSeconds = timeOfWaitInSeconds;
         this.isOnSession = false;
     }
@@ -47,7 +44,6 @@ public class BrowserUser {
     public WebDriver getDriver() {
         return this.driver;
     }
-
 
     public WebDriverWait getWaiter() {
         return this.waiter;
@@ -66,7 +62,7 @@ public class BrowserUser {
     public String getClientData() {
         return this.clientData;
     }
-
+    public void setClientData(String clientData) {this.clientData = clientData;}
     protected void configureDriver() {
         this.waiter = new WebDriverWait(this.driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
     }

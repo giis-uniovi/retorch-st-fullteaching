@@ -31,7 +31,6 @@ public class BaseLoggedTest {
     public static final String CHROME = "chrome";
     public static final String FIREFOX = "firefox";
     public static final String EDGE = "edge";
-
     protected static final Class<? extends WebDriver> chrome = ChromeDriver.class;
     protected static final Class<? extends WebDriver> firefox = FirefoxDriver.class;
     public static String TEACHER_BROWSER;
@@ -46,9 +45,10 @@ public class BaseLoggedTest {
     protected static String TEST_NAME = "DEFAULT";
     protected static String TJOB_NAME = "TJobDef";
     protected final static int DEPTH = 3;
-    public static final Logger log = LoggerFactory.getLogger(BaseLoggedTest.class);
     public WebDriver driver;
     protected BrowserUser user;
+
+    public static final Logger log = LoggerFactory.getLogger(BaseLoggedTest.class);
 
     public BaseLoggedTest() {
     }
@@ -57,15 +57,12 @@ public class BaseLoggedTest {
     static void setupAll() { // 28 lines
         // Initialize properties
         properties = new Properties();
-
         try {
-            // Load a properties file for reading
             properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
         } catch (IOException ex) {
-            ex.printStackTrace(); // Consider logging the exception instead of printing the stack trace
+            log.error("The properties file cannot be loaded, cause {}",ex.getStackTrace().toString());
         }
-
-        // Check if running outside ElasTest
+        // The existence of the ET_EUS_API indicates that its being executed in Jenkins, so set-up the chrom and firefox instances
         if (System.getenv("ET_EUS_API") == null) {
             // Setup drivers for Chrome and Firefox
             ChromeDriverManager.getInstance(chrome).setup();
@@ -86,31 +83,25 @@ public class BaseLoggedTest {
         } else {
             // Check if app.url system property is defined
             APP_URL = System.getProperty("app.url", LOCALHOST);
-
             // Set HOST if APP_URL is not null
             if (APP_URL != null) {
                 HOST = APP_URL;
             }
         }
-
         // Set browser types for teacher and student
         TEACHER_BROWSER = System.getenv("TEACHER_BROWSER");
         STUDENT_BROWSER = System.getenv("STUDENT_BROWSER");
-
         // Default to Chrome if browser types are not defined or are not Firefox
         TEACHER_BROWSER = (TEACHER_BROWSER == null || !TEACHER_BROWSER.equals(FIREFOX)) ? CHROME : TEACHER_BROWSER;
         STUDENT_BROWSER = (STUDENT_BROWSER == null || !STUDENT_BROWSER.equals(FIREFOX)) ? CHROME : STUDENT_BROWSER;
-
         log.info("Using URL {} to connect to OpenVidu-app", APP_URL);
     }
 
     @BeforeEach
     void setup(TestInfo info) { //65 lines
-
         if (info.getTestMethod().isPresent()) {
             TEST_NAME = info.getTestMethod().get().getName();
         }
-
         log.info("##### Start test: {}", TEST_NAME);
         TJOB_NAME = System.getProperty("dirtarget");
         user = setupBrowser("chrome", TEST_NAME, userMail, WAIT_SECONDS);
@@ -125,21 +116,19 @@ public class BaseLoggedTest {
         switch (browser) {
             case FIREFOX:
                 BROWSER_NAME = FIREFOX;
-                u = new FirefoxUser(userIdentifier, secondsOfWait, testName,
+                u = new FirefoxUser(secondsOfWait, testName,
                         userIdentifier);
                 break;
             case EDGE:
                 BROWSER_NAME = EDGE;
-                u = new EdgeUser(userIdentifier, secondsOfWait, testName,
+                u = new EdgeUser(secondsOfWait, testName,
                         userIdentifier);
                 break;
-
             default:
                 BROWSER_NAME = CHROME;
-                u = new ChromeUser(userIdentifier, secondsOfWait, testName,
+                u = new ChromeUser(secondsOfWait, testName,
                         userIdentifier);
         }
-
         log.info("Navigating to {}", APP_URL);
 
         u.getDriver().get(APP_URL);
@@ -188,28 +177,24 @@ public class BaseLoggedTest {
     private void login(BrowserUser user, String userEmail, String userPass,
                        boolean slow) { //24 lines
         user.setOnSession(true);
+        if(user.getClientData()==null){user.setClientData(userEmail);}
         log.info("Logging in user {} with mail '{}'", user.getClientData(), userEmail);
         Wait.waitForPageLoaded(user.getDriver());
-
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.cssSelector("#download-button")), "The button searched by CSS #download-button is not clickable");
         openDialog("#download-button", user);
         Wait.waitForPageLoaded(user.getDriver());
         user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.id("email")), "The email field is not present");
         // Find form elements (login modal is already opened)
         WebElement userNameField = user.getDriver().findElement(By.id("email"));
-
         user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.id("password")), "The password field is not present");
         WebElement userPassField = user.getDriver().findElement(By.id("password"));
         // Fill input fields
         userNameField.sendKeys(userEmail);
         if (slow)
             waitSeconds(3);
-
         userPassField.sendKeys(userPass);
-
         if (slow)
             waitSeconds(3);
-
         // Ensure fields contain what has been entered
         Assertions.assertEquals(userNameField.getAttribute("value"), userEmail);
         Assertions.assertEquals(userPassField.getAttribute("value"), userPass);
@@ -220,19 +205,19 @@ public class BaseLoggedTest {
         try {
             userName = getUserName(user, true, APP_URL);
         } catch (NotLoggedException | ElementNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            if (e instanceof NotLoggedException) {
+                log.error("The user {} is not logged in", user.getClientData());}
+            else {
+                log.error("The web element with the user data was not found");
+            }
         }
-
         log.info("Logging in successful for user {}", user.getClientData());
-
     }
 
     protected void logout(BrowserUser user) { //43 lines
         log.info("Logging out {}", user.getClientData());
 
-        if (user.getDriver().findElements(By.cssSelector("#fixed-icon"))
-                .size() > 0) {
+        if (!user.getDriver().findElements(By.cssSelector("#fixed-icon")).isEmpty()) {
             // Get out of video session page
             if (!isClickable("#exit-icon", user)) { // Side menu not opened
                 user.getDriver().findElement(By.cssSelector("#fixed-icon"))
@@ -302,7 +287,7 @@ public class BaseLoggedTest {
                         "//div[contains(@class, 'modal-overlay') and contains(@style, 'opacity: 0.5')]")),
                 "Dialog not opened");
 
-        log.info("Dialog opened for user {}", user.getClientData());
+        log.info("Dialog opened by clicking CSS  for user {}", user.getClientData());
     }
 
     protected void openDialog(WebElement el, BrowserUser user) {//8lines
@@ -314,7 +299,7 @@ public class BaseLoggedTest {
         user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.xpath(
                         "//div[contains(@class, 'modal-overlay') and contains(@style, 'opacity: 0.5')]")),
                 "Dialog not opened");
-        log.info("Dialog opened for user {}", user.getClientData());
+        log.info("Dialog opened by web element for user {}", user.getClientData());
     }
 
     protected void waitForDialogClosed(String dialogId, String errorMessage,
@@ -342,14 +327,12 @@ public class BaseLoggedTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     public String getUserName(BrowserUser user, boolean goBack, String host) throws NotLoggedException, ElementNotFoundException {
         log.info("[INI]getUserName");
         //Wait to settings button to be present
         try {
-
             Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SETTINGS_BUTTON));
             WebElement settings_button = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.elementToBeClickable(SETTINGS_BUTTON));
 
@@ -370,11 +353,8 @@ public class BaseLoggedTest {
         if (goBack) {
             user.getDriver().navigate().back();
         }
-        //Check if the username is the expected
         log.info("[END] getUserName");
+
         return userUIName;
-
     }
-
-
 }
