@@ -111,7 +111,7 @@ class CourseTeacherTest extends BaseLoggedTest {
         // Create a new course
         String courseTitle = "Test Course_" + System.currentTimeMillis();
         CourseNavigationUtilities.newCourse(user.getDriver(), courseTitle);
-
+        //TO-DO the problem its here
         // Verify the course has been created
         assertTrue(checkIfCourseExists(driver, courseTitle));
 

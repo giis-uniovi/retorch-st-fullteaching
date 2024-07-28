@@ -10,7 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class CourseNavigationUtilities {
 
-    private static final Logger log = LoggerFactory.getLogger(CourseNavigationUtilities.class);
+    private static final Logger log = getLogger(CourseNavigationUtilities.class);
 
     public static String newCourse(WebDriver wd, String courseName) throws ElementNotFoundException { //37 lines
         NavigationUtilities.toCoursesHome(wd);
@@ -32,7 +31,7 @@ public class CourseNavigationUtilities {
         Click.byJS(wd, newCourseButton);
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL));
 
-        log.debug("Introducing Course Name: "+courseName);
+        log.debug("Introducing Course Name: {}", courseName);
         WebElement nameField = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL_NAME_FIELD));
         nameField.sendKeys(courseName);
         Click.element(wd, By.id(NEW_COURSE_MODAL_SAVE_ID));
@@ -49,9 +48,10 @@ public class CourseNavigationUtilities {
         List<WebElement> courses = courseList.findElements(By.tagName("li"));
 
         for (WebElement course : courses) {
+            String titleText = "No courses";
             try {
                 WebElement titleElement = course.findElement(By.className("title"));
-                String titleText = titleElement.getText();
+                titleText = titleElement.getText();
 
                 if (courseTitle.equals(titleText)) {
                     log.info("The course with title {} exists!", courseTitle);
@@ -59,6 +59,7 @@ public class CourseNavigationUtilities {
                 }
             } catch (NoSuchElementException ignored) {
                 // Do nothing and look for the next item
+                log.debug("The current course is:{} and the course that we are searching is {}",courseTitle,titleText);
             }
         }
         return false;
@@ -117,8 +118,8 @@ public class CourseNavigationUtilities {
         log.info("[INI] deleteCourse({})", courseName);
 
         NavigationUtilities.toCoursesHome(wd);
-        Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
-
+        WebElement coursesList = Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(COURSE_LIST));
+        int numcoursesinitial=coursesList.findElements(By.tagName("li")).size();
         try {
             WebElement courseElement = getCourseByName(wd, courseName);
             openEditCourseModal(wd, courseElement);
@@ -137,6 +138,12 @@ public class CourseNavigationUtilities {
             log.error("[END] deleteCourse KO: Course \"{}\" probably doesn't exist", courseName);
             throw new ElementNotFoundException("deleteCourse - Course " + courseName + " probably doesn't exist");
         }
+        log.debug("Checking that after removing the course, the number of courses is {} minus one", numcoursesinitial);
+        Wait.notTooMuch(wd).until(driver -> {
+            WebElement listCourses = driver.findElement(COURSE_LIST);
+            int currentNumberOfCourses = listCourses.findElements(By.tagName("li")).size();
+            return currentNumberOfCourses == numcoursesinitial - 1;
+        });
 
         log.info("[END] deleteCourse OK: Course \"{}\"", courseName);
     }
