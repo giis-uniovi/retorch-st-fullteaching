@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
@@ -120,7 +123,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         WebElement modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_NEW_SESSION_MODAL));
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TITLE).sendKeys(sessionName);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_CONTENT).sendKeys(sessionDescription);
-        modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(sessionDate);
+        introduceSessionDate(user,modal,sessionDate);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TIME).sendKeys(sessionHour);
         Click.element(user.getDriver(), modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON));
         Wait.notTooMuch(user.getDriver());
@@ -129,6 +132,35 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(SESSION_LIST_SESSION_ROW,3),"Incorrect number of sessions (never more than 2)");
         List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
         assertTrue(session_titles.contains(sessionName), "Session has not been created");
+    }
+
+    private void introduceSessionDate(BrowserUser user, WebElement element, String date) {
+        boolean success = false;
+        int attempts = 3;
+        log.info("The date is going to be:{}",date);
+        for (int i = 0; i < attempts; i++) {
+            try {
+                user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).clear();
+                String[] splitDate = date.split("-");
+                user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(date);
+                String invertedDate = splitDate[2] + "-" + splitDate[1] + "-" + splitDate[0];
+                String actualValue= user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).getAttribute("value");
+                if(!actualValue.equals(invertedDate)) { // Use JavaScript to set the value of the date input
+                    log.info("Selenium sendKeys dont working properly, using JS..");
+                    user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).clear();
+                    JavascriptExecutor js = (JavascriptExecutor) user.getDriver();
+                    js.executeScript("arguments[0].value = arguments[1];", user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE), invertedDate);
+                }
+                user.getWaiter().until(ExpectedConditions.textToBePresentInElementValue(element.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE), invertedDate));
+                success = true;
+                break; //
+            } catch (TimeoutException e) {
+                log.info("Attempt {} failed. Cleaning the dateChooser and retrying...", i + 1);
+            }
+        }
+        if (!success) {
+            throw new TimeoutException("Failed to set the date after " + attempts + " attempts.");
+        }
     }
     /**
      * This method gets the current date in the format DDMMYYYY. for the video session name
@@ -139,7 +171,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         int mYear = calendar.get(Calendar.YEAR);
         int mMonth = calendar.get(Calendar.MONTH);
         int mDay = calendar.get(Calendar.DAY_OF_MONTH);
-        return "" + (mDay < 10 ? "0" + mDay : mDay) + (mMonth < 10 ? "0" + mMonth : mMonth) + mYear;
+        return "" + (mDay < 10 ? "0" + mDay : mDay)+"-" + (mMonth < 10 ? "0" + mMonth : mMonth)+"-"+ mYear;
     }
     /**
      * This method gets the current time in the format HHmmA/P, where A/P indicates AM or PM for the video session name
