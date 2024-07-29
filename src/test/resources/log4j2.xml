@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
+    <Properties>
+        <Property name="logDate">${date:yyyy-MM-dd_HH-mm-ss}</Property>
+    </Properties>
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n%throwable"/>
         </Console>
-        <File name="FileAppender" fileName="target/testlogs/log${sys:tjob_name:-testinglocal}-test.log">
+        <File name="FileAppender" fileName="target/testlogs/log${logDate}-${sys:tjob_name:-testinglocal}-test.log" append="true">
             <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
         </File>
     </Appenders>
