@@ -131,17 +131,18 @@ class BViewCourseClassesTest extends BaseLoggedTest {
             // Access the first course
             WebElement course = CourseNavigationUtilities.getCourseByName(driver, courses.get(0));
             course.findElement(By.cssSelector(".course-title")).click();
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("course-classes")));
+            CourseNavigationUtilities.go2Tab(driver, SESSION_ICON);
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("session-data")));
 
             // Verify classes are ordered by date
-            List<WebElement> classes = driver.findElements(By.cssSelector(".class-item"));
+            List<WebElement> classes = driver.findElements(By.className("session-data"));
             assertTrue(classes.size() > 0, "No classes found in the course");
 
             // Check if classes are ordered by date
             boolean isOrderedByDate = true;
             for (int i = 1; i < classes.size(); i++) {
-                String previousDate = classes.get(i - 1).findElement(By.cssSelector(".class-date")).getText();
-                String currentDate = classes.get(i).findElement(By.cssSelector(".class-date")).getText();
+                String previousDate = classes.get(i - 1).findElement(By.className("session-datetime")).getText();
+                String currentDate = classes.get(i).findElement(By.className("session-datetime")).getText();
                 if (previousDate.compareTo(currentDate) > 0) {
                     isOrderedByDate = false;
                     break;
@@ -153,10 +154,11 @@ class BViewCourseClassesTest extends BaseLoggedTest {
             fail("Failed to access courses and view classes: " + e.getClass() + ": " + e.getLocalizedMessage());
         }
     }
-    @Test
-    void userAccessCoursesAndViewClassesCOT4oTest() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void userAccessCoursesAndViewClassesCOT4oTest(String mail, String password, String role) {
         // Step 1: User logs into the application
-        this.slowLogin(user, "user@example.com", "password");
+        this.slowLogin(user, mail, password);
 
         try {
             // Step 2: User navigates to the dashboard
@@ -168,16 +170,17 @@ class BViewCourseClassesTest extends BaseLoggedTest {
             String courseName = courses.get(0); // Select the first course for simplicity
             WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);
             course.findElement(By.cssSelector(".course-title")).click();
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("course-page")));
+            CourseNavigationUtilities.go2Tab(driver, SESSION_ICON);
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("session-data")));
 
             // Step 4: System displays the classes within the course, ordered by date
-            List<WebElement> classes = driver.findElements(By.cssSelector(".class-item"));
+            List<WebElement> classes = driver.findElements(By.className("session-data"));
             assertTrue(classes.size() > 0, "No classes found in the course");
 
             // Verify that classes are ordered by date
             for (int i = 1; i < classes.size(); i++) {
-                String previousDate = classes.get(i - 1).findElement(By.cssSelector(".class-date")).getText();
-                String currentDate = classes.get(i).findElement(By.cssSelector(".class-date")).getText();
+                String previousDate = classes.get(i - 1).findElement(By.className("session-datetime")).getText();
+                String currentDate = classes.get(i).findElement(By.className("session-datetime")).getText();
                 assertTrue(previousDate.compareTo(currentDate) <= 0, "Classes are not ordered by date");
             }
 
@@ -210,14 +213,18 @@ class BViewCourseClassesTest extends BaseLoggedTest {
 
             // Step 4: System displays the classes within the course, ordered by date
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
-
+            CourseNavigationUtilities.go2Tab(driver, SESSION_ICON);
             // Verify that classes are displayed
-            List<WebElement> classes = CourseNavigationUtilities.getClassesList(driver);
+            List<WebElement> classes = driver.findElements(By.className("session-data"));
             assertFalse(classes.isEmpty(), "No classes found for the selected course.");
 
             // Optionally, check if classes are ordered by date
             // (Assuming there is a method to verify the order of classes)
-            assertTrue(CourseNavigationUtilities.areClassesOrderedByDate(classes), "Classes are not ordered by date.");
+            for (int i = 1; i < classes.size(); i++) {
+                String previousDate = classes.get(i - 1).findElement(By.className("session-datetime")).getText();
+                String currentDate = classes.get(i).findElement(By.className("session-datetime")).getText();
+                assertTrue(previousDate.compareTo(currentDate) <= 0, "Classes are not ordered by date");
+            }
 
         } catch (ElementNotFoundException notFoundException) {
             fail("Failed to navigate to courses or view classes: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
@@ -233,8 +240,8 @@ class BViewCourseClassesTest extends BaseLoggedTest {
 
         try {
             // Step 2: Navigate to the dashboard
-            NavigationUtilities.toDashboard(driver);
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(DASHBOARD_ID)));
+            NavigationUtilities.toCoursesHome(driver);
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(COURSES_DASHBOARD_TITLE));
 
             // Step 3: View enrolled courses
             List<String> enrolledCourses = CourseNavigationUtilities.getCoursesList(driver);
@@ -244,15 +251,18 @@ class BViewCourseClassesTest extends BaseLoggedTest {
             String courseName = enrolledCourses.get(0); // Access the first course
             WebElement courseElement = CourseNavigationUtilities.getCourseByName(driver, courseName);
             Click.element(driver, courseElement);
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(COURSE_PAGE_ID)));
 
             // Step 5: View classes within the course
-            List<WebElement> classes = CourseNavigationUtilities.getClassesList(driver);
+             CourseNavigationUtilities.go2Tab(driver, SESSION_ICON);
+            List<WebElement> classes = driver.findElements(By.className("session-data"));
             assertFalse(classes.isEmpty(), "The course should have classes displayed.");
             // Optionally, check if classes are ordered by date
             // (Assuming there's a method to verify order)
-            assertTrue(CourseNavigationUtilities.areClassesOrderedByDate(classes), "Classes should be ordered by date.");
-
+            for (int i = 1; i < classes.size(); i++) {
+                String previousDate = classes.get(i - 1).findElement(By.className("session-datetime")).getText();
+                String currentDate = classes.get(i).findElement(By.className("session-datetime")).getText();
+                assertTrue(previousDate.compareTo(currentDate) <= 0, "Classes are not ordered by date");
+            }
         } catch (Exception e) {
             fail("Test failed due to an exception: " + e.getMessage());
         } finally {
