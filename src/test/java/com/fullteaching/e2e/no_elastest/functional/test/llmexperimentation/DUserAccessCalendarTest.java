@@ -10,6 +10,7 @@ import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -96,14 +97,14 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     void userAccessCalendarFS4oTest(String mail, String password, String role) {
-        this.slowLogin(mail, password);
+        this.slowLogin(user,mail, password);
         try {
             // Navigate to the calendar page
-            NavigationUtilities.toCalendarPage(driver);
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("calendar")));
+            NavigationUtilities.toCoursesHome(driver);
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("calendar-div")));
 
             // Verify that the calendar displays all the user's classes
-            List<WebElement> classes = driver.findElements(By.cssSelector(".calendar-class"));
+            List<WebElement> classes = driver.findElements(By.className("cal-day-badge"));
             assertTrue(classes.size() > 0, "No classes found in the calendar");
 
         } catch (Exception e) {
@@ -113,19 +114,19 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     void userCanAccessAndViewCalendarCOT4oTest(String mail, String password, String role) {
-        this.slowLogin(mail, password);
+        this.slowLogin(user,mail, password);
 
         try {
             // Navigate to the calendar page
-            NavigationUtilities.toCalendarPage(driver);
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("calendar")));
+            NavigationUtilities.toCoursesHome(driver);
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("calendar-div")));
 
             // Verify that the calendar is displayed
-            WebElement calendar = driver.findElement(By.id("calendar"));
+            WebElement calendar = driver.findElement(By.className("calendar-div"));
             assertTrue(calendar.isDisplayed(), "Calendar is not displayed");
 
             // Verify that the calendar displays all the user's classes
-            List<WebElement> classes = calendar.findElements(By.className("calendar-class"));
+            List<WebElement> classes = calendar.findElements(By.className("cal-day-badge"));
             assertTrue(classes.size() > 0, "No classes are displayed on the calendar");
 
             for (WebElement calendarClass : classes) {
@@ -150,17 +151,16 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
 
         try {
             // Step 2: User navigates to the calendar page
-            NavigationUtilities.toCalendarPage(driver);
-
+            NavigationUtilities.toCoursesHome(driver);
             // Step 3: System displays a calendar with all the user's classes
-            List<WebElement> calendarEntries = driver.findElements(By.className("calendar-entry")); // Assuming 'calendar-entry' is the class for calendar entries
+            List<WebElement> calendarEntries = driver.findElements(By.className("cal-day-badge")); // Assuming 'calendar-entry' is the class for calendar entries
             assertFalse(calendarEntries.isEmpty(), "The calendar should display at least one class entry.");
 
             // Additional assertions can be added here to verify the content of the calendar entries
-            for (WebElement entry : calendarEntries) {
-                assertNotNull(entry.findElement(By.className("class-title")), "Class title should be present in the calendar entry.");
-                // You can add more checks for date, time, etc. based on your application structure
-            }
+                Click.element(user.getDriver(),calendarEntries.get(0));
+                String entrytitle=user.getDriver().findElement(By.className("cal-event-title")).getText();
+                assertEquals("Session 1: Introduction to Web | 12:41",entrytitle,"Class title should be present in the calendar entry.");
+
 
         } catch (ElementNotFoundException notFoundException) {
             fail("Failed to navigate to the calendar page:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
@@ -178,15 +178,15 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
 
         try {
             // Step 2: User navigates to the calendar page
-            NavigationUtilities.toCalendarPage(driver);
+            NavigationUtilities.toCoursesHome(driver);
 
             // Step 3: Verify calendar display
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(CALENDAR_ID)));
-            WebElement calendar = driver.findElement(By.id(CALENDAR_ID));
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("calendar-div")));
+            WebElement calendar = driver.findElement(By.className("calendar-div"));
             assertTrue(calendar.isDisplayed(), "Calendar is not displayed");
 
             // Step 4: Check that the calendar shows all the user's classes
-            List<WebElement> classes = calendar.findElements(By.className(CLASS_ITEM_CLASS));
+            List<WebElement> classes =  calendar.findElements(By.className("cal-day-badge")); ;
             assertTrue(classes.size() > 0, "No classes found in the calendar");
 
             // Optionally, you can validate the class details here
