@@ -125,8 +125,8 @@ class AViewEnrolledCoursesTest extends BaseLoggedTest {
             }
 
             // Step 3: System displays a list of courses the user is enrolled in
-            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("courses-list")));
-            List<WebElement> courses = driver.findElements(By.className("course-item"));
+            Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("course-list")));
+            List<WebElement> courses = driver.findElements(By.className("course-list-item"));
 
             // Expected Output: The dashboard shows a list of courses the user is enrolled in
             assertTrue(courses.size() > 0, "No enrolled courses found for the user");
@@ -138,23 +138,23 @@ class AViewEnrolledCoursesTest extends BaseLoggedTest {
         // Teardown: Navigate to the main page to logout
         user.getDriver().get(APP_URL);
     }
-    @Test
-    void viewEnrolledCoursesCOT4oTest() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void viewEnrolledCoursesCOT4oTest(String email, String password, String role) {
         // Setup
-        String email = "user@example.com";
-        String password = "password";
-        String[] expectedCourses = {"Course 1", "Course 2", "Course 3"};
+        String[] expectedCourses = {"Pseudoscientific course for treating the evil eye",  "Don't mind. This is a real course"};
 
         // Login
         this.slowLogin(user, email, password);
 
         // Verify Dashboard
         try {
+            NavigationUtilities.toCoursesHome(driver);
             // Wait for the dashboard to load
-            Wait.notTooMuch(driver).until(ExpectedConditions.presenceOfElementLocated(By.id("dashboard")));
+            Wait.notTooMuch(driver).until(ExpectedConditions.presenceOfElementLocated(COURSES_DASHBOARD_TITLE));
 
             // Get the list of enrolled courses
-            List<WebElement> courses = driver.findElements(By.className("course-title"));
+            List<WebElement> courses = driver.findElements(By.className("title"));
 
             // Verify the number of courses
             assertEquals(expectedCourses.length, courses.size(), "Number of enrolled courses does not match");
@@ -178,19 +178,19 @@ class AViewEnrolledCoursesTest extends BaseLoggedTest {
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void viewEnrolledCoursesFS4oMiniTest(String mail, String password, String role) {
+    void viewEnrolledCoursesFS4oMiniTest(String mail, String password, String role) throws ElementNotFoundException {
         // Setup: User logs into the application
         this.slowLogin(user, mail, password);
 
         // Navigate to the dashboard
-        NavigationUtilities.toDashboard(driver);
+        NavigationUtilities.toCoursesHome(driver);
 
         // Wait for the courses list to be visible
-        Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("enrolledCoursesList")));
+        Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id("course-list")));
 
         // Verify that the dashboard shows a list of courses the user is enrolled in
-        List<WebElement> enrolledCourses = driver.findElements(By.className("course-title"));
-        assertFalse(enrolledCourses.isEmpty(), "The enrolled courses list should not be empty.");
+        List<WebElement> enrolledCourses = driver.findElements(By.className("course-list-item"));
+        assertFalse(enrolledCourses.size()!=2, "The enrolled courses list should not be empty.");
 
         // Optionally, you can check for specific course titles if known
         // assertTrue(enrolledCourses.stream().anyMatch(course -> course.getText().equals("Expected Course Title")), "Expected course is not found in the enrolled courses list.");
@@ -198,18 +198,17 @@ class AViewEnrolledCoursesTest extends BaseLoggedTest {
         // Teardown: Navigate back to the main page or logout
         user.getDriver().get(APP_URL);
     }
-    @Test
-    void viewEnrolledCoursesCOT4oMiniTest() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void viewEnrolledCoursesCOT4oMiniTest(String email, String password, String role) throws ElementNotFoundException {
         // Setup: Log in to the application
-        String email = "testuser@example.com"; // Replace with actual test user email
-        String password = "password"; // Replace with actual test user password
         this.slowLogin(user, email, password);
 
         // Navigation: Navigate to the dashboard
-        NavigationUtilities.toDashboard(driver);
+        NavigationUtilities.toCoursesHome(driver);
 
         // Verification: Check that the system displays a list of enrolled courses
-        List<WebElement> enrolledCourses = driver.findElements(By.className("enrolled-course")); // Replace with actual class name for enrolled courses
+        List<WebElement> enrolledCourses = driver.findElements(By.className("course-list-item")); // Replace with actual class name for enrolled courses
         Assertions.assertFalse(enrolledCourses.isEmpty(), "The enrolled courses list should not be empty.");
 
         // Optionally, validate the content of the enrolled courses
@@ -220,7 +219,7 @@ class AViewEnrolledCoursesTest extends BaseLoggedTest {
         }
 
         // Teardown: Log out of the application
-        NavigationUtilities.logout(driver); // Replace with actual logout method
+        //NavigationUtilities.logout(driver); // Replace with actual logout method (NOT NECESSARY DONE IN THE TEAR-DOWN)
     }
 
 
