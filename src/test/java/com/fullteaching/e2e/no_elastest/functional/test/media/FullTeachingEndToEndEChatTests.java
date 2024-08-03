@@ -19,21 +19,22 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.BrowserUser;
+import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static org.openqa.selenium.logging.LogType.BROWSER;
 
 /**
  * E2E tests for FullTeaching chat in a video session.
@@ -44,19 +45,15 @@ import static org.openqa.selenium.logging.LogType.BROWSER;
 
 @Tag("e2e")
 @DisplayName("E2E tests for FullTeaching chat")
-@ExtendWith(SeleniumJupiter.class)
 class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
 
-
-    private final static String TEACHER_BROWSER = "chrome";
     private final static String STUDENT_BROWSER = "chrome";
-
-    final String teacherMail = "teacher@gmail.com";
-    final String teacherPass = "pass";
     final String studentMail = "student1@gmail.com";
     final String studentPass = "pass";
-    BrowserUser student;
-    private String TestName = "default-test-name";
+
+    public static Stream<Arguments> data() throws IOException {
+        return ParameterLoader.getTestTeachers();
+    }
 
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
@@ -64,31 +61,36 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
     @Resource(resID = "Course", replaceable = {"Configuration"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READONLY")
-    @Test
-    void oneToOneChatInSessionChrome() { //197 Lines of code
-        int numberpriormessages = 1;
+    @DisplayName("oneToOneChatInSessionChrome")
+    @ParameterizedTest
+    @MethodSource("data")
+    @Tag("Multiuser Test")
+    void oneToOneChatInSessionChrome(String mail, String password, String role ) { //197 Lines of code
+        int numberpriormessages;
 
         // TEACHER
-        this.slowLogin(user, teacherMail, teacherPass);//24
+        this.slowLogin(teacher, mail, password);//24
 
-        log.info("{} entering first course", user.getClientData());
-        user.getWaiter().until(ExpectedConditions.presenceOfElementLocated(
+        log.info("{} entering first course", teacher.getClientData());
+        teacher.getWaiter().until(ExpectedConditions.presenceOfElementLocated(
                 By.cssSelector(("ul.collection li.collection-item:first-child div.course-title"))));
-        user.getDriver().findElement(By.cssSelector("ul.collection li.collection-item:first-child div.course-title"))
+        teacher.getDriver().findElement(By.cssSelector("ul.collection li.collection-item:first-child div.course-title"))
                 .click();
 
-        log.info("{} navigating to 'Sessions' tab", user.getClientData());
-        user.getWaiter().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(("#md-tab-label-0-1"))));
-        user.getDriver().findElement(By.cssSelector("#md-tab-label-0-1")).click();
+        log.info("{} navigating to 'Sessions' tab", teacher.getClientData());
+        teacher.getWaiter().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(("#md-tab-label-0-1"))));
+        teacher.getDriver().findElement(By.cssSelector("#md-tab-label-0-1")).click();
 
-        log.info("{} getting into first session", user.getClientData());
-        user.getDriver().findElement(By.cssSelector("ul div:first-child li.session-data div.session-ready")).click();
-        user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#fixed-icon")), "Element fixed-icon not clickable");
+        log.info("{} getting into first session", teacher.getClientData());
+        teacher.getDriver().findElement(By.cssSelector("ul div:first-child li.session-data div.session-ready")).click();
+        teacher.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#fixed-icon")), "Element fixed-icon not clickable");
         // Check connected message
-        user.getDriver().findElement(By.cssSelector("#fixed-icon")).click();
+        teacher.getDriver().findElement(By.cssSelector("#fixed-icon")).click();
 
-        checkSystemMessage("Connected", user, 100); // 6 lines
+        checkSystemMessage("Connected", teacher, 100); // 6 lines
         // STUDENT
+        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" +"oneToOneChatInSessionChrome-STUDENT", studentMail,5);//27 lines
+
         this.slowLogin(student, studentMail, studentPass);
 
         student.getWaiter().until(ExpectedConditions.presenceOfElementLocated(
@@ -104,26 +106,26 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         checkSystemMessage("Connected", student, 0); //6 lines
 
 
-        checkSystemMessage(STUDENT_NAME + " has connected", user, 100); //6 lines
+        checkSystemMessage(STUDENT_NAME + " has connected", teacher, 100); //6 lines
         checkSystemMessage(TEACHER_NAME + " has connected", student, 100);//6lines
         // Test chat
 
         String teacherMessage = "TEACHER CHAT MESSAGE";
         String studentMessage = "STUDENT CHAT MESSAGE";
-        numberpriormessages = getNumberMessages(user);
-        WebElement chatInputTeacher = user.getDriver().findElement(By.id("message"));
+        numberpriormessages = getNumberMessages(teacher);
+        WebElement chatInputTeacher = teacher.getDriver().findElement(By.id("message"));
         chatInputTeacher.sendKeys(teacherMessage);
-        user.getWaiter().until(ExpectedConditions.elementToBeClickable(By.id("send-btn")));
-        user.getDriver().findElement(By.id("send-btn")).click();
+        teacher.getWaiter().until(ExpectedConditions.elementToBeClickable(By.id("send-btn")));
+        teacher.getDriver().findElement(By.id("send-btn")).click();
 
-        checkOwnMessage(teacherMessage, TEACHER_NAME, user, numberpriormessages);//7 lines
+        checkOwnMessage(teacherMessage, TEACHER_NAME, teacher, numberpriormessages);//7 lines
         checkStrangerMessage(teacherMessage, TEACHER_NAME, student, numberpriormessages); //8lines
         numberpriormessages = getNumberMessages(student);
         WebElement chatInputStudent = student.getDriver().findElement(By.id("message"));
         chatInputStudent.sendKeys(studentMessage);
         student.getWaiter().until(ExpectedConditions.elementToBeClickable(By.id("send-btn")));
         student.getDriver().findElement(By.id("send-btn")).click();
-        checkStrangerMessage(studentMessage, STUDENT_NAME, user, numberpriormessages); //8lines
+        checkStrangerMessage(studentMessage, STUDENT_NAME, teacher, numberpriormessages); //8lines
         checkOwnMessage(studentMessage, STUDENT_NAME, student, numberpriormessages);//7lines
 
 
@@ -170,61 +172,5 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         return user.getDriver().findElements(By.tagName("app-chat-line")).size();
     }
 
-    @BeforeEach
-    void setup(TestInfo info) { //65 lines
-        log.info("Custom Set-up for the OpenviduTest");
-        if (info.getTestMethod().isPresent()) {
-            TestName = info.getTestMethod().get().getName();
-        }
-
-        log.info("##### Start test: " + TestName);
-        TJOB_NAME = System.getProperty("dirtarget");
-        user = setupBrowser(TEACHER_BROWSER, TJOB_NAME + "_" + TestName, teacherMail, WAIT_SECONDS);
-        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TestName, studentMail, WAIT_SECONDS);//27 lines
-
-    }
-
-    @AfterEach
-    void tearDown(TestInfo testInfo) { //13 lines
-        log.info("Custom TearDown");
-        if (testInfo.getTestMethod().isPresent()) {
-            TestName = testInfo.getTestMethod().get().getName();
-        }
-        if (student != null) {
-            log.info("##### Finish test: {} - Driver {}", TestName, this.student.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = student.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            //TO-DO- ERROR with the logout
-            if (student.isOnSession()) {
-                this.logout(student);
-            }
-
-            student.dispose();
-
-
-        }
-
-        if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", TestName, this.user.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            //TO-DO- ERROR with the logout
-            if (user.isOnSession()) {
-                this.logout(user);
-            }
-
-            user.dispose();
-
-
-        }
-
-
-    }
 
 }

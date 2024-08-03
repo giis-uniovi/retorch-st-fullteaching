@@ -50,7 +50,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     void teacherCourseMainTest(String mail, String password, String role) {//39+80+ 28 set up +13 lines teardown =160
-        this.slowLogin(user, mail, password);
+        this.slowLogin(teacher, mail, password);
         try {
 
             NavigationUtilities.toCoursesHome(driver); //4lines
@@ -106,23 +106,23 @@ class CourseTeacherTest extends BaseLoggedTest {
     @MethodSource("data")
     void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {
         // Setup
-        this.slowLogin(user, mail, password);
+        this.slowLogin(teacher, mail, password);
 
         // Create a new course
         String courseTitle = "Test Course_" + System.currentTimeMillis();
-        CourseNavigationUtilities.newCourse(user.getDriver(), courseTitle);
+        CourseNavigationUtilities.newCourse(teacher.getDriver(), courseTitle);
         //TO-DO the problem its here
         // Verify the course has been created
         assertTrue(checkIfCourseExists(driver, courseTitle));
 
         // Delete the course
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), courseTitle);
+        CourseNavigationUtilities.deleteCourse(teacher.getDriver(), courseTitle);
 
         // Verify the course has been deleted
         assertFalse(checkIfCourseExists(driver, courseTitle));
 
         // Teardown
-        user.getDriver().get(APP_URL);
+        teacher.getDriver().get(APP_URL);
     }
 
 
@@ -146,7 +146,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @MethodSource("data")
     void teacherEditCourseValues(String mail, String password, String role) {//165+256+ 28 set up +13 lines teardown =462
         String courseName = properties.getProperty("forum.test.course");
-        this.slowLogin(user, mail, password); //24 lines
+        this.slowLogin(teacher, mail, password); //24 lines
         try {
             // navigate to course if not there
             NavigationUtilities.toCoursesHome(driver);//3lines
@@ -193,7 +193,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             //wait for editor md editor???'
             WebElement edit_description_desc = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className(EDIT_DESCRIPTION_CONTENT_BOX_CLASS)));
             //text here?? /html/body/app/div/com.fullteaching.e2e.no_elastest.main/app-course-details/div/div[4]/md-tab-group/div[2]/div[1]/div/div[2]/p-editor/div/div[2]/div[1]
-            String old_desc = edit_description_desc.getAttribute("ng-reflect-model");
+            edit_description_desc.getAttribute("ng-reflect-model");
             //delete old_desc
             log.info("Deleting old description");
             WebElement editor = driver.findElement(By.className("ql-editor"));
@@ -213,7 +213,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             editor = driver.findElement(By.className("ql-editor"));
             jse.executeScript("arguments[0].innerHTML = '<h1>New Title</h1><h2>New SubHeading</h2><p>This is the normal content</p>'", editor);
             driver.findElement(By.xpath("//*[@id=\"textEditorRowButtons\"]/a[2]")).click();
-            user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.className("ql-editor-custom")), "Element that was waiting doesn't found");
+            teacher.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.className("ql-editor-custom")), "Element that was waiting doesn't found");
             WebElement preview = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("ql-editor-custom")));
             //check heading TO-DO : Error here, the type of font is not saved
             assertEquals("New Title", preview.findElement(By.tagName("h1")).getText(), "Heading preview not properly rendered");
@@ -253,7 +253,6 @@ class CourseTeacherTest extends BaseLoggedTest {
             //check if Forum is enabled
 
             if (ForumNavigationUtilities.isForumEnabled(forum_tab_content)) {//6lines
-                //if (enabled)
                 //check entries ¡Only check if there is entries and all the buttons are present!
                 log.info("Forum enabled checking that the entries and buttons are present");
                 assertNotNull(forum_tab_content.findElement(FORUM_NEW_ENTRY_ICON), "Add Entry not found");
@@ -310,7 +309,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     void teacherDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {//51+114+28 set up +13 lines teardown =206
-        this.slowLogin(user, mail, password);//24
+        this.slowLogin(teacher, mail, password);//24
         String courseName = "Test Course_" + System.currentTimeMillis();
         // navigate to course if not there
         try {
@@ -333,9 +332,9 @@ class CourseTeacherTest extends BaseLoggedTest {
         // in attenders
         // TODO: add attenders
         // delete course
-        List<WebElement> allCoursesPriorDeleting = user.getDriver().findElements(By.className("course-list-item"));
-        CourseNavigationUtilities.deleteCourse(user.getDriver(), courseName);
-        List<WebElement> allCourses = user.getDriver().findElements(By.className("course-list-item"));
+        List<WebElement> allCoursesPriorDeleting = teacher.getDriver().findElements(By.className("course-list-item"));
+        CourseNavigationUtilities.deleteCourse(teacher.getDriver(), courseName);
+        List<WebElement> allCourses = teacher.getDriver().findElements(By.className("course-list-item"));
         assertEquals(allCoursesPriorDeleting.size() - 1, allCourses.size());
         //Well done!
     }

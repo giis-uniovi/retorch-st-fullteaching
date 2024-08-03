@@ -9,6 +9,7 @@ import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
 import io.github.bonigarcia.seljup.SeleniumJupiter;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,26 +35,28 @@ class UserTest extends BaseLoggedTest {
      * was logged correctly
      */
 
-    @ParameterizedTest
-    @MethodSource("data")
+
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @ParameterizedTest
+    @MethodSource("data")
+    @DisplayName("loginTest")
     void loginTest(String mail, String password, String role) { //22  +85 +28 set up +13 lines teardown  =148
         try {
-            this.slowLogin(user, mail, password); //24 lines
+            this.slowLogin(teacher, mail, password); //24 lines
             UserUtilities.checkLogin(driver, mail); //12 lines
             assertTrue(true, "not logged");
         } catch (NotLoggedException | BadUserException e) {
-            e.printStackTrace();
+            log.debug("The user was not logged");
             fail("Not logged");
         } catch (ElementNotFoundException e) {
-            e.printStackTrace();
+            log.debug("The web element used to check the log was not found");
             fail(e.getLocalizedMessage());
         }
         try {
-            this.logout(user); //14 lines
+            this.logout(teacher); //14 lines
             UserUtilities.checkLogOut(driver); //8lines
         } catch (ElementNotFoundException eleNotFoundExcept) {
             fail("Still logged");

@@ -6,16 +6,17 @@ import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.SessionNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
+import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 
@@ -24,14 +25,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
@@ -39,10 +39,13 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
     final static Logger log = getLogger(lookup().lookupClass());
 
     public String courseName;
-    protected List<BrowserUser> studentBrowserUserList;
     protected List<String> studentPassList;
     protected List<String> studentNamesList;
     protected List<String> studentNameList;
+
+    public static Stream<Arguments> data() throws IOException {
+        return ParameterLoader.getTestTeachers();
+    }
 
 
     /**
@@ -56,17 +59,19 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
     @Resource(resID = "Course", replaceable = {"Session"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READONLY")
-    @Test
-    void sessionTest() throws ElementNotFoundException, IOException {
+    @DisplayName("sessionTest")
+    @ParameterizedTest
+    @MethodSource("data")
+    void sessionTest(String mail, String password, String role) throws ElementNotFoundException, IOException {
         String sessionName = "Today's Session";
         courseName = "Pseudoscientific course for treating the evil eye";
-        this.slowLogin(this.user, "teacher@gmail.com", "pass");
+        this.slowLogin(this.teacher, mail, password);
         initializeStudents("src/test/resources/inputs/default_user_LoggedVideoStudents.csv");
         createNewSession(sessionName);
-        joinSession(sessionName, this.user);
+        joinSession(sessionName, this.teacher);
         joinSessionStudents(sessionName);
         leaveStudentSessions();
-        leaveSession(this.user);
+        leaveSession(this.teacher);
         deleteSession(sessionName);
     }
 
@@ -76,6 +81,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      * @throws IOException if there is an error reading the file
      */
     private void initializeStudents(String pathData) throws IOException {
+        log.info("Initializing students");
         String users_data = loadStudentsData(pathData);
         studentNameList = new ArrayList<>();
         studentPassList = new ArrayList<>();
@@ -94,6 +100,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
             studentNamesList.add(userid);
             studentBrowserUserList.add(studentD);
         }
+        log.info("Initializing students end, number of students: {} " ,studentNameList.size());
     }
     /**
      * This method creates a new video session with the given name, navigating to the course, opens the new session modal,
@@ -106,19 +113,19 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         String sessionHour = getCurrentTime();
         String sessionDescription = "Wow today session will be amazing";
 
-        navigateToCourse(user, courseName);
-        Click.element(user.getDriver(), SESSION_LIST_NEW_SESSION_ICON);
-        WebElement modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_NEW_SESSION_MODAL));
+        navigateToCourse(teacher, courseName);
+        Click.element(teacher.getDriver(), SESSION_LIST_NEW_SESSION_ICON);
+        WebElement modal = Wait.notTooMuch(teacher.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_NEW_SESSION_MODAL));
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TITLE).sendKeys(sessionName);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_CONTENT).sendKeys(sessionDescription);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(sessionDate);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TIME).sendKeys(sessionHour);
-        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON));
-        Wait.notTooMuch(user.getDriver());
+        Click.element(teacher.getDriver(), modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON));
+        Wait.notTooMuch(teacher.getDriver());
         // Verify session creation
-        Wait.waitForPageLoaded(user.getDriver());
-        user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(SESSION_LIST_SESSION_ROW,3),"Incorrect number of sessions (never more than 2)");
-        List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
+        Wait.waitForPageLoaded(teacher.getDriver());
+        teacher.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(SESSION_LIST_SESSION_ROW,3),"Incorrect number of sessions (never more than 2)");
+        List<String> session_titles = SessionNavigationUtilities.getFullSessionList(teacher.getDriver());
         assertTrue(session_titles.contains(sessionName), "Session has not been created");
     }
     /**
@@ -202,13 +209,13 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         List<String> session_titles;
         WebElement modal;
         WebElement session;
-        session = SessionNavigationUtilities.getSession(user.getDriver(), sessionName);
-        Click.element(user.getDriver(), session.findElement(SESSION_LIST_SESSION_EDIT_ICON));
-        modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_EDIT_MODAL));
-        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("label")));
-        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("a")));
-        Wait.waitForPageLoaded(user.getDriver());//13 lines
-        session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver()); //7 lines
+        session = SessionNavigationUtilities.getSession(teacher.getDriver(), sessionName);
+        Click.element(teacher.getDriver(), session.findElement(SESSION_LIST_SESSION_EDIT_ICON));
+        modal = Wait.notTooMuch(teacher.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_EDIT_MODAL));
+        Click.element(teacher.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("label")));
+        Click.element(teacher.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("a")));
+        Wait.waitForPageLoaded(teacher.getDriver());//13 lines
+        session_titles = SessionNavigationUtilities.getFullSessionList(teacher.getDriver()); //7 lines
         assertFalse(session_titles.contains(sessionName), "Session has not been deleted");
     }
 
@@ -225,29 +232,5 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         System.out.println(key);
         return key.toString();
     }
-    @AfterEach
-    void tearDown(TestInfo testInfo) {
-        //Logout and exit students
-        if (studentBrowserUserList!=null) {
-            for (BrowserUser student : studentBrowserUserList) {
-                if (student.isOnSession()) {
-                    this.logout(student);
-                }
-                student.dispose();
-            }
-        }
-        if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            if (user.isOnSession()) {
-                this.logout(user);
-            }
 
-            user.dispose();
-        }
-    }
 }
