@@ -25,7 +25,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -41,25 +42,19 @@ import static org.openqa.selenium.logging.LogType.BROWSER;
 public class ChromeUser extends BrowserUser {
     ChromeOptions options = new ChromeOptions();
 
-    public ChromeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) {
+    public ChromeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) throws URISyntaxException, MalformedURLException {
         super(userName, timeOfWaitInSeconds);
         log.info("Starting the configuration of the web browser");
-        log.debug(String.format("The Test names are: %s", testName));
+        log.debug(String.format("The Test name is: %s", testName));
 
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(BROWSER, ALL);
         options.setCapability("goog:loggingPrefs", logPrefs);
 
         //Problems with the max attempt of retry, solved with : https://github.com/aerokube/selenoid/issues/1124 solved with --disable-gpu
+        // options.addArguments("--disable-gpu"); Commented for the moment
         //Problems with flakiness due to screen resolution solved with --start-maximized
-        String[] arguments = {"--no-sandbox", "--disable-dev-shm-usage", "--allow-elevated-browser", "--disable-gpu", "--start-maximized"};
-
-        log.debug("Adding the arguments ({})", Arrays.toString(arguments));
-        for (String argument : arguments
-        ) {
-            options.addArguments(argument);
-        }
-
+        options.addArguments("--start-maximized");
         options.setAcceptInsecureCerts(true);
         //This capability is to store the logs of the test case
         log.debug("Added Capabilities of acceptInsecureCerts and ignore alarms");
@@ -68,8 +63,6 @@ public class ChromeUser extends BrowserUser {
             log.info("Using the Local WebDriver ()");
             this.driver = new ChromeDriver(options);
         } else {
-            try {
-
                 Map<String, Object> selenoidOptions = new HashMap<>();
                 log.info("Using the remote WebDriver (Selenoid)");
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
@@ -85,7 +78,7 @@ public class ChromeUser extends BrowserUser {
                 LocalDateTime now = LocalDateTime.now();
                 String logName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
                 String videoName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
+                log.debug("The data of this test would be stored into: video name: {} and the log name: {} " , videoName,logName);
 
                 selenoidOptions.put("enableLog", true);
                 selenoidOptions.put("logName ", logName);
@@ -97,13 +90,10 @@ public class ChromeUser extends BrowserUser {
 
                 //END CAPABILITIES FOR SELENOID RETORCH
                 log.debug("Configuring the remote WebDriver ");
-                RemoteWebDriver remote = new RemoteWebDriver(new URL("http://selenoid:4444/wd/hub"), options);
+                RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
                 log.debug("Configuring the Local File Detector");
                 remote.setFileDetector(new LocalFileDetector());
                 this.driver = remote;
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Exception creating eusApiURL", e);
-            }
         }
         log.debug("Configure the driver connection timeouts at ({})", this.timeOfWaitInSeconds);
         new WebDriverWait(driver, Duration.ofSeconds(this.timeOfWaitInSeconds));

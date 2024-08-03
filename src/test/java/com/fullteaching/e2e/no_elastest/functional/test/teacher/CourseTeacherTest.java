@@ -193,7 +193,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             //wait for editor md editor???'
             WebElement edit_description_desc = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className(EDIT_DESCRIPTION_CONTENT_BOX_CLASS)));
             //text here?? /html/body/app/div/com.fullteaching.e2e.no_elastest.main/app-course-details/div/div[4]/md-tab-group/div[2]/div[1]/div/div[2]/p-editor/div/div[2]/div[1]
-            String old_desc = edit_description_desc.getAttribute("ng-reflect-model");
+            edit_description_desc.getAttribute("ng-reflect-model");
             //delete old_desc
             log.info("Deleting old description");
             WebElement editor = driver.findElement(By.className("ql-editor"));
@@ -253,7 +253,6 @@ class CourseTeacherTest extends BaseLoggedTest {
             //check if Forum is enabled
 
             if (ForumNavigationUtilities.isForumEnabled(forum_tab_content)) {//6lines
-                //if (enabled)
                 //check entries ¡Only check if there is entries and all the buttons are present!
                 log.info("Forum enabled checking that the entries and buttons are present");
                 assertNotNull(forum_tab_content.findElement(FORUM_NEW_ENTRY_ICON), "Add Entry not found");

@@ -29,7 +29,7 @@ public class SessionNavigationUtilities {
             try {
                 WebElement title = session.findElement(SESSION_LIST_SESSION_NAME);
                 String title_text = title.getText();
-                if (title_text == null || title_text.equals("")) {
+                if (title_text == null || title_text.isEmpty()) {
                     title_text = title.getAttribute("innerHTML");
                 }
                 if (session_name.equals(title_text)) {

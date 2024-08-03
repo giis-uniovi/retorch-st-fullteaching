@@ -19,21 +19,24 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.BrowserUser;
+import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Date;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static org.openqa.selenium.logging.LogType.BROWSER;
 
 /**
  * E2E tests for FullTeaching chat in a video session.
@@ -44,19 +47,15 @@ import static org.openqa.selenium.logging.LogType.BROWSER;
 
 @Tag("e2e")
 @DisplayName("E2E tests for FullTeaching chat")
-@ExtendWith(SeleniumJupiter.class)
 class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
 
-
-    private final static String TEACHER_BROWSER = "chrome";
     private final static String STUDENT_BROWSER = "chrome";
-
-    final String teacherMail = "teacher@gmail.com";
-    final String teacherPass = "pass";
     final String studentMail = "student1@gmail.com";
     final String studentPass = "pass";
-    BrowserUser student;
-    private String TestName = "default-test-name";
+
+    public static Stream<Arguments> data() throws IOException {
+        return ParameterLoader.getTestTeachers();
+    }
 
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
@@ -64,12 +63,15 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
     @Resource(resID = "Course", replaceable = {"Configuration"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READONLY")
-    @Test
-    void oneToOneChatInSessionChrome() { //197 Lines of code
-        int numberpriormessages = 1;
+    @DisplayName("oneToOneChatInSessionChrome")
+    @ParameterizedTest
+    @MethodSource("data")
+    @Tag("Multiuser Test")
+    void oneToOneChatInSessionChrome(String mail, String password, String role ) throws URISyntaxException, MalformedURLException { //197 Lines of code
+        int numberpriormessages;
 
         // TEACHER
-        this.slowLogin(user, teacherMail, teacherPass);//24
+        this.slowLogin(user, mail, password);//24
 
         log.info("{} entering first course", user.getClientData());
         user.getWaiter().until(ExpectedConditions.presenceOfElementLocated(
@@ -89,6 +91,8 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
 
         checkSystemMessage("Connected", user, 100); // 6 lines
         // STUDENT
+        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" +"oneToOneChatInSessionChrome-STUDENT", studentMail,5);//27 lines
+
         this.slowLogin(student, studentMail, studentPass);
 
         student.getWaiter().until(ExpectedConditions.presenceOfElementLocated(
@@ -170,61 +174,5 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         return user.getDriver().findElements(By.tagName("app-chat-line")).size();
     }
 
-    @BeforeEach
-    void setup(TestInfo info) { //65 lines
-        log.info("Custom Set-up for the OpenviduTest");
-        if (info.getTestMethod().isPresent()) {
-            TestName = info.getTestMethod().get().getName();
-        }
-
-        log.info("##### Start test: " + TestName);
-        TJOB_NAME = System.getProperty("dirtarget");
-        user = setupBrowser(TEACHER_BROWSER, TJOB_NAME + "_" + TestName, teacherMail, WAIT_SECONDS);
-        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TestName, studentMail, WAIT_SECONDS);//27 lines
-
-    }
-
-    @AfterEach
-    void tearDown(TestInfo testInfo) { //13 lines
-        log.info("Custom TearDown");
-        if (testInfo.getTestMethod().isPresent()) {
-            TestName = testInfo.getTestMethod().get().getName();
-        }
-        if (student != null) {
-            log.info("##### Finish test: {} - Driver {}", TestName, this.student.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = student.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            //TO-DO- ERROR with the logout
-            if (student.isOnSession()) {
-                this.logout(student);
-            }
-
-            student.dispose();
-
-
-        }
-
-        if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", TestName, this.user.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            //TO-DO- ERROR with the logout
-            if (user.isOnSession()) {
-                this.logout(user);
-            }
-
-            user.dispose();
-
-
-        }
-
-
-    }
 
 }

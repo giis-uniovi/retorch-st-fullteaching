@@ -24,7 +24,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ import java.util.Map;
 public class EdgeUser extends BrowserUser {
     EdgeOptions options = new EdgeOptions();
 
-    public EdgeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) {
+    public EdgeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) throws URISyntaxException {
         super(userName, timeOfWaitInSeconds);
         log.info(String.format("The Test names are: %s", testName));
 
@@ -67,7 +68,7 @@ public class EdgeUser extends BrowserUser {
                 LocalDateTime now = LocalDateTime.now();
                 String logName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
                 String videoName = dtf.format(now) + "_" + testName + "_" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
+                log.debug("The data of this test would be stored into: video name {} and the log is {}", videoName,logName);
 
                 selenoidOptions.put("enableLog", true);
                 selenoidOptions.put("logName ", logName);
@@ -79,7 +80,7 @@ public class EdgeUser extends BrowserUser {
 
                 //END CAPABILITIES FOR SELENOID RETORCH
 
-                RemoteWebDriver remote = new RemoteWebDriver(new URL(eusApiURL), options);
+                RemoteWebDriver remote = new RemoteWebDriver(new URI(eusApiURL).toURL(), options);
                 remote.setFileDetector(new LocalFileDetector());
 
 

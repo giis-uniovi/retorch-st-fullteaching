@@ -8,8 +8,7 @@ import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -25,7 +24,6 @@ import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
-@ExtendWith(SeleniumJupiter.class)
 class CourseStudentTest extends BaseLoggedTest {
 
 
@@ -46,6 +44,7 @@ class CourseStudentTest extends BaseLoggedTest {
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
     void studentCourseMainTest(String userMail, String password, String role) {//45+ 107+28 set up +13 lines teardown =193

@@ -12,7 +12,6 @@ import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +22,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -31,9 +29,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.slf4j.LoggerFactory.getLogger;
 
 
 @Tag("e2e")
@@ -66,6 +62,7 @@ class LoggedForumTest extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
     void forumLoadEntriesTest(String mail, String password, String role) { //47lines +115 +28 set up +13 lines teardown =203
@@ -74,7 +71,7 @@ class LoggedForumTest extends BaseLoggedTest {
             //navigate to courses.
             NavigationUtilities.toCoursesHome(driver);//3lines
             List<String> courses = CourseNavigationUtilities.getCoursesList(driver);//13lines
-            assertTrue(courses.size() > 0, "No courses in the list");
+            assertFalse(courses.isEmpty(), "No courses in the list");
             //find course with forum activated
             boolean activated_forum_on_some_test = false;
             boolean has_comments = false;
@@ -92,7 +89,7 @@ class LoggedForumTest extends BaseLoggedTest {
                     log.info("Loading the entries list");
                     //Load list of entries
                     List<String> entries_list = ForumNavigationUtilities.getFullEntryList(driver);//6lines
-                    if (entries_list.size() > 0) {
+                    if (!entries_list.isEmpty()) {
                         //Go into first entry
                         for (String entry_name : entries_list) {
                             log.info("Checking the entry with name: {}", entry_name);
@@ -102,7 +99,7 @@ class LoggedForumTest extends BaseLoggedTest {
                             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST));
                             List<WebElement> comments = ForumNavigationUtilities.getComments(driver);
                             log.info("Checking if the entry has comments");
-                            if (comments.size() > 0) {
+                            if (!comments.isEmpty()) {
                                 has_comments = true;
                                 log.info("Comments found, saving them");
 
@@ -134,6 +131,7 @@ class LoggedForumTest extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
     void forumNewEntryTest(String mail, String password, String role) {// 48+ 104 +   28 set up +13 lines teardown =193
@@ -180,7 +178,7 @@ class LoggedForumTest extends BaseLoggedTest {
             //first comment should be the inserted while creating the entry
             Wait.waitForPageLoaded(driver);
             List<WebElement> comments = ForumNavigationUtilities.getComments(driver);
-            assertFalse(comments.size() < 1, "No comments on the entry");
+            assertFalse(comments.isEmpty(), "No comments on the entry");
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST));
             Wait.waitForPageLoaded(driver);
             WebElement newComment = comments.get(0);
@@ -211,6 +209,7 @@ class LoggedForumTest extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @DisplayName("forumNewCommentTest")
     @ParameterizedTest
     @MethodSource("data")
     void forumNewCommentTest(String mail, String password, String role) { // 69+142 + 28 set up +13 lines teardown =252
@@ -299,15 +298,17 @@ class LoggedForumTest extends BaseLoggedTest {
      * previously created, go to the first and replies to the same comment.After it, we check
      * that the comment was correctly published.
      */
-    @Disabled
-    @ParameterizedTest
-    @MethodSource("data")
+
+
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @DisplayName("forumNewReply2CommentTest")
+    @ParameterizedTest
+    @MethodSource("data")
     void forumNewReply2CommentTest(String mail, String password, String role) { // 63+137+ 28 set up +13 lines teardown = 242
         this.slowLogin(user, mail, password);//24 lines
         Calendar calendar = Calendar.getInstance();

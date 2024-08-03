@@ -24,7 +24,8 @@ import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +36,7 @@ import java.util.Map;
 public class FirefoxUser extends BrowserUser {
     FirefoxOptions options = new FirefoxOptions();
 
-    public FirefoxUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) {
+    public FirefoxUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) throws URISyntaxException {
         super(userName, timeOfWaitInSeconds);
         //TO-DO Firefox configuration has changed, review it.
         FirefoxProfile profile = new FirefoxProfile();
@@ -74,8 +75,7 @@ public class FirefoxUser extends BrowserUser {
                 LocalDateTime now = LocalDateTime.now();
                 String logName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
                 String videoName = dtf.format(now) + "_" + testName + "_" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
-
+                log.debug("The data of this test would be stored into: video name {} and the log is {}", videoName,logName);
                 selenoidOptions.put("enableLog", true);
                 selenoidOptions.put("logName ", logName);
                 selenoidOptions.put("videoName", videoName);
@@ -86,7 +86,7 @@ public class FirefoxUser extends BrowserUser {
 
                 //END CAPABILITIES FOR SELENOID RETORCH
 
-                RemoteWebDriver remote = new RemoteWebDriver(new URL(eusApiURL), options);
+                RemoteWebDriver remote = new RemoteWebDriver(new URI(eusApiURL).toURL(), options);
                 remote.setFileDetector(new LocalFileDetector());
 
 
@@ -99,7 +99,6 @@ public class FirefoxUser extends BrowserUser {
             }
         }
 
-        //this.driver.manage().timeouts().setScriptTimeout(this.timeOfWaitInSeconds, TimeUnit.SECONDS);
 
         this.configureDriver();
     }

@@ -13,8 +13,6 @@ import java.util.List;
 
 import static com.fullteaching.e2e.no_elastest.common.BaseLoggedTest.HOST;
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
-import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class NavigationUtilities {

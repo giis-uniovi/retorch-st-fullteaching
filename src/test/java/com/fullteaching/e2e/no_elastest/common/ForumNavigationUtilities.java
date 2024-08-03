@@ -15,10 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class ForumNavigationUtilities {
@@ -72,7 +70,7 @@ public class ForumNavigationUtilities {
             try {
                 WebElement title = entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE);
                 String title_text = title.getText();
-                if (title_text == null || title_text.equals("")) {
+                if (title_text == null || title_text.isEmpty()) {
                     title_text = title.getAttribute("innerHTML");
                 }
                 if (entry_name.equals(title_text)) {

@@ -6,11 +6,11 @@ import com.fullteaching.e2e.no_elastest.common.SpiderNavigation;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebElement;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.slf4j.LoggerFactory.getLogger;
 
 class UnLoggedLinksTests extends BaseLoggedTest {
 
@@ -30,17 +28,18 @@ class UnLoggedLinksTests extends BaseLoggedTest {
     }
 
     public static Stream<Arguments> data() throws IOException {
-        return ParameterLoader.getTestUsers();
+        return ParameterLoader.getTestTeachers();
     }
 
-    @ParameterizedTest
-    @MethodSource("data")
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {})
     @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "READWRITE")
+    @ParameterizedTest
+    @MethodSource("data")
+    @DisplayName("spiderUnloggedTest")
     void spiderUnloggedTest(String mail, String password, String role) { //125 lines + 28 set up +13 lines teardown = 166
 
         userMail = "nonloged@gmail.com";

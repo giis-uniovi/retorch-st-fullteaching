@@ -14,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
-import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class UserUtilities {

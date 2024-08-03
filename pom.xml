@@ -150,9 +150,9 @@
     <!-- Plugins -->
 
     <build>
-        <!-- Temporal patch, comment this to avoid unexpected behaviour -->
+        <!-- To avoid problems with concurrency we change the directories of the reports and outputs -->
         <testOutputDirectory>${basedir}/target/test-classes/${dirtarget}</testOutputDirectory>
-
+        <outputDirectory>${basedir}/target/classes/${dirtarget}</outputDirectory>
         <plugins>
             <!-- Jacoco Plugin for Jesus -->
             <plugin>

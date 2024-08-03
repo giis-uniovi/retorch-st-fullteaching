@@ -20,22 +20,25 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -47,16 +50,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 //@Disabled
 @Tag("e2e")
 @DisplayName("E2E tests for FullTeaching REST CRUD operations")
-@ExtendWith(SeleniumJupiter.class)
 class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
 
 
     final String TEST_COURSE_INFO = "TEST_COURSE_INFO";
     final String EDITED = " EDITED";
-    final String TEACHER_MAIL = "teacher@gmail.com";
-    final String TEACHER_PASS = "pass";
     final String TEACHER_NAME = "Teacher Cheater";
     String COURSE_NAME = "TEST_COURSE";
+
+    public static Stream<Arguments> data() throws IOException {
+        return ParameterLoader.getTestTeachers();
+    }
 
     public FullTeachingEndToEndRESTTests() {
         super();
@@ -70,17 +74,19 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Configuration"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void courseRestOperations() throws ElementNotFoundException {
-        loginAndCreateNewCourse();
+    @DisplayName("courseRestOperations")
+    @ParameterizedTest
+    @MethodSource("data")
+    void courseRestOperations(String mail, String password, String role ) throws ElementNotFoundException {
+        loginAndCreateNewCourse(mail,password);
 
         editCourse();
 
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME + EDITED); // Tear down
     }
 
-    private void loginAndCreateNewCourse() throws ElementNotFoundException {
-        slowLogin(user, TEACHER_MAIL, TEACHER_PASS);
+    private void loginAndCreateNewCourse(String mail, String password) throws ElementNotFoundException {
+        slowLogin(user, mail, password);
         CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME);
     }
 
@@ -104,9 +110,11 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Information"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void courseInfoRestOperations() throws ElementNotFoundException { //12+16+65 set up +60 lines teardown =153
-        loginAndCreateNewCourse();
+    @DisplayName("courseInfoRestOperations")
+    @ParameterizedTest
+    @MethodSource("data")
+    void courseInfoRestOperations(String mail, String password, String role) throws ElementNotFoundException { //12+16+65 set up +60 lines teardown =153
+        loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "info-tab-icon");//16 lines
         user.waitUntil(ExpectedConditions.presenceOfNestedElementLocatedBy(By.cssSelector(".md-tab-body.md-tab-active"), By.cssSelector(".card-panel.warning")), "Course info wasn't empty");
         log.info("Editing course information");
@@ -126,9 +134,11 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Session"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void sessionRestOperations() throws ElementNotFoundException {
-        loginAndCreateNewCourse();
+    @DisplayName("sessionRestOperations")
+    @ParameterizedTest
+    @MethodSource("data")
+    void sessionRestOperations(String mail, String password, String role) throws ElementNotFoundException {
+        loginAndCreateNewCourse(mail,password);
 
         addNewSession();
 
@@ -207,9 +217,11 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void forumRestOperations() throws ElementNotFoundException { //60+66+65 set up +60 lines teardown =251
-        loginAndCreateNewCourse();
+    @DisplayName("forumRestOperations")
+    @ParameterizedTest
+    @MethodSource("data")
+    void forumRestOperations(String mail, String password, String role) throws ElementNotFoundException { //60+66+65 set up +60 lines teardown =251
+        loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "forum-tab-icon");//16 lines
         log.info("Adding new entry to the forum");
         openDialog("#add-entry-icon", user);//8lines
@@ -279,9 +291,11 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Files"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void filesRestOperations() throws ElementNotFoundException {//88+112+65 set up +60 lines teardown =325
-        loginAndCreateNewCourse();
+    @DisplayName("filesRestOperations")
+    @ParameterizedTest
+    @MethodSource("data")
+    void filesRestOperations(String mail, String password, String role) throws ElementNotFoundException {//88+112+65 set up +60 lines teardown =325
+        loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "files-tab-icon");//16 lines
         log.info("Checking that there are no files in the course");
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.cssSelector("app-error-message .card-panel.warning")),
@@ -380,9 +394,11 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Attenders"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void attendersRestOperations() throws ElementNotFoundException {//42+32+65 set up +60 lines teardown =199
-        loginAndCreateNewCourse();
+    @DisplayName("attendersRestOperations")
+    @ParameterizedTest
+    @MethodSource("data")
+    void attendersRestOperations(String mail, String password, String role) throws ElementNotFoundException {//42+32+65 set up +60 lines teardown =199
+        loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "attenders-tab-icon");//16 lines
         log.info("Checking that there is only one attender to the course");
         user.waitUntil(ExpectedConditions.numberOfElementsToBe(By.className("attender-row-div"), 1),

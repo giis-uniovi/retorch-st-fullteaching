@@ -20,19 +20,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.openqa.selenium.logging.LogType.BROWSER;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BaseLoggedTest {
 
     public static final String CHROME = "chrome";
-    // For use another host
-    //protected static final String host= SetUp.getHost();
     public static final String FIREFOX = "firefox";
     public static final String EDGE = "edge";
     public static final Logger log = LoggerFactory.getLogger(BaseLoggedTest.class);
@@ -41,7 +40,6 @@ public class BaseLoggedTest {
     public static String TEACHER_BROWSER;
     public static String STUDENT_BROWSER;
     public static String BROWSER_NAME;
-    public static String course_title;
     protected static String HOST = LOCALHOST;
     protected static String userName;
     protected static String userMail;
@@ -53,6 +51,8 @@ public class BaseLoggedTest {
 
     public WebDriver driver;
     protected BrowserUser user;
+    protected BrowserUser student;
+    protected List<BrowserUser> studentBrowserUserList;
 
     public BaseLoggedTest() {
     }
@@ -66,7 +66,7 @@ public class BaseLoggedTest {
             // Load a properties file for reading
             properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
         } catch (IOException ex) {
-            ex.printStackTrace(); // Consider logging the exception instead of printing the stack trace
+            log.error("Properties file could not be loaded");
         }
 
         // Check if running outside ElasTest
@@ -85,7 +85,7 @@ public class BaseLoggedTest {
             TJOB_NAME = envTJobName;
             PORT = envPort;
             APP_URL = envUrl + TJOB_NAME + ":" + PORT + "/";
-            log.debug("The URL is" + APP_URL);
+            log.debug("The URL is {}" , APP_URL);
             HOST = APP_URL;
         } else {
             // Check if app.url system property is defined
@@ -109,19 +109,18 @@ public class BaseLoggedTest {
     }
 
     @BeforeEach
-    void setup(TestInfo info) { //65 lines
-        if (info.getTestMethod().isPresent()) {
-            TEST_NAME = info.getTestMethod().get().getName();
-        }
-        log.info("##### Start test: " + TEST_NAME);
+    void setup(TestInfo info) throws URISyntaxException, MalformedURLException { //65 lines
+        log.info("##### Start test: {}" , info.getTestMethod().get().getName());
         TJOB_NAME = System.getProperty("dirtarget");
 
-        user = setupBrowser("chrome", TJOB_NAME + "_" + TEST_NAME, userMail, WAIT_SECONDS);
-        driver = user.getDriver();
+        this.user = setupBrowser("chrome", TJOB_NAME + "_" + info.getTestMethod().get().getName(), "Teacher", WAIT_SECONDS);
+
+        this.driver = this.user.getDriver();
+
     }
 
     protected BrowserUser setupBrowser(String browser, String testName,
-                                       String userIdentifier, int secondsOfWait) {
+                                       String userIdentifier, int secondsOfWait) throws URISyntaxException, MalformedURLException {
         BrowserUser u;
         log.info("Starting browser ({})", browser);
 
@@ -160,20 +159,41 @@ public class BaseLoggedTest {
     }
 
     @AfterEach
-    void tearDown(TestInfo testInfo) { //13 lines
-
-        if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
+    void tearDown(TestInfo info) { //13 lines
+        if (this.user != null) {
+            log.info("##### Finish test: {} - Driver {}", info.getTestMethod().get().getName(), this.user.getDriver());
             log.info("Browser console at the end of the test");
             LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
+            logEntries.forEach(entry -> log.info("[{}] {} {}",
                     new Date(entry.getTimestamp()), entry.getLevel(),
                     entry.getMessage()));
-            if (user.isOnSession()) {
-                this.logout(user);
+            if (this.user.isOnSession()) {
+                this.logout(this.user);
             }
 
-            user.dispose();
+            this.user.dispose();
+        }
+
+        if (this.student != null) {
+            log.info("##### Finish test: {} - Driver {}", info.getTestMethod().get().getName(), this.student.getDriver());
+            log.info("Browser console at the end of the test");
+            LogEntries logEntries = student.getDriver().manage().logs().get(BROWSER);
+            logEntries.forEach(entry -> log.info("[{}] {} {}",
+                    new Date(entry.getTimestamp()), entry.getLevel(),
+                    entry.getMessage()));
+            if (this.student.isOnSession()) {
+                this.logout(student);
+            }
+
+            student.dispose();}
+        //Logout and exit list of Students
+        if (this.studentBrowserUserList!=null) {
+            for (BrowserUser memberStudent : this.studentBrowserUserList) {
+                if (memberStudent.isOnSession()) {
+                    this.logout(memberStudent);
+                }
+                memberStudent.dispose();
+            }
         }
     }
 
@@ -224,8 +244,11 @@ public class BaseLoggedTest {
         try {
             userName = getUserName(user, true, APP_URL);
         } catch (NotLoggedException | ElementNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            if (e.getClass().isInstance(NotLoggedException.class)){
+            log.error("The user {} was not logged",user.getClientData());}
+            else{
+                log.error("The userName field not found" );
+            }
         }
 
         log.info("Logging in successful for user {}", user.getClientData());
@@ -233,10 +256,9 @@ public class BaseLoggedTest {
     }
 
     protected void logout(BrowserUser user) { //43 lines
-        //   log.info("Logging out {}", user.getClientData());
+           log.info("Logging out {}", user.getClientData());
 
-        if (user.getDriver().findElements(By.cssSelector("#fixed-icon"))
-                .size() > 0) {
+        if (!user.getDriver().findElements(By.cssSelector("#fixed-icon")).isEmpty()) {
             // Get out of video session page
             if (!isClickable("#exit-icon", user)) { // Side menu not opened
                 user.getDriver().findElement(By.cssSelector("#fixed-icon"))
@@ -309,7 +331,7 @@ public class BaseLoggedTest {
                         "//div[contains(@class, 'modal-overlay') and contains(@style, 'opacity: 0.5')]")),
                 "Dialog not opened");
 
-        log.info("Dialog opened for user {}", user.getClientData());
+        log.info("Dialog opened using css selector for user {}", user.getClientData());
     }
 
     protected void openDialog(WebElement el, BrowserUser user) {//8lines
@@ -321,7 +343,7 @@ public class BaseLoggedTest {
         user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.xpath(
                         "//div[contains(@class, 'modal-overlay') and contains(@style, 'opacity: 0.5')]")),
                 "Dialog not opened");
-        log.info("Dialog opened for user {}", user.getClientData());
+        log.info("Dialog  using webelement for user {}", user.getClientData());
     }
 
     protected void waitForDialogClosed(String dialogId, String errorMessage,
@@ -347,7 +369,7 @@ public class BaseLoggedTest {
         try {
             Thread.sleep(1000L * seconds);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Thread.sleep interrupted");
         }
 
     }
@@ -372,14 +394,14 @@ public class BaseLoggedTest {
 
         WebElement name_placeholder = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(By.xpath(USERNAME_XPATH)));
 
-        String userName = name_placeholder.getText().trim();
+        String userNameTag = name_placeholder.getText().trim();
 
         if (goBack) {
             user.getDriver().navigate().back();
         }
         //Check if the username is the expected
         log.info("[END] getUserName");
-        return userName;
+        return userNameTag;
 
     }
 

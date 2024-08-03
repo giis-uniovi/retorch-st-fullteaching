@@ -19,36 +19,36 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.BrowserUser;
+import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Date;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.stream.Stream;
 
-import static com.fullteaching.e2e.no_elastest.common.Constants.WAIT_SECONDS;
-import static org.openqa.selenium.logging.LogType.BROWSER;
 
 /*This test case were disabled due to problems with the OpenVidu Server. The video input doesn't work , so it's not
  * feasible check that in the other side of the connection its playing the stream*/
 @Disabled
 @Tag("e2e")
 @DisplayName("E2E tests for FullTeaching video session")
-@ExtendWith(SeleniumJupiter.class)
 class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
 
-
-    final String teacherMail = "teacher@gmail.com";
-    final String teacherPass = "pass";
     final String studentMail = "student1@gmail.com";
     final String studentPass = "pass";
-    BrowserUser student;
 
+    public static Stream<Arguments> data() throws IOException {
+        return ParameterLoader.getTestTeachers();
+    }
 
     public FullTeachingTestEndToEndVideoSessionTests() {
         super();
@@ -61,14 +61,13 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
     @Resource(resID = "Course", replaceable = {"Session"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @Test
-    void oneToOneVideoAudioSessionChrome() { //124+ 232+ 20 set up +8 lines teardown = 564
+    @DisplayName("sessionTest")
+    @ParameterizedTest
+    @MethodSource("data")
+    void oneToOneVideoAudioSessionChrome(String mail, String password, String role) throws URISyntaxException, MalformedURLException { //124+ 232+ 20 set up +8 lines teardown = 564
 
-        String testName = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        log.info("##### Start test: " + testName);
         // TEACHER
-        this.slowLogin(user, teacherMail, teacherPass);//24
+        this.slowLogin(user, mail, password);//24
 
         log.info("{} entering first course", user.getClientData());
         user.getWaiter().until(
@@ -98,6 +97,7 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
                         .findElement(By.cssSelector(("div.participant video"))),
                 "div.participant"); //30 lines
         // STUDENT
+        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" +"oneToOneVideoAudioSessionChrome-STUDENT", studentMail,5);//27 lines
 
         slowLogin(student, studentMail, studentPass);
 
@@ -164,7 +164,7 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
         checkVideoPlaying(user,
                 user.getDriver()
                         .findElement(By.cssSelector(("div.participant video"))),
-                "div.participant");//30 lines waitSeconds(5);
+                "div.participant");
         // Teacher stops student intervention
         user.getWaiter().until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//a[contains(@class, 'usr-btn')]")));
@@ -183,71 +183,6 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
 
     }
 
-
-    @BeforeEach
-    void setup(TestInfo info) { //65 lines
-        String TEST_NAME;
-        if (info.getTestMethod().isPresent()) {
-            log.info("Custom Set-up for the OpenviduTest");
-            TEST_NAME = info.getTestMethod().get().getName();
-        } else {
-            TEST_NAME = "test-name-default";
-        }
-
-        log.info("##### Start test: " + TEST_NAME);
-        TJOB_NAME = System.getProperty("dirtarget");
-        user = setupBrowser(TEACHER_BROWSER, TJOB_NAME + "_" + TEST_NAME, teacherMail, WAIT_SECONDS);
-        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TEST_NAME, studentMail, WAIT_SECONDS);//27 lines
-
-    }
-
-    @AfterEach
-    void tearDown(TestInfo testInfo) { //13 lines
-        String testName;
-        if (testInfo.getTestMethod().isPresent()) {
-
-            testName = testInfo.getTestMethod().get().getName();
-            log.info("Custom TearDown the info is present");
-        } else {
-            log.info("No test name, using default");
-            testName = "No-named-test";
-        }
-
-        if (student != null) {
-            log.info("##### Finish test: {} - Driver {}", testName, this.student.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = student.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            //TO-DO- ERROR with the logout
-            if (student.isOnSession()) {
-                this.logout(student);
-            }
-            student.dispose();
-
-
-        }
-
-        if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", testName, this.user.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            //TO-DO- ERROR with the logout
-            if (user.isOnSession()) {
-                this.logout(user);
-            }
-
-            user.dispose();
-
-
-        }
-
-
-    }
 
 
     /*
