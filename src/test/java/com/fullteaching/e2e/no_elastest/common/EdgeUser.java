@@ -19,67 +19,28 @@ package com.fullteaching.e2e.no_elastest.common;
 
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.remote.LocalFileDetector;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 public class EdgeUser extends BrowserUser {
+
     EdgeOptions options = new EdgeOptions();
 
     public EdgeUser(String userIdentifier, int timeOfWaitInSeconds, String testName) throws URISyntaxException, MalformedURLException {
-        super(userIdentifier, timeOfWaitInSeconds);
-        log.info(String.format("The Test names are: %s", testName));
-
-
-        String eusApiURL = System.getenv("ET_EUS_API");
+        super(userIdentifier, timeOfWaitInSeconds, testName);
+        log.info("Starting the configuration of Edge Web Browser, setting the capabilities");
         //This capability is to store the logs of the test case
-
         //Some tests report an error due to a non-trust server, this capability avoid it
         options.setAcceptInsecureCerts(true);
 
-
-        if (eusApiURL == null) {
+        if (System.getenv("SELENOID_PRESENT") == null) {
+            log.info("SELENOID not present, using the local EdgeDriver") ;
             this.driver = new EdgeDriver(options);
         } else {
-                Map<String, Object> selenoidOptions = new HashMap<>();
-                log.info("Using the remote WebDriver (Selenoid)");
-
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
-                LocalDateTime now = LocalDateTime.now();
-                String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier ;
-                log.debug("The data of this test are stored into .mp4 and .log files named: {}" , baseName);
-                log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
-                //CAPABILITIES FOR SELENOID
-
-                selenoidOptions.put("testName", testName + "-" + userIdentifier + "-" + dtf.format(now));
-                selenoidOptions.put("enableVideo", true);
-                selenoidOptions.put("enableVNC", true);
-                selenoidOptions.put("name", testName + "-" + userIdentifier);
-                selenoidOptions.put("enableLog", true);
-                selenoidOptions.put("logName ", String.format("%s%s",baseName.replaceAll("\\s","") , ".log"));
-                selenoidOptions.put("videoName", String.format("%s%s",baseName.replaceAll("\\s","") ,".mp4"));
-                selenoidOptions.put("screenResolution", "1920x1080x24");
-                options.setCapability("selenoid:options", selenoidOptions);
-                //END CAPABILITIES FOR SELENOID RETORCH
-                log.debug("Configuring the remote WebDriver ");
-                RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
-                log.debug("Configuring the Local File Detector");
-                remote.setFileDetector(new LocalFileDetector());
-                this.driver = remote;
+            configureRemoteWebDriver(testName, options);
         }
-
-        new WebDriverWait(driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
-
-        this.configureDriver();
+        waitAndLastConfDriver();
     }
 
 }

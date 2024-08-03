@@ -20,28 +20,20 @@ package com.fullteaching.e2e.no_elastest.common;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.LocalFileDetector;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.util.logging.Level.ALL;
 import static org.openqa.selenium.logging.LogType.BROWSER;
 
 public class ChromeUser extends BrowserUser {
+
     ChromeOptions options = new ChromeOptions();
 
     public ChromeUser(String userIdentifier, int timeOfWaitInSeconds, String testName) throws URISyntaxException, MalformedURLException {
-        super(userIdentifier, timeOfWaitInSeconds);
-        log.info("Starting the configuration of the web browser");
+        super(userIdentifier, timeOfWaitInSeconds, testName);
+        log.info("Starting the configuration of the Chrome web browser");
 
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(BROWSER, ALL);
@@ -53,42 +45,14 @@ public class ChromeUser extends BrowserUser {
         options.addArguments("--start-maximized");
         options.setAcceptInsecureCerts(true);
         //This capability is to store the logs of the test case
-        log.debug("Added Capabilities of acceptInsecureCerts and ignore alarms");
+        log.debug("Added Capabilities of acceptInsecureCerts and --start-maximized");
 
         if (System.getenv("SELENOID_PRESENT") == null) {
-            log.info("Using the Local WebDriver ()");
+            log.info("Using the Local Chrome WebDriver ()");
             this.driver = new ChromeDriver(options);
         } else {
-                Map<String, Object> selenoidOptions = new HashMap<>();
-                log.info("Using the remote WebDriver (Selenoid)");
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
-                LocalDateTime now = LocalDateTime.now();
-                String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier ;
-                log.debug("The data of this test are stored into .mp4 and .log files named: {}" , baseName);
-                log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
-                //CAPABILITIES FOR SELENOID
-
-                selenoidOptions.put("testName", testName + "-" + userIdentifier + "-" + dtf.format(now));
-                selenoidOptions.put("enableVideo", true);
-                selenoidOptions.put("enableVNC", true);
-                selenoidOptions.put("name", testName + "-" + userIdentifier);
-                selenoidOptions.put("enableLog", true);
-                selenoidOptions.put("logName ", String.format("%s%s",baseName.replaceAll("\\s","") , ".log"));
-                selenoidOptions.put("videoName", String.format("%s%s",baseName.replaceAll("\\s","") ,".mp4"));
-                selenoidOptions.put("screenResolution", "1920x1080x24");
-                options.setCapability("selenoid:options", selenoidOptions);
-                //END CAPABILITIES FOR SELENOID RETORCH
-                log.debug("Configuring the remote WebDriver ");
-                RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
-                log.debug("Configuring the Local File Detector");
-                remote.setFileDetector(new LocalFileDetector());
-                this.driver = remote;
+            configureRemoteWebDriver(testName, options);
         }
-        log.debug("Configure the driver connection timeouts at ({})", this.timeOfWaitInSeconds);
-        new WebDriverWait(driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
-
-        log.info("Driver Successfully configured");
-        this.configureDriver();
+        waitAndLastConfDriver();
     }
-
 }
