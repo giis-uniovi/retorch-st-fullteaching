@@ -47,7 +47,7 @@
 
         <junit-jupiter-engine.version>5.10.3</junit-jupiter-engine.version>
         
-        <junit-jupiter-params.version>5.10.3</junit-jupiter-params.version>
+        <junit-jupiter-params.version>5.11.0</junit-jupiter-params.version>
         
         <webdrivermanager.version>5.9.2</webdrivermanager.version>
         
