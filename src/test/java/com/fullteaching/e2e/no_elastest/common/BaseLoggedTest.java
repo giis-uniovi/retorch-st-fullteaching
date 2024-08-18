@@ -109,14 +109,16 @@ public class BaseLoggedTest {
     }
 
     @BeforeEach
-    void setup(TestInfo info) throws URISyntaxException, MalformedURLException { //65 lines
-        log.info("##### Start test: {}" , info.getTestMethod().get().getName());
-        TJOB_NAME = System.getProperty("dirtarget");
+    void setup(TestInfo info) throws URISyntaxException, MalformedURLException {
+        if (info.getTestMethod().isPresent()) {
+            TEST_NAME = info.getTestMethod().get().getName();
+            userName=info.getDisplayName().split(",")[2];
+        }
+        log.info("##### Start test: {}" , TEST_NAME);
 
-        this.user = setupBrowser("chrome", TJOB_NAME + "_" + info.getTestMethod().get().getName(), "Teacher", WAIT_SECONDS);
+        this.user = setupBrowser("chrome", TJOB_NAME + "-" +TEST_NAME, userName, WAIT_SECONDS);
 
         this.driver = this.user.getDriver();
-
     }
 
     protected BrowserUser setupBrowser(String browser, String testName,
@@ -127,19 +129,16 @@ public class BaseLoggedTest {
         switch (browser) {
             case FIREFOX:
                 BROWSER_NAME = FIREFOX;
-                u = new FirefoxUser(userIdentifier, secondsOfWait, testName,
-                        userIdentifier);
+                u = new FirefoxUser(userIdentifier, secondsOfWait, testName);
                 break;
             case EDGE:
                 BROWSER_NAME = EDGE;
-                u = new EdgeUser(userIdentifier, secondsOfWait, testName,
-                        userIdentifier);
+                u = new EdgeUser(userIdentifier, secondsOfWait, testName);
                 break;
 
             default:
                 BROWSER_NAME = CHROME;
-                u = new ChromeUser(userIdentifier, secondsOfWait, testName,
-                        userIdentifier);
+                u = new ChromeUser(userIdentifier, secondsOfWait, testName);
         }
 
         log.info("Navigating to {}", APP_URL);
@@ -159,9 +158,9 @@ public class BaseLoggedTest {
     }
 
     @AfterEach
-    void tearDown(TestInfo info) { //13 lines
+    void tearDown() { //13 lines
         if (this.user != null) {
-            log.info("##### Finish test: {} - Driver {}", info.getTestMethod().get().getName(), this.user.getDriver());
+            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
             log.info("Browser console at the end of the test");
             LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
             logEntries.forEach(entry -> log.info("[{}] {} {}",
@@ -175,7 +174,7 @@ public class BaseLoggedTest {
         }
 
         if (this.student != null) {
-            log.info("##### Finish test: {} - Driver {}", info.getTestMethod().get().getName(), this.student.getDriver());
+            log.info("##### Finish test: {} - Driver {}",TEST_NAME, this.student.getDriver());
             log.info("Browser console at the end of the test");
             LogEntries logEntries = student.getDriver().manage().logs().get(BROWSER);
             logEntries.forEach(entry -> log.info("[{}] {} {}",

@@ -34,6 +34,7 @@ class UserTest extends BaseLoggedTest {
      * This test is a simple logging acknowledgement, that checks if the current logged user
      * was logged correctly
      */
+
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})

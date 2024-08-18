@@ -27,12 +27,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,10 +39,9 @@ import static org.openqa.selenium.logging.LogType.BROWSER;
 public class ChromeUser extends BrowserUser {
     ChromeOptions options = new ChromeOptions();
 
-    public ChromeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) throws URISyntaxException, MalformedURLException {
-        super(userName, timeOfWaitInSeconds);
+    public ChromeUser(String userIdentifier, int timeOfWaitInSeconds, String testName) throws URISyntaxException, MalformedURLException {
+        super(userIdentifier, timeOfWaitInSeconds);
         log.info("Starting the configuration of the web browser");
-        log.debug(String.format("The Test name is: %s", testName));
 
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(BROWSER, ALL);
@@ -65,29 +61,22 @@ public class ChromeUser extends BrowserUser {
         } else {
                 Map<String, Object> selenoidOptions = new HashMap<>();
                 log.info("Using the remote WebDriver (Selenoid)");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
+                LocalDateTime now = LocalDateTime.now();
+                String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier ;
+                log.debug("The data of this test are stored into .mp4 and .log files named: {}" , baseName);
                 log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
+                //CAPABILITIES FOR SELENOID
 
-                selenoidOptions.put("testName", testName + "_" + userIdentifier + "_" + format.format(new Date()));
-                //CAPABILITIES FOR SELENOID RETORCH
+                selenoidOptions.put("testName", testName + "-" + userIdentifier + "-" + dtf.format(now));
                 selenoidOptions.put("enableVideo", true);
                 selenoidOptions.put("enableVNC", true);
                 selenoidOptions.put("name", testName + "-" + userIdentifier);
-
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
-                LocalDateTime now = LocalDateTime.now();
-                String logName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
-                String videoName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name: {} and the log name: {} " , videoName,logName);
-
                 selenoidOptions.put("enableLog", true);
-                selenoidOptions.put("logName ", logName);
-                selenoidOptions.put("videoName", videoName);
-
+                selenoidOptions.put("logName ", String.format("%s%s",baseName.replaceAll("\\s","") , ".log"));
+                selenoidOptions.put("videoName", String.format("%s%s",baseName.replaceAll("\\s","") ,".mp4"));
                 selenoidOptions.put("screenResolution", "1920x1080x24");
-
                 options.setCapability("selenoid:options", selenoidOptions);
-
                 //END CAPABILITIES FOR SELENOID RETORCH
                 log.debug("Configuring the remote WebDriver ");
                 RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);

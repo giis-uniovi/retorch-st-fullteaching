@@ -49,7 +49,9 @@ import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 @DisplayName("E2E tests for FullTeaching chat")
 class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
 
+
     private final static String STUDENT_BROWSER = "chrome";
+
     final String studentMail = "student1@gmail.com";
     final String studentPass = "pass";
 
@@ -91,7 +93,7 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
 
         checkSystemMessage("Connected", user, 100); // 6 lines
         // STUDENT
-        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" +"oneToOneChatInSessionChrome-STUDENT", studentMail,5);//27 lines
+        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" +"oneToOneChatInSessionChrome", "STUDENT",5);//27 lines
 
         this.slowLogin(student, studentMail, studentPass);
 

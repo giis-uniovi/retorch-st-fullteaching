@@ -23,13 +23,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LoggedLinksTests extends BaseLoggedTest {
 
+
+
+
+
     public LoggedLinksTests() {
         super();
     }
 
+
+
     public static Stream<Arguments> data() throws IOException {
         return ParameterLoader.getTestUsers();
     }
+
+
 
     /**
      * This test get logged the user and checks the navigation by URL works correctly.First

@@ -97,7 +97,7 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
                         .findElement(By.cssSelector(("div.participant video"))),
                 "div.participant"); //30 lines
         // STUDENT
-        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" +"oneToOneVideoAudioSessionChrome-STUDENT", studentMail,5);//27 lines
+        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" +TEST_NAME, "STUDENT",5);//27 lines
 
         slowLogin(student, studentMail, studentPass);
 

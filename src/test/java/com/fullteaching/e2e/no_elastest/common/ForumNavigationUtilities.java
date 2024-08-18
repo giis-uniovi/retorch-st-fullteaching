@@ -53,7 +53,8 @@ public class ForumNavigationUtilities {
         List<WebElement> entries = tab_content.findElements(By.className("entry-title"));
         for (WebElement entry : entries) {
             //if username is the publisher of the entry...
-            entries_titles.add(entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE).getText());
+            if (entry.getText().contains(user_name))
+                entries_titles.add(entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE).getText());
         }
 
         return entries_titles;
@@ -64,7 +65,6 @@ public class ForumNavigationUtilities {
 
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(FORUM_ICON));
         WebElement tab_content = CourseNavigationUtilities.getTabContent(wd, FORUM_ICON);
-        //Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(By.className("entry-title")));
         List<WebElement> entries = tab_content.findElements(By.className("entry-title"));
         for (WebElement entry : entries) {
             try {
@@ -147,6 +147,7 @@ public class ForumNavigationUtilities {
     public static List<WebElement> getReplies(WebDriver driver, WebElement comment) { //7 lines
         log.info("Get all the replies of the selected comment");
         List<WebElement> replies = new ArrayList<>();
+        Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST_COMMENT_DIV));
         //get all comment-div
         List<WebElement> nestedComments = comment.findElements(FORUM_COMMENT_LIST_COMMENT_DIV);
         //ignore first it is original comment

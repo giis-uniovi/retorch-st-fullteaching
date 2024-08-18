@@ -37,7 +37,6 @@ public class SpiderNavigation {
             String href = a.getAttribute("href");
             if ((href != null) && (!href.trim().isEmpty()) && (!href.contains("#")) && isContainedIn(href.trim(), links_href) && href.contains(host))
                     links.add(a);
-
         }
         return links;
     }
@@ -101,7 +100,6 @@ public class SpiderNavigation {
     public static Set<String> addNonExistentLink(Set<String> original, String href) { //5lines
         if ((href != null) && (!href.isEmpty()) && (!href.contains("#")) && isContainedIn(href, original) && href.contains(host))
                 original.add(href);
-
         return original;
     }
 
@@ -110,7 +108,6 @@ public class SpiderNavigation {
         for (String href : new_links) {
             if ((href != null) && (!href.isEmpty()) && (!href.contains("#")) && isContainedIn(href, explored) && href.contains(host))
                     withOutExplored.add(href);
-
         }
         return withOutExplored;
     }

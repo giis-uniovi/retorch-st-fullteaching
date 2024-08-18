@@ -26,18 +26,16 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FirefoxUser extends BrowserUser {
     FirefoxOptions options = new FirefoxOptions();
 
-    public FirefoxUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) throws URISyntaxException {
-        super(userName, timeOfWaitInSeconds);
+    public FirefoxUser(String userIdentifier, int timeOfWaitInSeconds, String testName) throws URISyntaxException, MalformedURLException {
+        super(userIdentifier, timeOfWaitInSeconds);
         //TO-DO Firefox configuration has changed, review it.
         FirefoxProfile profile = new FirefoxProfile();
         // This flag avoids granting the access to the camera
@@ -57,50 +55,36 @@ public class FirefoxUser extends BrowserUser {
             options.setCapability("marionette", true);
             driver = new FirefoxDriver(options);
 
-
         } else {
-            try {
-                Map<String, Object> selenoidOptions = new HashMap<>();
-                log.info("Using the remote WebDriver (Selenoid)");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
-                log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
+            Map<String, Object> selenoidOptions = new HashMap<>();
+            log.info("Using the remote WebDriver (Selenoid)");
 
-                selenoidOptions.put("testName", testName + "_" + userIdentifier + "_" + format.format(new Date()));
-                //CAPABILITIES FOR SELENOID RETORCH
-                selenoidOptions.put("enableVideo", true);
-                selenoidOptions.put("enableVNC", true);
-                selenoidOptions.put("name", testName + "_" + userIdentifier);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
+            LocalDateTime now = LocalDateTime.now();
+            String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier ;
+            log.debug("The data of this test are stored into .mp4 and .log files named: {}", baseName);
+            log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
+            //CAPABILITIES FOR SELENOID
 
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
-                LocalDateTime now = LocalDateTime.now();
-                String logName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
-                String videoName = dtf.format(now) + "_" + testName + "_" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name {} and the log is {}", videoName,logName);
-                selenoidOptions.put("enableLog", true);
-                selenoidOptions.put("logName ", logName);
-                selenoidOptions.put("videoName", videoName);
-
-                selenoidOptions.put("screenResolution", "1920x1080x24");
-
-                options.setCapability("selenoid:options", selenoidOptions);
-
-                //END CAPABILITIES FOR SELENOID RETORCH
-
-                RemoteWebDriver remote = new RemoteWebDriver(new URI(eusApiURL).toURL(), options);
-                remote.setFileDetector(new LocalFileDetector());
-
-
-                this.driver = remote;
-
-                remote.setFileDetector(new LocalFileDetector());
-                this.driver = remote;
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Exception creating eusApiURL", e);
-            }
+            selenoidOptions.put("testName", testName + "-" + userIdentifier + "-" + dtf.format(now));
+            selenoidOptions.put("enableVideo", true);
+            selenoidOptions.put("enableVNC", true);
+            selenoidOptions.put("name", testName + "-" + userIdentifier);
+            selenoidOptions.put("enableLog", true);
+            selenoidOptions.put("logName ", String.format("%s%s",baseName.replaceAll("\\s","") , ".log"));
+            selenoidOptions.put("videoName", String.format("%s%s",baseName.replaceAll("\\s","") ,".mp4"));
+            selenoidOptions.put("screenResolution", "1920x1080x24");
+            options.setCapability("selenoid:options", selenoidOptions);
+            //END CAPABILITIES FOR SELENOID RETORCH
+            log.debug("Configuring the remote WebDriver ");
+            RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
+            log.debug("Configuring the Local File Detector");
+            remote.setFileDetector(new LocalFileDetector());
+            this.driver = remote;
         }
-
 
         this.configureDriver();
     }
+
 
 }

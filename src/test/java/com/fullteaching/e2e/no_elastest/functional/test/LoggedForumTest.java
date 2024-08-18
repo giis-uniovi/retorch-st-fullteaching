@@ -298,8 +298,6 @@ class LoggedForumTest extends BaseLoggedTest {
      * previously created, go to the first and replies to the same comment.After it, we check
      * that the comment was correctly published.
      */
-
-
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
@@ -323,7 +321,6 @@ class LoggedForumTest extends BaseLoggedTest {
         try {
             //check if one course have any entry for comment
             NavigationUtilities.toCoursesHome(driver);//3lines
-
             WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14 lines
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
@@ -331,7 +328,7 @@ class LoggedForumTest extends BaseLoggedTest {
             assertTrue(ForumNavigationUtilities.isForumEnabled(CourseNavigationUtilities.getTabContent(driver, FORUM_ICON)), "Forum not activated");//2lines
             List<String> entries_list = ForumNavigationUtilities.getFullEntryList(driver);//6lines
             WebElement entry;
-            if (entries_list.size() <= 0) {//if not new entry
+            if (entries_list.isEmpty()) {//if not new entry
                 newEntryTitle = "New Comment Test " + mDay + mMonth + mYear + mHour + mMinute + mSecond;
                 String newEntryContent = "This is the content written on the " + mDay + " of " + months[mMonth - 1] + ", " + mHour + ":" + mMinute + "," + mSecond;
                 ForumNavigationUtilities.newEntry(driver, newEntryTitle, newEntryContent); //19 lines
@@ -352,7 +349,7 @@ class LoggedForumTest extends BaseLoggedTest {
             WebElement textField = driver.findElement(FORUM_COMMENT_LIST_MODAL_NEW_REPLY_TEXT_FIELD);
             textField.sendKeys(newReplyContent);
             Click.element(user.getDriver(), FORUM_NEW_COMMENT_MODAL_POST_BUTTON);
-
+            user.waitUntil(ExpectedConditions.invisibilityOfElementLocated(FORUM_COMMENT_LIST_MODAL_NEW_REPLY),"The model is still visible");
             user.waitUntil(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST), "The comments are not visible");
 
             user.waitUntil(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST_COMMENT), "The comment list are not visible");
@@ -361,16 +358,14 @@ class LoggedForumTest extends BaseLoggedTest {
             List<WebElement> replies = ForumNavigationUtilities.getReplies(user.getDriver(), comments.get(0)); // 7 lines
             WebElement newReply = null;
             for (WebElement reply : replies) {
-
-                reply.findElement(By.cssSelector("#div.col.l11.m11.s11 > div.message-itself"));
                 String text = reply.getText();
-                if (text.equals(newReplyContent))
+                if (text.contains(newReplyContent))
                     newReply = reply;
             }
             //assert reply
             assertNotNull(newReply, "Reply not found");
-            boolean asserto = newReply.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText().equals(userName);
-            assertTrue(asserto, "Bad user in comment");
+            boolean isNameEqual = newReply.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText().equals(userName);
+            assertTrue(isNameEqual, "Bad user in comment");
             //nested reply
             //assert nested reply
         } catch (ElementNotFoundException notFoundException) {

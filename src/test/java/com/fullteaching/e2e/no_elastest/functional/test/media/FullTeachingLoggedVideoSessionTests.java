@@ -96,7 +96,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
             String user_password = students_data[i].split(":")[1];
             studentPassList.add(user_password);
             String STUDENT_BROWSER = students_data[i].split(":")[2];
-            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TEST_NAME, "STUDENT" + i, WAIT_SECONDS);
+            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" + TEST_NAME, userid, WAIT_SECONDS);
             this.slowLogin(studentD, userid, user_password);
             studentNamesList.add(userid);
             studentBrowserUserList.add(studentD);
