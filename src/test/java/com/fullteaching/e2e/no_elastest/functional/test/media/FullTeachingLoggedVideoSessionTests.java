@@ -5,33 +5,35 @@ import com.fullteaching.e2e.no_elastest.common.BrowserUser;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.SessionNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
+import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
@@ -39,10 +41,13 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
     final static Logger log = getLogger(lookup().lookupClass());
 
     public String courseName;
-    protected List<BrowserUser> studentBrowserUserList;
     protected List<String> studentPassList;
     protected List<String> studentNamesList;
     protected List<String> studentNameList;
+
+    public static Stream<Arguments> data() throws IOException {
+        return ParameterLoader.getTestTeachers();
+    }
 
 
     /**
@@ -56,11 +61,13 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
     @Resource(resID = "Course", replaceable = {"Session"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READONLY")
-    @Test
-    void sessionTest() throws ElementNotFoundException, IOException {
+    @DisplayName("sessionTest")
+    @ParameterizedTest
+    @MethodSource("data")
+    void sessionTest(String mail, String password, String role) throws ElementNotFoundException, IOException, URISyntaxException, NotLoggedException, InterruptedException {
         String sessionName = "Today's Session";
         courseName = "Pseudoscientific course for treating the evil eye";
-        this.slowLogin(this.user, "teacher@gmail.com", "pass");
+        this.slowLogin(this.user, mail, password);
         initializeStudents("src/test/resources/inputs/default_user_LoggedVideoStudents.csv");
         createNewSession(sessionName);
         joinSession(sessionName, this.user);
@@ -75,7 +82,8 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      * @param pathData the path to the CSV file containing student data
      * @throws IOException if there is an error reading the file
      */
-    private void initializeStudents(String pathData) throws IOException {
+    private void initializeStudents(String pathData) throws IOException, URISyntaxException, NotLoggedException, ElementNotFoundException, InterruptedException {
+        log.info("Initializing students");
         String users_data = loadStudentsData(pathData);
         studentNameList = new ArrayList<>();
         studentPassList = new ArrayList<>();
@@ -89,11 +97,12 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
             String user_password = students_data[i].split(":")[1];
             studentPassList.add(user_password);
             String STUDENT_BROWSER = students_data[i].split(":")[2];
-            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "_" + TEST_NAME, "STUDENT" + i, WAIT_SECONDS);
+            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" + TEST_NAME, userid, WAIT_SECONDS);
             this.slowLogin(studentD, userid, user_password);
             studentNamesList.add(userid);
             studentBrowserUserList.add(studentD);
         }
+        log.info("Initializing students end, number of students: {} " ,studentNameList.size());
     }
     /**
      * This method creates a new video session with the given name, navigating to the course, opens the new session modal,
@@ -225,29 +234,5 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         System.out.println(key);
         return key.toString();
     }
-    @AfterEach
-    void tearDown(TestInfo testInfo) {
-        //Logout and exit students
-        if (studentBrowserUserList!=null) {
-            for (BrowserUser student : studentBrowserUserList) {
-                if (student.isOnSession()) {
-                    this.logout(student);
-                }
-                student.dispose();
-            }
-        }
-        if (user != null) {
-            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach((entry) -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
-            if (user.isOnSession()) {
-                this.logout(user);
-            }
 
-            user.dispose();
-        }
-    }
 }

@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
-import static java.lang.invoke.MethodHandles.lookup;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BrowserUser {
 
@@ -47,7 +45,6 @@ public class BrowserUser {
     public WebDriver getDriver() {
         return this.driver;
     }
-
 
     public WebDriverWait getWaiter() {
         return this.waiter;

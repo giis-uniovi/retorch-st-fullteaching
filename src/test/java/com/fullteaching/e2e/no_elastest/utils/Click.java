@@ -10,9 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.lang.invoke.MethodHandles.lookup;
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class Click {
 
     private static final Logger log = LoggerFactory.getLogger(Click.class);
@@ -42,23 +39,23 @@ public class Click {
                 Wait.notTooMuch(wd).until(ExpectedConditions.elementToBeClickable(wd.findElement(eleBy)));
                 wd.findElement(eleBy).click();
                 Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(waitFor));
-                log.info("Click.withNRetries (click): ele:" + tagName + ":" + text + " ==>OK");
+                log.info("Click.withNRetries (click): ele:{}:{} ==>OK", tagName, text);
                 return wd;
             } catch (Exception e) {
                 try {
-                    log.error("Click.withNRetries n (click):" + i + " " + e.getClass().getName() + ":" + e.getLocalizedMessage());
+                    log.error("Click.withNRetries n (click):{} {}:{}", i ,e.getClass().getName(),e.getLocalizedMessage());
                     byJS(wd, wd.findElement(eleBy));
-                    log.info("Click.element (ByJs): ele:" + tagName + ":" + text + " ==>OK");
+                    log.info("Click.withNRetries element (ByJs): ele:{}:{} ==>OK", tagName, text);
                     return wd;
                 } catch (Exception ex) {
-                    log.error("Click.withNRetries n (ByJS):" + i + " " + ex.getClass().getName() + ":" + ex.getLocalizedMessage());
+                    log.error("Click.withNRetries n (ByJS):{} {}:{}", i, ex.getClass().getName(), ex.getLocalizedMessage());
                     i++;
                 }
             }
 
         } while (i < n);
 
-        log.error("Click.withNRetries: ele:" + tagName + ":" + text + " ==>KO");
+        log.error("Click.withNRetries: ele:{}:{} ==>KO",tagName,text);
         throw new ElementNotFoundException("Click doesn't work properly");
     }
 
@@ -84,18 +81,18 @@ public class Click {
         try {
             Wait.notTooMuch(wd).until(ExpectedConditions.elementToBeClickable(ele));
             ele.click();
-            log.info("Click.element (click): ele:" + tagName + ":" + text + " ==>OK");
+            log.info("Click.element (click): ele:{}:{} ==>OK", tagName, text);
             return wd;
         } catch (Exception e) {
-            log.error("Click.element (click): ele:" + tagName + ":" + text + " ==>KO " + e.getClass().getName() + ":" + e.getLocalizedMessage());
+            log.error("Click.element (click): ele:{}:{} ==>KO {}:{}", tagName, text, e.getClass().getName(), e.getLocalizedMessage());
         }
         //Try by Js
         try {
             byJS(wd, ele);
-            log.info("Click.element (ByJs): ele:" + tagName + ":" + text + " ==>OK");
+            log.info("Click.element (ByJs): ele:{}:{} ==>OK", tagName, text);
             return wd;
         } catch (Exception e) {
-            log.error("Click.element (ByJs): ele:" + tagName + ":" + text + " ==>KO " + e.getClass().getName() + ":" + e.getLocalizedMessage());
+            log.error("Click.element (ByJs): ele:{}:{} ==>KO {}:{}", tagName, text, e.getClass().getName(), e.getLocalizedMessage());
         }
 
         throw new ElementNotFoundException("Click.element ERROR");

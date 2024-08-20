@@ -23,9 +23,7 @@ public final class Constants {
     public static final String LOGIN_MODAL_PASSWORD_FIELD_ID = "password";
     public static final String LOGIN_MODAL_LOGIN_BUTTON_ID = "log-in-btn";
 
-
     public static final String COURSES_DASHBOARD_TITLE_CLASS = "dashboard-title";
-
 
     public static final String FIRST_COURSE_XPATH = "/html/body/app/div/main/app-dashboard/div/div[3]/div/div[1]/ul/li[1]";
     public static final String GO_TO_COURSE_XPATH = "/div[2]"; /*use with XCOURSE_XPATH+GOTOCOURSE_XPATH*/
@@ -49,11 +47,8 @@ public final class Constants {
     public static final String COURSE_BACK_TO_DASHBOARD_CLASS = "btn-floating";
     public static final String COURSE_TABS_TAG = "tabs-course-details";
 
-
     //It's the original, changeD because don't work
     //public static final String COURSE_TABS_TAG = "md-tab-group";
-
-
     /*FROM mat-tab-group*/
     public static final String FORUM_TAB_XPATH = "./div[1]/div[3]";
     /*FROM mat-tab-group*/
@@ -128,7 +123,6 @@ public final class Constants {
     public static final String ATTENDERS_LIST_HIGHLIGHTED_ROW_CLASS = "attender-name-p";
 
     public static final String SETTINGS_USER_EMAIL_ID = "stng-user-mail";
-
     //BUTTONS
     public static final By NEW_COURSE_BUTTON = By.id(NEW_COURSE_BUTTON_ID);
     public static final By SETTINGS_BUTTON = By.id(SETTINGS_BUTTON_ID);
@@ -157,7 +151,6 @@ public final class Constants {
     public static final By SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON = By.id(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON_ID);
 
     public static final By SESSION_LEFT_MENU_BUTTON = By.id(SESSION_LEFT_MENU_BUTTON_ID);
-
     //TABS
 
     //MODALS
@@ -168,7 +161,6 @@ public final class Constants {
     public static final By FORUM_NEW_COMMENT_MODAL = By.id(FORUM_NEW_COMMENT_MODAL_ID);
     public static final By SESSION_LIST_NEW_SESSION_MODAL = By.id(SESSION_LIST_NEW_SESSION_MODAL_ID);
     public static final By SESSION_LIST_EDIT_MODAL = By.id(SESSION_LIST_EDIT_MODAL_ID);
-
     //OTHER ELEMENTS
     public static final By FOOTER = By.className(FOOTER_CLASS);
     public static final By MAIN_MENU_ARROW = By.id(MAIN_MENU_ARROW_ID);
@@ -180,7 +172,6 @@ public final class Constants {
 
     public static final By COURSES_DASHBOARD_TITLE = By.className(COURSES_DASHBOARD_TITLE_CLASS);
     public static final By COURSE_LIST = By.className(COURSE_LIST_CLASS);
-
 
     public static final By COURSE_TABS = By.id(COURSE_TABS_TAG);
     public static final By EDIT_COURSE_DELETE_CHECK = By.id(EDIT_COURSE_DELETE_CHECK_ID);
@@ -219,7 +210,6 @@ public final class Constants {
 
     public static final By ATTENDERS_LIST_ROWS = By.className(ATTENDERS_LIST_ROWS_CLASS);
     public static final By ATTENDERS_LIST_HIGHLIGHTED_ROW = By.className(ATTENDERS_LIST_HIGHLIGHTED_ROW_CLASS);
-
     //ICONS
     public static final By FORUM_ICON = By.id(FORUM_ICON_ID);
     public static final By HOME_ICON = By.id(HOME_ICON_ID);
@@ -236,7 +226,6 @@ public final class Constants {
     public static final By SESSION_LIST_SESSION_EDIT_ICON = By.className(SESSION_LIST_SESSION_EDIT_ICON_CLASS);
 
     public static final By SESSION_EXIT_ICON = By.id(SESSION_EXIT_ICON_ID);
-
     //KEYS
     public static final String SELECT_ALL = Keys.chord(Keys.CONTROL, "a");
     public static final String DELETE = Keys.chord(Keys.BACK_SPACE);

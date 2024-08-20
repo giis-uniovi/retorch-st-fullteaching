@@ -5,25 +5,22 @@ import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.ForumNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.DOMManager;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -31,9 +28,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.slf4j.LoggerFactory.getLogger;
 
 
 @Tag("e2e")
@@ -66,15 +61,15 @@ class LoggedForumTest extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumLoadEntriesTest(String mail, String password, String role) { //47lines +115 +28 set up +13 lines teardown =203
+    void forumLoadEntriesTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { //47lines +115 +28 set up +13 lines teardown =203
         this.slowLogin(user, mail, password);//24 lines
-        try {
             //navigate to courses.
             NavigationUtilities.toCoursesHome(driver);//3lines
             List<String> courses = CourseNavigationUtilities.getCoursesList(driver);//13lines
-            assertTrue(courses.size() > 0, "No courses in the list");
+            assertFalse(courses.isEmpty(), "No courses in the list");
             //find course with forum activated
             boolean activated_forum_on_some_test = false;
             boolean has_comments = false;
@@ -92,7 +87,7 @@ class LoggedForumTest extends BaseLoggedTest {
                     log.info("Loading the entries list");
                     //Load list of entries
                     List<String> entries_list = ForumNavigationUtilities.getFullEntryList(driver);//6lines
-                    if (entries_list.size() > 0) {
+                    if (!entries_list.isEmpty()) {
                         //Go into first entry
                         for (String entry_name : entries_list) {
                             log.info("Checking the entry with name: {}", entry_name);
@@ -102,7 +97,7 @@ class LoggedForumTest extends BaseLoggedTest {
                             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST));
                             List<WebElement> comments = ForumNavigationUtilities.getComments(driver);
                             log.info("Checking if the entry has comments");
-                            if (comments.size() > 0) {
+                            if (!comments.isEmpty()) {
                                 has_comments = true;
                                 log.info("Comments found, saving them");
 
@@ -116,9 +111,6 @@ class LoggedForumTest extends BaseLoggedTest {
                 driver = Click.element(driver, BACK_TO_DASHBOARD);
             }
             assertTrue((activated_forum_on_some_test && has_comments), "There isn't any forum that can be used to test this [Or not activated or no entry lists or not comments]");
-        } catch (ElementNotFoundException notFoundException) {
-            fail("Failed to navigate to courses forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
     }
 
     /**
@@ -134,9 +126,10 @@ class LoggedForumTest extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumNewEntryTest(String mail, String password, String role) {// 48+ 104 +   28 set up +13 lines teardown =193
+    void forumNewEntryTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {// 48+ 104 +   28 set up +13 lines teardown =193
         this.slowLogin(user, mail, password); //24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -150,7 +143,6 @@ class LoggedForumTest extends BaseLoggedTest {
         String newEntryTitle = "New Entry Test " + mDay + mMonth + mYear + mHour + mMinute + mSecond;
         String newEntryContent = "This is the content written on the " + mDay + " of " + months[mMonth] + ", " + mHour + ":" + mMinute + "," + mSecond;
         log.info("Navigating to courses tab");
-        try {
             log.info("Navigating to courses tab");
             //navigate to courses.
             if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
@@ -180,7 +172,7 @@ class LoggedForumTest extends BaseLoggedTest {
             //first comment should be the inserted while creating the entry
             Wait.waitForPageLoaded(driver);
             List<WebElement> comments = ForumNavigationUtilities.getComments(driver);
-            assertFalse(comments.size() < 1, "No comments on the entry");
+            assertFalse(comments.isEmpty(), "No comments on the entry");
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST));
             Wait.waitForPageLoaded(driver);
             WebElement newComment = comments.get(0);
@@ -189,9 +181,6 @@ class LoggedForumTest extends BaseLoggedTest {
             Wait.waitForPageLoaded(driver);
             String comment = newComment.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText();
             assertEquals(comment, userName, "Bad user in comment");
-        } catch (ElementNotFoundException notFoundException) {
-            Assertions.fail("Failed to navigate to course forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
         //Fix Flaky test Navigating to the mainpage to logout...
         user.getDriver().get(APP_URL);
     }
@@ -211,9 +200,10 @@ class LoggedForumTest extends BaseLoggedTest {
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @DisplayName("forumNewCommentTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumNewCommentTest(String mail, String password, String role) { // 69+142 + 28 set up +13 lines teardown =252
+    void forumNewCommentTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { // 69+142 + 28 set up +13 lines teardown =252
         this.slowLogin(user, mail, password); //24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -224,7 +214,6 @@ class LoggedForumTest extends BaseLoggedTest {
         int mMinute = calendar.get(Calendar.MINUTE);
         int mSecond = calendar.get(Calendar.SECOND);
 
-        try {
             //check if one course have any entry for comment
             NavigationUtilities.toCoursesHome(driver);//3lines
 
@@ -235,7 +224,7 @@ class LoggedForumTest extends BaseLoggedTest {
             assertTrue(ForumNavigationUtilities.isForumEnabled(CourseNavigationUtilities.getTabContent(driver, FORUM_ICON)), "Forum not activated");//6lines
             List<String> entries_list = ForumNavigationUtilities.getFullEntryList(driver);//6lines
             WebElement entry;
-            if (entries_list.size() <= 0) {//if not new entry
+            if (entries_list.isEmpty()) {//if not new entry
                 String newEntryTitle = "New Comment Test " + mDay + mMonth + mYear + mHour + mMinute + mSecond;
                 String newEntryContent = "This is the content written on the " + mDay + " of " + months[mMonth - 1] + ", " + mHour + ":" + mMinute + "," + mSecond;
                 ForumNavigationUtilities.newEntry(driver, newEntryTitle, newEntryContent);//16lines
@@ -274,20 +263,13 @@ class LoggedForumTest extends BaseLoggedTest {
             boolean commentFound = false;
             for (WebElement comment : comments) {
                 //check if it is new comment
-                try {
                     String text = comment.findElement(FORUM_COMMENT_LIST_COMMENT_CONTENT).getText();
                     if (text.equals(newCommentContent)) {
                         commentFound = true;
                         assertEquals(comment.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText(), userName, "Bad user in comment");
                     }
-                } catch (StaleElementReferenceException e) {
-                    log.info("Not Found");
-                }
             }
             assertTrue(commentFound, "Comment not found");
-        } catch (ElementNotFoundException notFoundException) {
-            fail("Failed to navigate to course forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
 
     }
 
@@ -299,16 +281,16 @@ class LoggedForumTest extends BaseLoggedTest {
      * previously created, go to the first and replies to the same comment.After it, we check
      * that the comment was correctly published.
      */
-    @Disabled
-    @ParameterizedTest
-    @MethodSource("data")
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
     @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
     @Resource(resID = "Course", replaceable = {"Forum"})
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    void forumNewReply2CommentTest(String mail, String password, String role) { // 63+137+ 28 set up +13 lines teardown = 242
+    @DisplayName("forumNewReply2CommentTest")
+    @ParameterizedTest
+    @MethodSource("data")
+    void forumNewReply2CommentTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { // 63+137+ 28 set up +13 lines teardown = 242
         this.slowLogin(user, mail, password);//24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -319,10 +301,8 @@ class LoggedForumTest extends BaseLoggedTest {
         int mMinute = calendar.get(Calendar.MINUTE);
         int mSecond = calendar.get(Calendar.SECOND);
         String newEntryTitle;
-        try {
             //check if one course have any entry for comment
             NavigationUtilities.toCoursesHome(driver);//3lines
-
             WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14 lines
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(TABS_DIV_ID)));
@@ -330,7 +310,7 @@ class LoggedForumTest extends BaseLoggedTest {
             assertTrue(ForumNavigationUtilities.isForumEnabled(CourseNavigationUtilities.getTabContent(driver, FORUM_ICON)), "Forum not activated");//2lines
             List<String> entries_list = ForumNavigationUtilities.getFullEntryList(driver);//6lines
             WebElement entry;
-            if (entries_list.size() <= 0) {//if not new entry
+            if (entries_list.isEmpty()) {//if not new entry
                 newEntryTitle = "New Comment Test " + mDay + mMonth + mYear + mHour + mMinute + mSecond;
                 String newEntryContent = "This is the content written on the " + mDay + " of " + months[mMonth - 1] + ", " + mHour + ":" + mMinute + "," + mSecond;
                 ForumNavigationUtilities.newEntry(driver, newEntryTitle, newEntryContent); //19 lines
@@ -351,7 +331,7 @@ class LoggedForumTest extends BaseLoggedTest {
             WebElement textField = driver.findElement(FORUM_COMMENT_LIST_MODAL_NEW_REPLY_TEXT_FIELD);
             textField.sendKeys(newReplyContent);
             Click.element(user.getDriver(), FORUM_NEW_COMMENT_MODAL_POST_BUTTON);
-
+            user.waitUntil(ExpectedConditions.invisibilityOfElementLocated(FORUM_COMMENT_LIST_MODAL_NEW_REPLY),"The model is still visible");
             user.waitUntil(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST), "The comments are not visible");
 
             user.waitUntil(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST_COMMENT), "The comment list are not visible");
@@ -360,21 +340,16 @@ class LoggedForumTest extends BaseLoggedTest {
             List<WebElement> replies = ForumNavigationUtilities.getReplies(user.getDriver(), comments.get(0)); // 7 lines
             WebElement newReply = null;
             for (WebElement reply : replies) {
-
-                reply.findElement(By.cssSelector("#div.col.l11.m11.s11 > div.message-itself"));
                 String text = reply.getText();
-                if (text.equals(newReplyContent))
+                if (text.contains(newReplyContent))
                     newReply = reply;
             }
             //assert reply
             assertNotNull(newReply, "Reply not found");
-            boolean asserto = newReply.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText().equals(userName);
-            assertTrue(asserto, "Bad user in comment");
+            boolean isNameEqual = newReply.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText().equals(userName);
+            assertTrue(isNameEqual, "Bad user in comment");
             //nested reply
             //assert nested reply
-        } catch (ElementNotFoundException notFoundException) {
-            fail("Failed to navigate to course forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
     }
 
 }

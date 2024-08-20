@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class ParameterLoader {
 
@@ -33,7 +31,6 @@ public class ParameterLoader {
     }
 
     public static Stream<Arguments> getTestStudents() throws IOException {
-
         log.debug("[getTestStudents] INI");
         Stream records = Stream.empty();
 
@@ -50,7 +47,6 @@ public class ParameterLoader {
     }
 
     public static Stream<Arguments> getTestTeachers() throws IOException {
-
         log.debug("[getTestTeachers] INI");
         Stream records = Stream.empty();
 
@@ -71,12 +67,10 @@ public class ParameterLoader {
     }
 
     private static boolean isStudent(User user) {
-
         return user.getRole().trim().equalsIgnoreCase("STUDENT");
     }
 
     private static boolean isTeacher(User user) {
-
         return user.getRole().trim().equalsIgnoreCase("TEACHER");
     }
 

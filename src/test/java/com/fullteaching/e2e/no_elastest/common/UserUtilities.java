@@ -14,15 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
-import static org.slf4j.LoggerFactory.getLogger;
-
 
 public class UserUtilities {
 
-
     private static final Logger log = LoggerFactory.getLogger(UserUtilities.class);
-
 
     public static WebDriver checkLogin(WebDriver wd, String user) throws NotLoggedException, BadUserException, ElementNotFoundException { //12 lines
         log.info("[INI]checkLogin");
@@ -40,7 +35,6 @@ public class UserUtilities {
         return wd;
     }
 
-
     public static void checkLogOut(WebDriver wd) throws ElementNotFoundException { //8lines
         log.info("[INI]checkLogOut");
         try {
@@ -51,6 +45,5 @@ public class UserUtilities {
         log.info("[END]checkLogOut");
 
     }
-
 
 }

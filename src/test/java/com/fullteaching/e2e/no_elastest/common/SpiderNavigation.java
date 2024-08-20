@@ -16,7 +16,6 @@ public class SpiderNavigation {
      * 		work properly in this kind of application.
      * This is a Specialized Spider navigation for FullTeaching.*/
 
-
     private static String host = LOCALHOST;
 
     /**
@@ -35,10 +34,8 @@ public class SpiderNavigation {
         List<WebElement> a_lst = wd.findElements(By.tagName("a"));
         for (WebElement a : a_lst) {
             String href = a.getAttribute("href");
-            if ((href != null) && (!href.trim().equals("")) && (!href.contains("#"))) {
-                if (isContainedIn(href.trim(), links_href) && href.contains(host))
+            if ((href != null) && (!href.trim().isEmpty()) && (!href.contains("#")) && isContainedIn(href.trim(), links_href) && href.contains(host))
                     links.add(a);
-            }
         }
         return links;
     }
@@ -54,10 +51,8 @@ public class SpiderNavigation {
         List<WebElement> allLinks = getPageLinks(wd);
         for (WebElement a : allLinks) {
             String href = a.getAttribute("href");
-            if ((href != null) && (!href.trim().equals("")) && (!href.contains("#"))) {
-                if (isContainedIn(href.trim(), explored.keySet()) && href.contains(host)) //8lines
-                    links.add(a);
-            }
+            if ((href != null) && (!href.trim().isEmpty()) && (!href.contains("#")) && isContainedIn(href.trim(), explored.keySet()) && href.contains(host))
+                links.add(a);
         }
         return links;
     }
@@ -102,20 +97,16 @@ public class SpiderNavigation {
     }
 
     public static Set<String> addNonExistentLink(Set<String> original, String href) { //5lines
-        if ((href != null) && (!href.equals("")) && (!href.contains("#"))) {
-            if (isContainedIn(href, original) && href.contains(host))
+        if ((href != null) && (!href.isEmpty()) && (!href.contains("#")) && isContainedIn(href, original) && href.contains(host))
                 original.add(href);
-        }
         return original;
     }
 
     public static List<String> discardExplored(List<String> new_links, Set<String> explored) { //8 lines
         List<String> withOutExplored = new ArrayList<>();
         for (String href : new_links) {
-            if ((href != null) && (!href.equals("")) && (!href.contains("#"))) {
-                if (isContainedIn(href, explored) && href.contains(host))
+            if ((href != null) && (!href.isEmpty()) && (!href.contains("#")) && isContainedIn(href, explored) && href.contains(host))
                     withOutExplored.add(href);
-            }
         }
         return withOutExplored;
     }

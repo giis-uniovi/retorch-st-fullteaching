@@ -6,6 +6,7 @@ import com.fullteaching.e2e.no_elastest.common.ForumNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
 import com.fullteaching.e2e.no_elastest.common.exception.ExceptionsHelper;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -49,7 +50,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "READONLY")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherCourseMainTest(String mail, String password, String role) {//39+80+ 28 set up +13 lines teardown =160
+    void teacherCourseMainTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {//39+80+ 28 set up +13 lines teardown =160
         this.slowLogin(user, mail, password);
         try {
 
@@ -104,7 +105,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "DYNAMIC")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {
+    void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {
         // Setup
         this.slowLogin(user, mail, password);
 
@@ -144,7 +145,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherEditCourseValues(String mail, String password, String role) {//165+256+ 28 set up +13 lines teardown =462
+    void teacherEditCourseValues(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {//165+256+ 28 set up +13 lines teardown =462
         String courseName = properties.getProperty("forum.test.course");
         this.slowLogin(user, mail, password); //24 lines
         try {
@@ -193,7 +194,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             //wait for editor md editor???'
             WebElement edit_description_desc = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className(EDIT_DESCRIPTION_CONTENT_BOX_CLASS)));
             //text here?? /html/body/app/div/com.fullteaching.e2e.no_elastest.main/app-course-details/div/div[4]/md-tab-group/div[2]/div[1]/div/div[2]/p-editor/div/div[2]/div[1]
-            String old_desc = edit_description_desc.getAttribute("ng-reflect-model");
+            edit_description_desc.getAttribute("ng-reflect-model");
             //delete old_desc
             log.info("Deleting old description");
             WebElement editor = driver.findElement(By.className("ql-editor"));
@@ -202,7 +203,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             //New Title
             log.info("Adding the new description");
             WebElement headerSelector = driver.findElement(By.className("ql-header"));
-            Click.element(driver, By.className("ql-header"));
+            Click.element(driver, headerSelector);
             WebElement picker_options = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("ql-picker-options")));
             WebElement option = NavigationUtilities.getOption(picker_options.findElements(By.className("ql-picker-item")), "Heading", NavigationUtilities.FindOption.ATTRIBUTE, "data-label");//20 lines
             assertNotNull(option, "Something went wrong while setting the Heading");
@@ -253,7 +254,6 @@ class CourseTeacherTest extends BaseLoggedTest {
             //check if Forum is enabled
 
             if (ForumNavigationUtilities.isForumEnabled(forum_tab_content)) {//6lines
-                //if (enabled)
                 //check entries ¡Only check if there is entries and all the buttons are present!
                 log.info("Forum enabled checking that the entries and buttons are present");
                 assertNotNull(forum_tab_content.findElement(FORUM_NEW_ENTRY_ICON), "Add Entry not found");
@@ -309,7 +309,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {//51+114+28 set up +13 lines teardown =206
+    void teacherDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {//51+114+28 set up +13 lines teardown =206
         this.slowLogin(user, mail, password);//24
         String courseName = "Test Course_" + System.currentTimeMillis();
         // navigate to course if not there

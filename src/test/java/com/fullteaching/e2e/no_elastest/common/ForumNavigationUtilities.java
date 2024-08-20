@@ -15,10 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.slf4j.LoggerFactory.getLogger;
 
 
 public class ForumNavigationUtilities {
@@ -55,7 +53,8 @@ public class ForumNavigationUtilities {
         List<WebElement> entries = tab_content.findElements(By.className("entry-title"));
         for (WebElement entry : entries) {
             //if username is the publisher of the entry...
-            entries_titles.add(entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE).getText());
+            if (entry.getText().contains(user_name))
+                entries_titles.add(entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE).getText());
         }
 
         return entries_titles;
@@ -66,13 +65,13 @@ public class ForumNavigationUtilities {
 
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(FORUM_ICON));
         WebElement tab_content = CourseNavigationUtilities.getTabContent(wd, FORUM_ICON);
-        //Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(By.className("entry-title")));
         List<WebElement> entries = tab_content.findElements(By.className("entry-title"));
+        String title_text = "No entries";
         for (WebElement entry : entries) {
             try {
                 WebElement title = entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE);
-                String title_text = title.getText();
-                if (title_text == null || title_text.equals("")) {
+                title_text = title.getText();
+                if (title_text == null || title_text.isEmpty()) {
                     title_text = title.getAttribute("innerHTML");
                 }
                 if (entry_name.equals(title_text)) {
@@ -80,7 +79,7 @@ public class ForumNavigationUtilities {
                     return entry;
                 }
             } catch (NoSuchElementException csee) {
-                //do nothing and look for the next item
+                log.info("Entry not found, the current title is {}", title_text);
             }
         }
         throw new ElementNotFoundException(String.format("[getEntry] The entry with title \"%s\" the entry doesn't exist, the number of entries was %s", entry_name, entries.size()));
@@ -145,10 +144,10 @@ public class ForumNavigationUtilities {
         return wd;
     }
 
-
     public static List<WebElement> getReplies(WebDriver driver, WebElement comment) { //7 lines
         log.info("Get all the replies of the selected comment");
         List<WebElement> replies = new ArrayList<>();
+        Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(FORUM_COMMENT_LIST_COMMENT_DIV));
         //get all comment-div
         List<WebElement> nestedComments = comment.findElements(FORUM_COMMENT_LIST_COMMENT_DIV);
         //ignore first it is original comment

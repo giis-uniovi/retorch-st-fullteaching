@@ -24,20 +24,19 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EdgeUser extends BrowserUser {
     EdgeOptions options = new EdgeOptions();
 
-    public EdgeUser(String userName, int timeOfWaitInSeconds, String testName, String userIdentifier) {
-        super(userName, timeOfWaitInSeconds);
+    public EdgeUser(String userIdentifier, int timeOfWaitInSeconds, String testName) throws URISyntaxException, MalformedURLException {
+        super(userIdentifier, timeOfWaitInSeconds);
         log.info(String.format("The Test names are: %s", testName));
 
 
@@ -51,42 +50,31 @@ public class EdgeUser extends BrowserUser {
         if (eusApiURL == null) {
             this.driver = new EdgeDriver(options);
         } else {
-            try {
                 Map<String, Object> selenoidOptions = new HashMap<>();
                 log.info("Using the remote WebDriver (Selenoid)");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
-                log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
-
-                selenoidOptions.put("testName", testName + "_" + userIdentifier + "_" + format.format(new Date()));
-                //CAPABILITIES FOR SELENOID RETORCH
-                selenoidOptions.put("enableVideo", true);
-                selenoidOptions.put("enableVNC", true);
-                selenoidOptions.put("name", testName + "_" + userIdentifier);
 
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
                 LocalDateTime now = LocalDateTime.now();
-                String logName = dtf.format(now) + "-" + testName + "-" + userIdentifier + ".log";
-                String videoName = dtf.format(now) + "_" + testName + "_" + userIdentifier + ".mp4";
-                log.debug("The data of this test would be stored into: video name " + videoName + " and the log is " + logName);
+                String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + userIdentifier ;
+                log.debug("The data of this test are stored into .mp4 and .log files named: {}" , baseName);
+                log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
+                //CAPABILITIES FOR SELENOID
 
+                selenoidOptions.put("testName", testName + "-" + userIdentifier + "-" + dtf.format(now));
+                selenoidOptions.put("enableVideo", true);
+                selenoidOptions.put("enableVNC", true);
+                selenoidOptions.put("name", testName + "-" + userIdentifier);
                 selenoidOptions.put("enableLog", true);
-                selenoidOptions.put("logName ", logName);
-                selenoidOptions.put("videoName", videoName);
-
+                selenoidOptions.put("logName ", String.format("%s%s",baseName.replaceAll("\\s","") , ".log"));
+                selenoidOptions.put("videoName", String.format("%s%s",baseName.replaceAll("\\s","") ,".mp4"));
                 selenoidOptions.put("screenResolution", "1920x1080x24");
-
                 options.setCapability("selenoid:options", selenoidOptions);
-
                 //END CAPABILITIES FOR SELENOID RETORCH
-
-                RemoteWebDriver remote = new RemoteWebDriver(new URL(eusApiURL), options);
+                log.debug("Configuring the remote WebDriver ");
+                RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
+                log.debug("Configuring the Local File Detector");
                 remote.setFileDetector(new LocalFileDetector());
-
-
                 this.driver = remote;
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Exception creating eusApiURL", e);
-            }
         }
 
         new WebDriverWait(driver, Duration.ofSeconds(this.timeOfWaitInSeconds));

@@ -65,17 +65,14 @@ public class CourseNavigationUtilities {
         return false;
     }
 
-    public static boolean checkIfCourseExists(WebDriver wd, String course_title, int retries) { //10 lines
+    public static boolean checkIfCourseExists(WebDriver wd, String course_title, int retries) throws InterruptedException { //10 lines
         for (int i = 0; i < retries; i++) {
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                log.error("The Sleeping could not be done");
-            }
+            TimeUnit.SECONDS.sleep(1);
             if (checkIfCourseExists(wd, course_title)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -101,6 +98,7 @@ public class CourseNavigationUtilities {
         }
 
         log.info("[END] changeCourseName OK");
+
         return wd;
     }
     private static void openEditCourseModal(WebDriver wd, WebElement courseElement) throws ElementNotFoundException {
@@ -182,6 +180,7 @@ public class CourseNavigationUtilities {
                 }
             } catch (NoSuchElementException noSuchElementException) {
                 // Do nothing and look for the next item
+                log.info("Course not found looking, for the next item");
             }
         }
         throw new ElementNotFoundException("getCourseElement - the course doesn't exist");
@@ -230,8 +229,9 @@ public class CourseNavigationUtilities {
         getTabContent(wd, ATTENDERS_ICON);
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(ATTENDERS_LIST_ROWS));
         List<WebElement> attenders_lst = wd.findElements(ATTENDERS_LIST_ROWS);
-        if (attenders_lst.size() < 1) {
+        if (attenders_lst.isEmpty()) {
             log.info("[END] isUserInAttendersList KO: attenders list is empty");
+            //TO-DO Check if can be replaced by a fail ("meessage")
             throw new ElementNotFoundException("isUserInAttendersList - attenders list is empty");
         }
         for (WebElement webElement : attenders_lst) {
@@ -249,12 +249,11 @@ public class CourseNavigationUtilities {
         log.info("[INI] getHighlightedAttender");
         WebElement attenders_content = getTabContent(wd, ATTENDERS_ICON);
         List<WebElement> attender_highlighted = attenders_content.findElements(ATTENDERS_LIST_HIGHLIGHTED_ROW);
-        if (attender_highlighted == null || attender_highlighted.size() < 1) {
+        if (attender_highlighted == null || attender_highlighted.isEmpty()) {
             log.info("[END] getHighlightedAttender KO: no highlighted user");
             throw new ElementNotFoundException("getHighlightedAttender - no highlighted user");
         }
         return attender_highlighted.get(0).getText();
     }
-
 
 }

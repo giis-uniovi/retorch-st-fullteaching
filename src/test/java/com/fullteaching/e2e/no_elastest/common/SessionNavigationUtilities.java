@@ -4,6 +4,8 @@ import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundExceptio
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 
 public class SessionNavigationUtilities {
-
+    private static final Logger log = LoggerFactory.getLogger(SessionNavigationUtilities.class);
     public static List<String> getFullSessionList(WebDriver wd) { //7lines
         ArrayList<String> session_titles = new ArrayList<>();
         WebElement tab_content = CourseNavigationUtilities.getTabContent(wd, SESSION_ICON);
@@ -29,7 +31,7 @@ public class SessionNavigationUtilities {
             try {
                 WebElement title = session.findElement(SESSION_LIST_SESSION_NAME);
                 String title_text = title.getText();
-                if (title_text == null || title_text.equals("")) {
+                if (title_text == null || title_text.isEmpty()) {
                     title_text = title.getAttribute("innerHTML");
                 }
                 if (session_name.equals(title_text)) {
@@ -37,6 +39,7 @@ public class SessionNavigationUtilities {
                 }
             } catch (NoSuchElementException noSuchElementExcept) {
                 //do nothing and look for the next item
+                log.info("Looking to the next session to check if the title match.");
             }
         }
         throw new ElementNotFoundException("getSession-the session doesn't exist");
