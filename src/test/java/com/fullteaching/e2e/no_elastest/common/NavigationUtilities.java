@@ -34,11 +34,9 @@ public class NavigationUtilities {
     }
 
     public static void getUrl(WebDriver wd, String url) {
-
         if (amINotHere(wd, url))
             log.info("Navigating to: {}", url);
         wd.get(url);
-
     }
 
     public static void getUrlAndWaitFooter(WebDriver wd, String url) { //3lines
@@ -87,7 +85,6 @@ public class NavigationUtilities {
         }
         return null;
     }
-
 
     public enum FindOption {
         CLASS, TEXT, VALUE, ATTRIBUTE

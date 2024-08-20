@@ -5,6 +5,7 @@ import com.fullteaching.e2e.no_elastest.common.BrowserUser;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.SessionNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -63,7 +64,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
     @DisplayName("sessionTest")
     @ParameterizedTest
     @MethodSource("data")
-    void sessionTest(String mail, String password, String role) throws ElementNotFoundException, IOException, URISyntaxException {
+    void sessionTest(String mail, String password, String role) throws ElementNotFoundException, IOException, URISyntaxException, NotLoggedException, InterruptedException {
         String sessionName = "Today's Session";
         courseName = "Pseudoscientific course for treating the evil eye";
         this.slowLogin(this.user, mail, password);
@@ -81,7 +82,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      * @param pathData the path to the CSV file containing student data
      * @throws IOException if there is an error reading the file
      */
-    private void initializeStudents(String pathData) throws IOException, URISyntaxException {
+    private void initializeStudents(String pathData) throws IOException, URISyntaxException, NotLoggedException, ElementNotFoundException, InterruptedException {
         log.info("Initializing students");
         String users_data = loadStudentsData(pathData);
         studentNameList = new ArrayList<>();

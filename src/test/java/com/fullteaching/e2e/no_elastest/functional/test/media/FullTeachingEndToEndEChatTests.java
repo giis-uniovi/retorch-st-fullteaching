@@ -19,6 +19,8 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.BrowserUser;
+import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
@@ -49,9 +51,7 @@ import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 @DisplayName("E2E tests for FullTeaching chat")
 class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
 
-
     private final static String STUDENT_BROWSER = "chrome";
-
     final String studentMail = "student1@gmail.com";
     final String studentPass = "pass";
 
@@ -69,7 +69,7 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     @Tag("Multiuser Test")
-    void oneToOneChatInSessionChrome(String mail, String password, String role ) throws URISyntaxException, MalformedURLException { //197 Lines of code
+    void oneToOneChatInSessionChrome(String mail, String password, String role ) throws URISyntaxException, MalformedURLException, NotLoggedException, ElementNotFoundException, InterruptedException { //197 Lines of code
         int numberpriormessages;
 
         // TEACHER
@@ -131,8 +131,6 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         student.getDriver().findElement(By.id("send-btn")).click();
         checkStrangerMessage(studentMessage, STUDENT_NAME, user, numberpriormessages); //8lines
         checkOwnMessage(studentMessage, STUDENT_NAME, student, numberpriormessages);//7lines
-
-
     }
 
     private void checkOwnMessage(String message, String sender, BrowserUser user, int numberpriormessages) { //7Lines
@@ -175,6 +173,5 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
     private int getNumberMessages(BrowserUser user) {
         return user.getDriver().findElements(By.tagName("app-chat-line")).size();
     }
-
 
 }

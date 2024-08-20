@@ -6,6 +6,7 @@ import com.fullteaching.e2e.no_elastest.common.ForumNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
 import com.fullteaching.e2e.no_elastest.common.exception.ExceptionsHelper;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -49,7 +50,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "READONLY")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherCourseMainTest(String mail, String password, String role) {//39+80+ 28 set up +13 lines teardown =160
+    void teacherCourseMainTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {//39+80+ 28 set up +13 lines teardown =160
         this.slowLogin(user, mail, password);
         try {
 
@@ -104,7 +105,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "DYNAMIC")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {
+    void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {
         // Setup
         this.slowLogin(user, mail, password);
 
@@ -144,7 +145,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherEditCourseValues(String mail, String password, String role) {//165+256+ 28 set up +13 lines teardown =462
+    void teacherEditCourseValues(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {//165+256+ 28 set up +13 lines teardown =462
         String courseName = properties.getProperty("forum.test.course");
         this.slowLogin(user, mail, password); //24 lines
         try {
@@ -308,7 +309,7 @@ class CourseTeacherTest extends BaseLoggedTest {
     @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void teacherDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException {//51+114+28 set up +13 lines teardown =206
+    void teacherDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {//51+114+28 set up +13 lines teardown =206
         this.slowLogin(user, mail, password);//24
         String courseName = "Test Course_" + System.currentTimeMillis();
         // navigate to course if not there

@@ -33,7 +33,6 @@ public class ParameterLoader {
     }
 
     public static Stream<Arguments> getTestStudents() throws IOException {
-
         log.debug("[getTestStudents] INI");
         Stream records = Stream.empty();
 
@@ -50,7 +49,6 @@ public class ParameterLoader {
     }
 
     public static Stream<Arguments> getTestTeachers() throws IOException {
-
         log.debug("[getTestTeachers] INI");
         Stream records = Stream.empty();
 
@@ -71,12 +69,10 @@ public class ParameterLoader {
     }
 
     private static boolean isStudent(User user) {
-
         return user.getRole().trim().equalsIgnoreCase("STUDENT");
     }
 
     private static boolean isTeacher(User user) {
-
         return user.getRole().trim().equalsIgnoreCase("TEACHER");
     }
 

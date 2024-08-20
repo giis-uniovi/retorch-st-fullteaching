@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-
 @ExtendWith(SeleniumJupiter.class)
 class UserTest extends BaseLoggedTest {
 
@@ -29,12 +28,10 @@ class UserTest extends BaseLoggedTest {
         return ParameterLoader.getTestUsers();
     }
 
-
     /**
      * This test is a simple logging acknowledgement, that checks if the current logged user
      * was logged correctly
      */
-
     @Resource(resID = "LoginService", replaceable = {})
     @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
     @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
@@ -42,26 +39,13 @@ class UserTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     @DisplayName("loginTest")
-    void loginTest(String mail, String password, String role) { //22  +85 +28 set up +13 lines teardown  =148
-        try {
+    void loginTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, BadUserException { //22  +85 +28 set up +13 lines teardown  =148
             this.slowLogin(user, mail, password); //24 lines
             UserUtilities.checkLogin(driver, mail); //12 lines
             assertTrue(true, "not logged");
-        } catch (NotLoggedException | BadUserException e) {
-            log.debug("The user was not logged");
-            fail("Not logged");
-        } catch (ElementNotFoundException e) {
-            log.debug("The web element used to check the log was not found");
-            fail(e.getLocalizedMessage());
-        }
-        try {
+
             this.logout(user); //14 lines
             UserUtilities.checkLogOut(driver); //8lines
-        } catch (ElementNotFoundException eleNotFoundExcept) {
-            fail("Still logged");
-        }
-        assertTrue(true);
+            assertTrue(true);
     }
-
-
 }

@@ -25,8 +25,6 @@ public class UserLoader {
 
     public static void loadUsers(String usersFile, boolean override) throws IOException {
         //read file and create users
-
-
         List<User> userList = new ArrayList<>();
 
         BufferedReader br = new BufferedReader(new FileReader(usersDefaultFile));
@@ -37,7 +35,6 @@ public class UserLoader {
         loadUsers(userList, override);
     }
 
-
     public static void loadUsers(String usersFile) throws IOException {
         loadUsers(usersFile, false);
     }
@@ -46,14 +43,12 @@ public class UserLoader {
         loadUsers(usersDefaultFile);
     }
 
-
     public static User parseUser(String cvsline) {
         String[] field = cvsline.split(cvsMainFieldsSplitBy);
         return new User(field[USERNAME],
                 field[PASSWORD],
                 field[ROLES]);
     }
-
 
     public static Collection<String[]> getSessionParameters() throws IOException {
         String line;
@@ -77,6 +72,5 @@ public class UserLoader {
         }
         return users.values();
     }
-
 
 }

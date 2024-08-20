@@ -46,7 +46,6 @@ public class BrowserUser {
         return this.driver;
     }
 
-
     public WebDriverWait getWaiter() {
         return this.waiter;
     }

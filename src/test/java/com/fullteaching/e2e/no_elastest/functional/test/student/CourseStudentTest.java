@@ -3,6 +3,8 @@ package com.fullteaching.e2e.no_elastest.functional.test.student;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
+import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -23,14 +25,11 @@ import java.util.stream.Stream;
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
-
 class CourseStudentTest extends BaseLoggedTest {
-
 
     public static Stream<Arguments> data() throws IOException {
         return ParameterLoader.getTestStudents();
     }
-
 
     /**
      * These tests get the login the user as student, go the courses  and check if
@@ -47,9 +46,8 @@ class CourseStudentTest extends BaseLoggedTest {
     @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
-    void studentCourseMainTest(String userMail, String password, String role) {//45+ 107+28 set up +13 lines teardown =193
-        this.slowLogin(user, userMail, password);//24 lines
-        try {
+    void studentCourseMainTest(String userMail, String password, String role) throws ElementNotFoundException, InterruptedException, NotLoggedException {//45+ 107+28 set up +13 lines teardown =193
+            this.slowLogin(user, userMail, password);//24 lines
             NavigationUtilities.toCoursesHome(driver); //3lines
             //go to first course
             //get course list
@@ -58,38 +56,10 @@ class CourseStudentTest extends BaseLoggedTest {
             WebElement course_button = CourseNavigationUtilities.getCourseByName(driver, course_list.get(0)).findElement(By.className("title")); //14 lines
             Click.element(driver, course_button);
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(COURSE_TABS_TAG)));
-        } catch (Exception e) {
-            fail("Failed to load Courses Tabs" + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        //Check tabs
-        //Home tab
-        try {
-
             CourseNavigationUtilities.go2Tab(driver, HOME_ICON);//4 lines
-        } catch (Exception e) {
-            fail("Failed to load home tab" + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        try {
             CourseNavigationUtilities.go2Tab(driver, SESSION_ICON);//4lines
-        } catch (Exception e) {
-            fail("Failed to load session tab" + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        try {
             CourseNavigationUtilities.go2Tab(driver, FORUM_ICON);//4lines
-        } catch (Exception e) {
-            fail("Failed to load forum tab" + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        try {
             CourseNavigationUtilities.go2Tab(driver, FILES_ICON);//4lines
-        } catch (Exception e) {
-            fail("Failed to load files tab" + e.getClass() + ": " + e.getLocalizedMessage());
-        }
-        try {
             CourseNavigationUtilities.go2Tab(driver, ATTENDERS_ICON);//4lines
-        } catch (Exception e) {
-            fail("Failed to load attenders tab" + e.getClass() + ": " + e.getLocalizedMessage());
-        }
     }
-
-
 }

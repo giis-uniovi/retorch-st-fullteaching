@@ -5,6 +5,7 @@ import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.ForumNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.DOMManager;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
@@ -65,9 +66,8 @@ class LoggedForumTest extends BaseLoggedTest {
     @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumLoadEntriesTest(String mail, String password, String role) { //47lines +115 +28 set up +13 lines teardown =203
+    void forumLoadEntriesTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { //47lines +115 +28 set up +13 lines teardown =203
         this.slowLogin(user, mail, password);//24 lines
-        try {
             //navigate to courses.
             NavigationUtilities.toCoursesHome(driver);//3lines
             List<String> courses = CourseNavigationUtilities.getCoursesList(driver);//13lines
@@ -113,9 +113,6 @@ class LoggedForumTest extends BaseLoggedTest {
                 driver = Click.element(driver, BACK_TO_DASHBOARD);
             }
             assertTrue((activated_forum_on_some_test && has_comments), "There isn't any forum that can be used to test this [Or not activated or no entry lists or not comments]");
-        } catch (ElementNotFoundException notFoundException) {
-            fail("Failed to navigate to courses forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
     }
 
     /**
@@ -134,7 +131,7 @@ class LoggedForumTest extends BaseLoggedTest {
     @DisplayName("studentCourseMainTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumNewEntryTest(String mail, String password, String role) {// 48+ 104 +   28 set up +13 lines teardown =193
+    void forumNewEntryTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {// 48+ 104 +   28 set up +13 lines teardown =193
         this.slowLogin(user, mail, password); //24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -148,7 +145,6 @@ class LoggedForumTest extends BaseLoggedTest {
         String newEntryTitle = "New Entry Test " + mDay + mMonth + mYear + mHour + mMinute + mSecond;
         String newEntryContent = "This is the content written on the " + mDay + " of " + months[mMonth] + ", " + mHour + ":" + mMinute + "," + mSecond;
         log.info("Navigating to courses tab");
-        try {
             log.info("Navigating to courses tab");
             //navigate to courses.
             if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
@@ -187,9 +183,6 @@ class LoggedForumTest extends BaseLoggedTest {
             Wait.waitForPageLoaded(driver);
             String comment = newComment.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText();
             assertEquals(comment, userName, "Bad user in comment");
-        } catch (ElementNotFoundException notFoundException) {
-            Assertions.fail("Failed to navigate to course forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
         //Fix Flaky test Navigating to the mainpage to logout...
         user.getDriver().get(APP_URL);
     }
@@ -212,7 +205,7 @@ class LoggedForumTest extends BaseLoggedTest {
     @DisplayName("forumNewCommentTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumNewCommentTest(String mail, String password, String role) { // 69+142 + 28 set up +13 lines teardown =252
+    void forumNewCommentTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { // 69+142 + 28 set up +13 lines teardown =252
         this.slowLogin(user, mail, password); //24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -223,7 +216,6 @@ class LoggedForumTest extends BaseLoggedTest {
         int mMinute = calendar.get(Calendar.MINUTE);
         int mSecond = calendar.get(Calendar.SECOND);
 
-        try {
             //check if one course have any entry for comment
             NavigationUtilities.toCoursesHome(driver);//3lines
 
@@ -273,20 +265,13 @@ class LoggedForumTest extends BaseLoggedTest {
             boolean commentFound = false;
             for (WebElement comment : comments) {
                 //check if it is new comment
-                try {
                     String text = comment.findElement(FORUM_COMMENT_LIST_COMMENT_CONTENT).getText();
                     if (text.equals(newCommentContent)) {
                         commentFound = true;
                         assertEquals(comment.findElement(FORUM_COMMENT_LIST_COMMENT_USER).getText(), userName, "Bad user in comment");
                     }
-                } catch (StaleElementReferenceException e) {
-                    log.info("Not Found");
-                }
             }
             assertTrue(commentFound, "Comment not found");
-        } catch (ElementNotFoundException notFoundException) {
-            fail("Failed to navigate to course forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
 
     }
 
@@ -307,7 +292,7 @@ class LoggedForumTest extends BaseLoggedTest {
     @DisplayName("forumNewReply2CommentTest")
     @ParameterizedTest
     @MethodSource("data")
-    void forumNewReply2CommentTest(String mail, String password, String role) { // 63+137+ 28 set up +13 lines teardown = 242
+    void forumNewReply2CommentTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { // 63+137+ 28 set up +13 lines teardown = 242
         this.slowLogin(user, mail, password);//24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -318,7 +303,6 @@ class LoggedForumTest extends BaseLoggedTest {
         int mMinute = calendar.get(Calendar.MINUTE);
         int mSecond = calendar.get(Calendar.SECOND);
         String newEntryTitle;
-        try {
             //check if one course have any entry for comment
             NavigationUtilities.toCoursesHome(driver);//3lines
             WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14 lines
@@ -368,9 +352,6 @@ class LoggedForumTest extends BaseLoggedTest {
             assertTrue(isNameEqual, "Bad user in comment");
             //nested reply
             //assert nested reply
-        } catch (ElementNotFoundException notFoundException) {
-            fail("Failed to navigate to course forum:: " + notFoundException.getClass() + ": " + notFoundException.getLocalizedMessage());
-        }
     }
 
 }

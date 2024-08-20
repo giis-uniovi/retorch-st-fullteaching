@@ -66,10 +66,11 @@ public class ForumNavigationUtilities {
         Wait.notTooMuch(wd).until(ExpectedConditions.visibilityOfElementLocated(FORUM_ICON));
         WebElement tab_content = CourseNavigationUtilities.getTabContent(wd, FORUM_ICON);
         List<WebElement> entries = tab_content.findElements(By.className("entry-title"));
+        String title_text = "No entries";
         for (WebElement entry : entries) {
             try {
                 WebElement title = entry.findElement(FORUM_ENTRY_LIST_ENTRY_TITLE);
-                String title_text = title.getText();
+                title_text = title.getText();
                 if (title_text == null || title_text.isEmpty()) {
                     title_text = title.getAttribute("innerHTML");
                 }
@@ -78,7 +79,7 @@ public class ForumNavigationUtilities {
                     return entry;
                 }
             } catch (NoSuchElementException csee) {
-                //do nothing and look for the next item
+                log.info("Entry not found, the current title is {}", title_text);
             }
         }
         throw new ElementNotFoundException(String.format("[getEntry] The entry with title \"%s\" the entry doesn't exist, the number of entries was %s", entry_name, entries.size()));
@@ -142,7 +143,6 @@ public class ForumNavigationUtilities {
         ForumNavigationUtilities.getEntry(wd, newEntryTitle);
         return wd;
     }
-
 
     public static List<WebElement> getReplies(WebDriver driver, WebElement comment) { //7 lines
         log.info("Get all the replies of the selected comment");

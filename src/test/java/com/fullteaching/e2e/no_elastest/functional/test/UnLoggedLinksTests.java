@@ -41,7 +41,6 @@ class UnLoggedLinksTests extends BaseLoggedTest {
     @MethodSource("data")
     @DisplayName("spiderUnloggedTest")
     void spiderUnloggedTest(String mail, String password, String role) { //125 lines + 28 set up +13 lines teardown = 166
-
         userMail = "nonloged@gmail.com";
         NavigationUtilities.getUrlAndWaitFooter(driver, HOST);
         List<WebElement> pageLinks = SpiderNavigation.getPageLinks(driver); //29 lines

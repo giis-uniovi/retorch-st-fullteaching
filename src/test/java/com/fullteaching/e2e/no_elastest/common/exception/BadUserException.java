@@ -8,5 +8,4 @@ public class BadUserException extends Exception {
         super();
     }
 
-
 }

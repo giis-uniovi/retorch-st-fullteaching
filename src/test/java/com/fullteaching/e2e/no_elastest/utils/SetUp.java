@@ -22,7 +22,7 @@ public class SetUp {
 
     private static final Logger log = LoggerFactory.getLogger(SetUp.class);
 
-    public static void tearDown(WebDriver driver) {
+    public static void tearDown(WebDriver driver) throws InterruptedException {
         if (driver != null) {
             log.info("url:" + driver.getCurrentUrl() + "\nScreenshot (in Base64) at the end of the test:\n{}",
                     getBase64Screenshot(driver));
@@ -32,13 +32,8 @@ public class SetUp {
             logEntries.forEach((entry) -> log.info("[{}] {} {}",
                     new Date(entry.getTimestamp()), entry.getLevel(),
                     entry.getMessage()));
-            try {
+
                 TimeUnit.SECONDS.sleep(300);
-            } catch (InterruptedException e) {
-
-                e.printStackTrace();
-            }
-
         }
     }
 
@@ -48,13 +43,13 @@ public class SetUp {
                 .getScreenshotAs(BASE64);
 
         log.debug("getBase64Screenshot END");
-        return "data:image/png;base64," + screenshotBase64;
 
+        return "data:image/png;base64," + screenshotBase64;
     }
 
     public static String cleanEmptyCourse(WebDriver driver) throws ElementNotFoundException {
         String course_title = "Test Course_" + System.currentTimeMillis();
-        return CourseNavigationUtilities.newCourse(driver, course_title);
 
+        return CourseNavigationUtilities.newCourse(driver, course_title);
     }
 }

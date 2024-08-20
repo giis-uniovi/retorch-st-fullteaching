@@ -16,7 +16,6 @@ public class SpiderNavigation {
      * 		work properly in this kind of application.
      * This is a Specialized Spider navigation for FullTeaching.*/
 
-
     private static String host = LOCALHOST;
 
     /**

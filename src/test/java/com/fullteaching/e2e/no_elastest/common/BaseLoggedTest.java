@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -58,16 +59,11 @@ public class BaseLoggedTest {
     }
 
     @BeforeAll
-    static void setupAll() { // 28 lines
+    static void setupAll() throws IOException { // 28 lines
         // Initialize properties
         properties = new Properties();
-
-        try {
-            // Load a properties file for reading
-            properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
-        } catch (IOException ex) {
-            log.error("Properties file could not be loaded");
-        }
+        // Load a properties file for reading
+        properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
 
         // Check if running outside ElasTest
         if (System.getenv("ET_EUS_API") == null) {
@@ -197,19 +193,19 @@ public class BaseLoggedTest {
     }
 
     protected void slowLogin(BrowserUser user, String userEmail,
-                             String userPass) {//24 lines
+                             String userPass) throws NotLoggedException, ElementNotFoundException, InterruptedException {//24 lines
         log.info("Slow login");
         this.login(user, userEmail, userPass, true);
     }
 
     protected void quickLogin(BrowserUser user, String userEmail,
-                              String userPass) { //24 lines
+                              String userPass) throws NotLoggedException, ElementNotFoundException, InterruptedException { //24 lines
         log.info("Quick login");
         this.login(user, userEmail, userPass, false);
     }
 
     private void login(BrowserUser user, String userEmail, String userPass,
-                       boolean slow) { //24 lines
+                       boolean slow) throws NotLoggedException, ElementNotFoundException, InterruptedException { //24 lines
         user.setOnSession(true);
         log.info("Logging in user {} with mail '{}'", user.getClientData(), userEmail);
         Wait.waitForPageLoaded(user.getDriver());
@@ -240,18 +236,9 @@ public class BaseLoggedTest {
 
         user.waitUntil(ExpectedConditions.presenceOfElementLocated(COURSE_LIST), "The Course list is not present");
         user.waitUntil(ExpectedConditions.elementToBeClickable(By.id(("course-list"))), "Course list is not clickable");
-        try {
-            userName = getUserName(user, true, APP_URL);
-        } catch (NotLoggedException | ElementNotFoundException e) {
-            if (e.getClass().isInstance(NotLoggedException.class)){
-            log.error("The user {} was not logged",user.getClientData());}
-            else{
-                log.error("The userName field not found" );
-            }
-        }
 
+        userName = getUserName(user, true, APP_URL);
         log.info("Logging in successful for user {}", user.getClientData());
-
     }
 
     protected void logout(BrowserUser user) { //43 lines
@@ -364,12 +351,8 @@ public class BaseLoggedTest {
         log.info("Dialog closed for user {}", user.getClientData());
     }
 
-    protected void waitSeconds(int seconds) {
-        try {
+    protected void waitSeconds(int seconds) throws InterruptedException {
             Thread.sleep(1000L * seconds);
-        } catch (InterruptedException e) {
-            log.error("Thread.sleep interrupted");
-        }
 
     }
 

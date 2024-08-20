@@ -19,6 +19,8 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.BrowserUser;
+import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
@@ -64,7 +66,7 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
     @DisplayName("sessionTest")
     @ParameterizedTest
     @MethodSource("data")
-    void oneToOneVideoAudioSessionChrome(String mail, String password, String role) throws URISyntaxException, MalformedURLException { //124+ 232+ 20 set up +8 lines teardown = 564
+    void oneToOneVideoAudioSessionChrome(String mail, String password, String role) throws URISyntaxException, MalformedURLException, NotLoggedException, ElementNotFoundException, InterruptedException { //124+ 232+ 20 set up +8 lines teardown = 564
 
         // TEACHER
         this.slowLogin(user, mail, password);//24

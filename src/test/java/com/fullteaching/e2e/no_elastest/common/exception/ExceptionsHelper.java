@@ -20,4 +20,3 @@ public class ExceptionsHelper {
         return stackMap.get(file);
     }
 }
-

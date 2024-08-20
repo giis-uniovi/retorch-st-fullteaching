@@ -20,6 +20,7 @@ package com.fullteaching.e2e.no_elastest.functional.test.media;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
@@ -52,7 +53,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DisplayName("E2E tests for FullTeaching REST CRUD operations")
 class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
 
-
     final String TEST_COURSE_INFO = "TEST_COURSE_INFO";
     final String EDITED = " EDITED";
     final String TEACHER_NAME = "Teacher Cheater";
@@ -77,7 +77,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @DisplayName("courseRestOperations")
     @ParameterizedTest
     @MethodSource("data")
-    void courseRestOperations(String mail, String password, String role ) throws ElementNotFoundException {
+    void courseRestOperations(String mail, String password, String role ) throws ElementNotFoundException, NotLoggedException, InterruptedException {
         loginAndCreateNewCourse(mail,password);
 
         editCourse();
@@ -85,7 +85,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME + EDITED); // Tear down
     }
 
-    private void loginAndCreateNewCourse(String mail, String password) throws ElementNotFoundException {
+    private void loginAndCreateNewCourse(String mail, String password) throws ElementNotFoundException, NotLoggedException, InterruptedException {
         slowLogin(user, mail, password);
         CourseNavigationUtilities.newCourse(user.getDriver(), COURSE_NAME);
     }
@@ -113,7 +113,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @DisplayName("courseInfoRestOperations")
     @ParameterizedTest
     @MethodSource("data")
-    void courseInfoRestOperations(String mail, String password, String role) throws ElementNotFoundException { //12+16+65 set up +60 lines teardown =153
+    void courseInfoRestOperations(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException { //12+16+65 set up +60 lines teardown =153
         loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "info-tab-icon");//16 lines
         user.waitUntil(ExpectedConditions.presenceOfNestedElementLocatedBy(By.cssSelector(".md-tab-body.md-tab-active"), By.cssSelector(".card-panel.warning")), "Course info wasn't empty");
@@ -137,7 +137,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @DisplayName("sessionRestOperations")
     @ParameterizedTest
     @MethodSource("data")
-    void sessionRestOperations(String mail, String password, String role) throws ElementNotFoundException {
+    void sessionRestOperations(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {
         loginAndCreateNewCourse(mail,password);
 
         addNewSession();
@@ -220,7 +220,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @DisplayName("forumRestOperations")
     @ParameterizedTest
     @MethodSource("data")
-    void forumRestOperations(String mail, String password, String role) throws ElementNotFoundException { //60+66+65 set up +60 lines teardown =251
+    void forumRestOperations(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException { //60+66+65 set up +60 lines teardown =251
         loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "forum-tab-icon");//16 lines
         log.info("Adding new entry to the forum");
@@ -294,7 +294,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @DisplayName("filesRestOperations")
     @ParameterizedTest
     @MethodSource("data")
-    void filesRestOperations(String mail, String password, String role) throws ElementNotFoundException {//88+112+65 set up +60 lines teardown =325
+    void filesRestOperations(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {//88+112+65 set up +60 lines teardown =325
         loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "files-tab-icon");//16 lines
         log.info("Checking that there are no files in the course");
@@ -397,7 +397,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     @DisplayName("attendersRestOperations")
     @ParameterizedTest
     @MethodSource("data")
-    void attendersRestOperations(String mail, String password, String role) throws ElementNotFoundException {//42+32+65 set up +60 lines teardown =199
+    void attendersRestOperations(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {//42+32+65 set up +60 lines teardown =199
         loginAndCreateNewCourse(mail,password);
         enterCourseAndNavigateTab(COURSE_NAME, "attenders-tab-icon");//16 lines
         log.info("Checking that there is only one attender to the course");
@@ -467,8 +467,5 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.textToBe(By.id("main-course-title"), courseName), "Unexpected course title");
         log.info("Navigating to tab by clicking icon with id '{}'", tabId);
         user.getDriver().findElement(By.id(tabId)).click();
-
     }
-
-
 }

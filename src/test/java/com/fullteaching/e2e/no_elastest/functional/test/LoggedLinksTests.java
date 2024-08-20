@@ -3,6 +3,8 @@ package com.fullteaching.e2e.no_elastest.functional.test;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.SpiderNavigation;
+import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
@@ -55,7 +57,7 @@ class LoggedLinksTests extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     @DisplayName("spiderLoggedTest")
-    void spiderLoggedTest(String mail, String password, String role) { //140 + 28 set up +13 lines teardown = 181
+    void spiderLoggedTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { //140 + 28 set up +13 lines teardown = 181
         this.slowLogin(user, mail, password);
         //*navigate from home*//*
         NavigationUtilities.getUrlAndWaitFooter(driver, HOST); //13 lines
