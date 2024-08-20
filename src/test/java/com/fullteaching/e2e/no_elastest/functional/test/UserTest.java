@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(SeleniumJupiter.class)
 class UserTest extends BaseLoggedTest {

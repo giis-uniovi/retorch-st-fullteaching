@@ -11,12 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.fullteaching.e2e.no_elastest.common.Constants.LOCALHOST;
-import static java.lang.System.getProperty;
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.openqa.selenium.OutputType.BASE64;
 import static org.openqa.selenium.logging.LogType.BROWSER;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class SetUp {
 
@@ -24,7 +20,7 @@ public class SetUp {
 
     public static void tearDown(WebDriver driver) throws InterruptedException {
         if (driver != null) {
-            log.info("url:" + driver.getCurrentUrl() + "\nScreenshot (in Base64) at the end of the test:\n{}",
+            log.info("url:{}\nScreenshot (in Base64) at the end of the test:\n{}",driver.getCurrentUrl(),
                     getBase64Screenshot(driver));
 
             log.info("Browser console at the end of the test");

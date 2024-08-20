@@ -203,7 +203,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             //New Title
             log.info("Adding the new description");
             WebElement headerSelector = driver.findElement(By.className("ql-header"));
-            Click.element(driver, By.className("ql-header"));
+            Click.element(driver, headerSelector);
             WebElement picker_options = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("ql-picker-options")));
             WebElement option = NavigationUtilities.getOption(picker_options.findElements(By.className("ql-picker-item")), "Heading", NavigationUtilities.FindOption.ATTRIBUTE, "data-label");//20 lines
             assertNotNull(option, "Something went wrong while setting the Heading");

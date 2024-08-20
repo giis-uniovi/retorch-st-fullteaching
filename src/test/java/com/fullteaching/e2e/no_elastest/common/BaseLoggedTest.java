@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -353,7 +352,6 @@ public class BaseLoggedTest {
 
     protected void waitSeconds(int seconds) throws InterruptedException {
             Thread.sleep(1000L * seconds);
-
     }
 
     public String getUserName(BrowserUser user, boolean goBack, String host) throws NotLoggedException, ElementNotFoundException {
@@ -383,9 +381,8 @@ public class BaseLoggedTest {
         }
         //Check if the username is the expected
         log.info("[END] getUserName");
+
         return userNameTag;
-
     }
-
 
 }

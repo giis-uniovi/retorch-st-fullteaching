@@ -52,7 +52,7 @@ class CourseStudentTest extends BaseLoggedTest {
             //go to first course
             //get course list
             List<String> course_list = CourseNavigationUtilities.getCoursesList(driver); //13 lines
-            if (course_list.size() <= 0) fail("No courses available for test user");
+            if (course_list.isEmpty()) fail("No courses available for test user");
             WebElement course_button = CourseNavigationUtilities.getCourseByName(driver, course_list.get(0)).findElement(By.className("title")); //14 lines
             Click.element(driver, course_button);
             Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.id(COURSE_TABS_TAG)));

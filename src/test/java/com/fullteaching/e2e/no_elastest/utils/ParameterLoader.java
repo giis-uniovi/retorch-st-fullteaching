@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class ParameterLoader {
 
