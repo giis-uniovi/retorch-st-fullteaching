@@ -18,14 +18,23 @@
 package com.fullteaching.e2e.no_elastest.common;
 
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BrowserUser {
 
@@ -36,12 +45,45 @@ public class BrowserUser {
     protected boolean isOnSession;
     protected WebDriverWait waiter;
 
-    public BrowserUser(String clientData, int timeOfWaitInSeconds) {
+    public BrowserUser(String clientData, int timeOfWaitInSeconds,String testName) {
+        log.debug("Creating BrowserUser for the test: {}", testName);
         this.clientData = clientData;
         this.timeOfWaitInSeconds = timeOfWaitInSeconds;
         this.isOnSession = false;
     }
 
+    public void configureRemoteWebDriver(String testName,MutableCapabilities options) throws URISyntaxException, MalformedURLException {
+        log.debug("SELENOID_PRESENT, using the remote WebDriver (Selenoid)");
+        Map<String, Object> selenoidOptions = new HashMap<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
+        LocalDateTime now = LocalDateTime.now();
+        String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + clientData ;
+        log.debug("Video and log files stored into .mp4 and .log named: {}" , baseName);
+        log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
+        //CAPABILITIES FOR SELENOID
+        selenoidOptions.put("testName", testName + "-" + clientData + "-" + dtf.format(now));
+        selenoidOptions.put("enableVideo", true);
+        selenoidOptions.put("enableVNC", true);
+        selenoidOptions.put("name", testName + "-" + clientData);
+        selenoidOptions.put("enableLog", true);
+        selenoidOptions.put("logName ", String.format("%s%s",baseName.replaceAll("\\s","") , ".log"));
+        selenoidOptions.put("videoName", String.format("%s%s",baseName.replaceAll("\\s","") ,".mp4"));
+        selenoidOptions.put("screenResolution", "1920x1080x24");
+        options.setCapability("selenoid:options", selenoidOptions);
+        //END CAPABILITIES FOR SELENOID RETORCH
+        log.debug("Configuring the remote WebDriver ");
+        RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
+        log.debug("Configuring the Local File Detector");
+        remote.setFileDetector(new LocalFileDetector());
+        this.driver = remote;
+        log.debug("End configuration of the RemoteWebDriver");
+    }
+    public void waitAndLastConfDriver(){
+        log.debug("Configure the driver connection timeouts at ({})", this.timeOfWaitInSeconds);
+        new WebDriverWait(driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
+        log.info("Driver Successfully configured");
+        this.configureDriver();
+    }
     public WebDriver getDriver() {
         return this.driver;
     }
