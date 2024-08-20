@@ -39,7 +39,7 @@ class UserTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     @DisplayName("loginTest")
-    void loginTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, BadUserException { //22  +85 +28 set up +13 lines teardown  =148
+    void loginTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, BadUserException, InterruptedException { //22  +85 +28 set up +13 lines teardown  =148
             this.slowLogin(user, mail, password); //24 lines
             UserUtilities.checkLogin(driver, mail); //12 lines
             assertTrue(true, "not logged");
