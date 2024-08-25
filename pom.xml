@@ -39,25 +39,22 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Test dependencies version -->
-        <junit.jupiter.version>5.5.2</junit.jupiter.version>
         
         <junit.platform.version>1.0.0</junit.platform.version>
         
         <selenium-jupiter.version>5.1.1</selenium-jupiter.version>
 
-        <junit-jupiter-engine.version>5.10.3</junit-jupiter-engine.version>
-        
-        <junit-jupiter-params.version>5.10.3</junit-jupiter-params.version>
+        <junit-jupiter.version>5.11.0</junit-jupiter.version>
         
         <webdrivermanager.version>5.9.2</webdrivermanager.version>
         
         <retorch.version>1.1.0</retorch.version>
         
-        <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.4.0</maven-surefire-plugin.version>
         
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 
-        <slf4j-api.version>2.0.13</slf4j-api.version>
+        <slf4j-api.version>2.0.16</slf4j-api.version>
 
         <log4j-slf4j2-impl.version>2.23.1</log4j-slf4j2-impl.version>
 
@@ -93,25 +90,25 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter-engine.version}</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter-params.version}</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <!--	As of version 4, Selenium-Jupiter does not include Selenium WebDriver as a transitive dependency.-->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.23.0</version>
+            <version>4.23.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.2</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -215,7 +212,7 @@
 
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.3.3</version>
                 <!-- ONLY ON DEVELOPMENT -->
                 <dependencies>
                     <dependency>
@@ -231,7 +228,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <mainClass>com.fullteaching.backend.Application</mainClass>
                 </configuration>
@@ -285,7 +282,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
