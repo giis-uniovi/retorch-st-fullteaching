@@ -39,15 +39,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Test dependencies version -->
-        <junit.jupiter.version>5.5.2</junit.jupiter.version>
         
         <junit.platform.version>1.0.0</junit.platform.version>
         
         <selenium-jupiter.version>5.1.1</selenium-jupiter.version>
 
-        <junit-jupiter-engine.version>5.10.3</junit-jupiter-engine.version>
-        
-        <junit-jupiter-params.version>5.10.3</junit-jupiter-params.version>
+        <junit-jupiter.version>5.11.0</junit-jupiter.version>
         
         <webdrivermanager.version>5.9.2</webdrivermanager.version>
         
@@ -93,13 +90,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter-engine.version}</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter-params.version}</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <!--	As of version 4, Selenium-Jupiter does not include Selenium WebDriver as a transitive dependency.-->
@@ -111,7 +108,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.2</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
