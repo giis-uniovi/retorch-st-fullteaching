@@ -64,15 +64,7 @@ pipeline {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobf 0'
           }// EndStepsTJobF
         }// EndStageTJobF
-        stage('TJobG IdResource: Course LoginService OpenViduMock ') {
-          steps {
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobg 0'
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobg 0 https://full-teaching- 5000 "CourseStudentTest#studentCourseMainTest,CourseTeacherTest#teacherCourseMainTest,CourseTeacherTest#teacherCreateAndDeleteCourseTest"'
-              }// EndExecutionStageErrorTJobG
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobg 0'
-          }// EndStepsTJobG
-        }// EndStageTJobG
+
      }// End Parallel
     }// End Stage
     stage('Stage 1'){
@@ -114,15 +106,6 @@ pipeline {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobk 1'
           }// EndStepsTJobK
         }// EndStageTJobK
-        stage('TJobL IdResource: LoginService OpenViduMock ') {
-          steps {
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobl 1'
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobl 1 https://full-teaching- 5000 "UserTest#loginTest"'
-              }// EndExecutionStageErrorTJobL
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobl 1'
-          }// EndStepsTJobL
-        }// EndStageTJobL
      }// End Parallel
     }// End Stage
     stage('Stage 2'){
@@ -146,6 +129,24 @@ pipeline {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobn 2'
           }// EndStepsTJobN
         }// EndStageTJobN
+        stage('TJobG IdResource: Course LoginService OpenViduMock ') {
+          steps {
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobg 0'
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobg 0 https://full-teaching- 5000 "CourseStudentTest#studentCourseMainTest,CourseTeacherTest#teacherCourseMainTest,CourseTeacherTest#teacherCreateAndDeleteCourseTest"'
+              }// EndExecutionStageErrorTJobG
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobg 0'
+          }// EndStepsTJobG
+        }// EndStageTJobG
+        stage('TJobL IdResource: LoginService OpenViduMock ') {
+          steps {
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobl 1'
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobl 1 https://full-teaching- 5000 "UserTest#loginTest"'
+              }// EndExecutionStageErrorTJobL
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobl 1'
+          }// EndStepsTJobL
+        }// EndStageTJobL
      }// End Parallel
     }// End Stage
 stage('TEARDOWN-Infrastructure') {
