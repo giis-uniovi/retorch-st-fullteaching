@@ -25,9 +25,6 @@ pipeline {
             sh '$SCRIPTS_FOLDER/coilifecycles/coi-setup.sh'
         }// EndStepsSETUPINF
       }// EndStageSETUPInf
-    stage('Stage 0'){
-      failFast false
-      parallel{
         stage('TJobC IdResource: Attenders LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobc 0'
@@ -73,11 +70,6 @@ pipeline {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobg 0'
           }// EndStepsTJobG
         }// EndStageTJobG
-     }// End Parallel
-    }// End Stage
-    stage('Stage 1'){
-      failFast false
-      parallel{
         stage('TJobH IdResource: Information LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 1'
@@ -123,11 +115,7 @@ pipeline {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobl 1'
           }// EndStepsTJobL
         }// EndStageTJobL
-     }// End Parallel
-    }// End Stage
-    stage('Stage 2'){
-      failFast false
-      parallel{
+
         stage('TJobM IdResource: Session LoginService OpenVidu ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobm 2'
@@ -146,8 +134,6 @@ pipeline {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobn 2'
           }// EndStepsTJobN
         }// EndStageTJobN
-     }// End Parallel
-    }// End Stage
 stage('TEARDOWN-Infrastructure') {
       steps {
         sh '$SCRIPTS_FOLDER/coilifecycles/coi-teardown.sh'
