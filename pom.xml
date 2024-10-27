@@ -44,13 +44,13 @@
         
         <selenium-jupiter.version>5.1.1</selenium-jupiter.version>
 
-        <junit-jupiter.version>5.11.1</junit-jupiter.version>
+        <junit-jupiter.version>5.11.3</junit-jupiter.version>
         
         <webdrivermanager.version>5.9.2</webdrivermanager.version>
         
         <retorch.version>1.1.0</retorch.version>
         
-        <maven-surefire-plugin.version>3.5.0</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.1</maven-surefire-plugin.version>
         
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 
@@ -212,7 +212,7 @@
 
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.3.4</version>
+                <version>3.3.5</version>
                 <!-- ONLY ON DEVELOPMENT -->
                 <dependencies>
                     <dependency>
@@ -228,7 +228,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <configuration>
                     <mainClass>com.fullteaching.backend.Application</mainClass>
                 </configuration>
@@ -282,7 +282,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
