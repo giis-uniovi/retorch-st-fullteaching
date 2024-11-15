@@ -12,8 +12,6 @@ import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
 import giis.retorch.annotations.Resource;
-import io.github.bonigarcia.seljup.SeleniumJupiter;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -30,7 +28,6 @@ import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities.checkIfCourseExists;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SeleniumJupiter.class)
 class CourseTeacherTest extends BaseLoggedTest {
 
     public static Stream<Arguments> data() throws IOException {

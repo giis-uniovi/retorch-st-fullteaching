@@ -26,44 +26,24 @@
     </developers>
 
     <properties>
-        <!-- This oversuscribe the ENV variable-->
-        <RETORCH_TESTENV>false</RETORCH_TESTENV>
-
-        <!-- Java 8 -->
-        <java.version>11</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven.compiler.version>3.13.0</maven.compiler.version>
-        <!-- Encoding -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- Test dependencies version -->
-        
-        <junit.platform.version>1.0.0</junit.platform.version>
-        
-        <selenium-jupiter.version>5.1.1</selenium-jupiter.version>
-
-        <junit-jupiter.version>5.11.3</junit-jupiter.version>
-        
-        <webdrivermanager.version>5.9.2</webdrivermanager.version>
-        
-        <retorch.version>1.1.0</retorch.version>
-        
-        <maven-surefire-plugin.version>3.5.1</maven-surefire-plugin.version>
-        
-        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <surefire.version>3.5.2</surefire.version>
 
         <slf4j-api.version>2.0.16</slf4j-api.version>
 
-        <log4j-slf4j2-impl.version>2.24.0</log4j-slf4j2-impl.version>
+        <log4j-slf4j2-impl.version>2.24.1</log4j-slf4j2-impl.version>
 
-        <!-- Plugins Jacoco -->
-        <jacoco.version>0.8.12</jacoco.version>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
-        <sonar.language>java</sonar.language>
+        <junit-jupiter-api.version>5.11.3</junit-jupiter-api.version>
+
+        <selenium-java.version>4.26.0</selenium-java.version>
+
+        <webdrivermanager.version>5.9.2</webdrivermanager.version>
+
+        <retorch-annotations.version>1.1.0</retorch-annotations.version>
+
     </properties>
 
     <scm>
@@ -86,43 +66,6 @@
     </distributionManagement>
 
     <dependencies>
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--	As of version 4, Selenium-Jupiter does not include Selenium WebDriver as a transitive dependency.-->
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>4.25.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>selenium-jupiter</artifactId>
-            <version>${selenium-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>${webdrivermanager.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -134,175 +77,176 @@
             <version>${log4j-slf4j2-impl.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- RETORCH DEPENDENCY-->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.github.giis-uniovi</groupId>
             <artifactId>retorch-annotations</artifactId>
-            <version>${retorch.version}</version>
+            <version>${retorch-annotations.version}</version>
+        </dependency>
+        <!--Dependencies related to webdrivers (near future remplaced by selema)-->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager.version}</version>
         </dependency>
 
-        <!-- END RETORCH DEPENDENCY-->
+        <!-- Dependency to create the parametrized tests (inclides the annotations) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <!-- Plugins -->
 
     <build>
-        <!-- To avoid problems with concurrency we change the directories of the reports and outputs -->
-        <testOutputDirectory>${basedir}/target/test-classes/${dirtarget}</testOutputDirectory>
-        <outputDirectory>${basedir}/target/classes/${dirtarget}</outputDirectory>
-        <plugins>
-            <!-- Jacoco Plugin for Jesus -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <configuration>
-                    <!--suppress MavenModelInspection -->
-                    <skip>${maven.test.skip}</skip>
-                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
-                    <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
-                    <output>file</output>
-                    <append>true</append>
-                    <excludes>
-                        <exclude>*MethodAccess</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>jacoco-initialize</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <phase>test-compile</phase>
-                    </execution>
-                    <execution>
-                        <id>jacoco-site</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-
-
-                <configuration>
-                    <!-- This parameter is used to end all the threads (And avoid thread overflown)-->
-                    <shutdown>kill</shutdown>
-                    <!-- This configuration should solve the problem with the starting fork
-                     The error was caused by not enough memory for the app-->
-
-                    <systemPropertyVariables>
-                        <RETORCH_TESTENV>false</RETORCH_TESTENV>
-                    </systemPropertyVariables>
-                    <!-- This configuration excludes the test cases for analysis purposes -->
-
-                    <excludes>com.fullteaching.e2e.no_elastest.common.*</excludes>
-                </configuration>
-            </plugin>
-
-            <!--Added-->
-            <plugin>
-
-
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.3.5</version>
-                <!-- ONLY ON DEVELOPMENT -->
-                <dependencies>
-                    <dependency>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>springloaded</artifactId>
-                        <version>1.2.8.RELEASE</version>
-                    </dependency>
-                </dependencies>
-                <!-- ONLY ON DEVELOPMENT -->
-
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.0</version>
-                <configuration>
-                    <mainClass>com.fullteaching.backend.Application</mainClass>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.2</version>
-                <configuration>
-                    <imageName>codeurjc/${project.artifactId}</imageName>
-                    <imageTags>
-                        <imageTag>latest</imageTag>
-                    </imageTags>
-                    <serverId>docker-hub</serverId>
-                    <dockerDirectory>src/com.fullteaching.e2e.no_elastest.main/docker</dockerDirectory>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.war</include>
-                        </resource>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>src/com.fullteaching.e2e.no_elastest.main/docker</directory>
-                            <include>init.sh</include>
-                        </resource>
-                    </resources>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <!--suppress MavenModelInspection -->
-                <artifactId>maven-war-plugin</artifactId>
-                <!--suppress MavenModelInspection -->
-                <version>3.4.0</version>
-                <configuration>
-
-                    <webResources>
-                        <resource>
-                            <directory>src/com.fullteaching.e2e.no_elastest.main/ebextensions</directory>
-                            <targetPath>.ebextensions</targetPath>
-                            <filtering>true</filtering>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-
-            <!-- Added  For reports!-->
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.5.1</version>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report-only</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Added  to solve problems with the compiler!-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-        </plugins>
+        <!-- To avoid problems with concurrency we change the directories of the reports, outputs and build -->
+        <directory>${project.basedir}/target/${tjob_name}</directory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                    <configuration>
+                        <testFailureIgnore>false</testFailureIgnore>
+                        <!-- Sets the VM argument line used when unit tests are run under JaCoCo -->
+                        <argLine>${surefireArgLine}</argLine>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <!-- evita fallo con jenkins slave linux y openjdk: https://stackoverflow.com/questions/23260057/the-forked-vm-terminated-without-saying-properly-goodbye-vm-crash-or-system-exi/53070605 -->
+                        <useSystemClassLoader>false</useSystemClassLoader>
+                        <skipTests>${skipTests}</skipTests>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-report-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                    <executions>
+                        <execution>
+                            <id>ut-reports</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report-only</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.12</version>
+                    <executions>
+                        <execution>
+                            <id>pre-unit-test</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
+                                <propertyName>surefireArgLine</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>post-unit-test</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <executions>
+                        <!-- Aggregate junit style reports -->
+                        <execution>
+                            <id>junit-reports</id>
+                            <phase>test</phase>
+                            <configuration>
+                                <target unless="skipTests">
+                                    <junitreport>
+                                        <fileset dir="${project.basedir}/target/surefire-reports"
+                                                 erroronmissingdir="false">
+                                            <include name="**/*.xml"/>
+                                        </fileset>
+                                        <report format="frames"
+                                                todir="${project.reporting.outputDirectory}/junit-frames"/>
+                                        <report format="noframes"
+                                                todir="${project.reporting.outputDirectory}/junit-noframes"/>
+                                    </junitreport>
+                                </target>
+                            </configuration>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.ant</groupId>
+                            <artifactId>ant-junit</artifactId>
+                            <version>1.10.15</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.ant</groupId>
+                            <artifactId>ant-trax</artifactId>
+                            <version>1.8.0</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.3.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.11.1</version>
+                    <configuration>
+                        <quiet>true</quiet>
+                        <doclint>none</doclint>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
