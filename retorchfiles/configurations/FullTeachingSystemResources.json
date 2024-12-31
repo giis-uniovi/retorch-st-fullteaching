@@ -1,0 +1,362 @@
+{
+  "openvidumock": {
+    "hierarchyParent": [
+      "openvidu"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelopenvidumock",
+      "elasticity": 30,
+      "elasticityCost": 10.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "openvidumock",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.048
+      },
+      {
+        "name": "processor",
+        "quantity": 0.25
+      },
+      {
+        "name": "storage",
+        "quantity": 0.31
+      }
+    ],
+    "dockerImage": "mediaserver;eexit/mirror-http-server"
+  },
+  "openvidu": {
+    "hierarchyParent": [],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelopenvidu",
+      "elasticity": 1,
+      "elasticityCost": 300.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "openvidu",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 8
+      },
+      {
+        "name": "processor",
+        "quantity": 2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.88
+      }
+    ],
+    "dockerImage": "mediaserver;openvidu/openvidu-server-kms:1.7.0"
+  },
+  "configuration": {
+    "hierarchyParent": [
+      "course"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelconfiguration",
+      "elasticity": 5,
+      "elasticityCost": 15.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "configuration",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "course": {
+    "hierarchyParent": [
+      "mysql"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelcourse",
+      "elasticity": 5,
+      "elasticityCost": 90.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "course",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "information": {
+    "hierarchyParent": [
+      "Course"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelinformation",
+      "elasticity": 5,
+      "elasticityCost": 15.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "information",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "files": {
+    "hierarchyParent": [
+      "course"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelfiles",
+      "elasticity": 5,
+      "elasticityCost": 15.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "files",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "attenders": {
+    "hierarchyParent": [
+      "course"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelattenders",
+      "elasticity": 5,
+      "elasticityCost": 15.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "attenders",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "loginservice": {
+    "hierarchyParent": [
+      "mysql"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelloginservice",
+      "elasticity": 5,
+      "elasticityCost": 30.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "loginservice",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "session": {
+    "hierarchyParent": [
+      "course"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelsession",
+      "elasticity": 5,
+      "elasticityCost": 15.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "session",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "forum": {
+    "hierarchyParent": [
+      "course"
+    ],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelforum",
+      "elasticity": 5,
+      "elasticityCost": 15.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "forum",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.2929
+      },
+      {
+        "name": "processor",
+        "quantity": 0.2
+      },
+      {
+        "name": "storage",
+        "quantity": 0.5
+      }
+    ],
+    "dockerImage": "database;mysql:5.7.21"
+  },
+  "webserver": {
+    "hierarchyParent": [],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelwebserver",
+      "elasticity": 5,
+      "elasticityCost": 100.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "webserver",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 1.465
+      },
+      {
+        "name": "processor",
+        "quantity": 0.5
+      },
+      {
+        "name": "storage",
+        "quantity": 0.92
+      }
+    ],
+    "dockerImage": "webserver;codeurjc/full-teaching:demo"
+  },
+  "executor": {
+    "hierarchyParent": [],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelexecutor",
+      "elasticity": 30,
+      "elasticityCost": 30
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "executor",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 0.14
+      },
+      {
+        "name": "processor",
+        "quantity": 0.25
+      },
+      {
+        "name": "storage",
+        "quantity": 0.49
+      }
+    ],
+    "dockerImage": "executor;xretorch-agent"
+  },
+  "webbrowser": {
+    "hierarchyParent": [],
+    "replaceable": [],
+    "elasticityModel": {
+      "elasticityID": "elasmodelwebbrowser",
+      "elasticity": 6,
+      "elasticityCost": 50.0
+    },
+    "resourceType": "LOGICAL",
+    "resourceID": "webbrowser",
+    "minimalCapacities": [
+      {
+        "name": "memory",
+        "quantity": 1
+      },
+      {
+        "name": "processor",
+        "quantity": 0.5
+      },
+      {
+        "name": "storage",
+        "quantity": 1.16
+      },
+      {
+        "name": "slots",
+        "quantity": 1
+      }
+    ],
+    "dockerImage": "browser;vnc_chrome:lastest"
+  }
+}

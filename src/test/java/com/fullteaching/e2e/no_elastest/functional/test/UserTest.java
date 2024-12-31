@@ -7,7 +7,6 @@ import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundExceptio
 import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,10 +28,11 @@ class UserTest extends BaseLoggedTest {
      * was logged correctly
      */
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
     @DisplayName("loginTest")

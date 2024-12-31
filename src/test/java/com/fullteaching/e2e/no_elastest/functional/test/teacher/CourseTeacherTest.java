@@ -11,7 +11,6 @@ import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -39,12 +38,12 @@ class CourseTeacherTest extends BaseLoggedTest {
      * course.Once the user it's here, it clicks upon the different tabs(Course info,sessions,Forum,Files
      * and attenders), checking that the navigation its possible.
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {})
-    @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "course", concurrency = 15, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
     void teacherCourseMainTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {//39+80+ 28 set up +13 lines teardown =160
@@ -94,12 +93,12 @@ class CourseTeacherTest extends BaseLoggedTest {
      * into the edit icon, check the box that allows it and clicking into the delete button
      * After that, we proceed to check if the course don't appear in the list.
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {})
-    @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "DYNAMIC")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "course", concurrency = 15, sharing = true, accessMode = "DYNAMIC")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
     void teacherCreateAndDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {
@@ -134,12 +133,13 @@ class CourseTeacherTest extends BaseLoggedTest {
      * this test check if the current user, that is accessing to the course, is included
      * in the Attenders list( check if the user is in it)
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Configuration"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "configuration", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
     void teacherEditCourseValues(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {//165+256+ 28 set up +13 lines teardown =462
@@ -298,12 +298,12 @@ class CourseTeacherTest extends BaseLoggedTest {
         //Well done!
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
     void teacherDeleteCourseTest(String mail, String password, String role) throws ElementNotFoundException, NotLoggedException, InterruptedException {//51+114+28 set up +13 lines teardown =206
