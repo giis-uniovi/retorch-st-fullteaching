@@ -63,7 +63,7 @@ public class BrowserUser {
         Map<String, Object> selenoidOptions = new HashMap<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd-HH:mm");
         LocalDateTime now = LocalDateTime.now();
-        String baseName = System.getProperty("tjob_name") + "-" + dtf.format(now) + "-" + testName + "-" + clientData ;
+        String baseName = System.getProperty("TJOB_NAME") + "-" + dtf.format(now) + "-" + testName + "-" + clientData ;
         log.debug("Video and log files stored into .mp4 and .log named: {}" , baseName);
         log.debug("Adding all the extra capabilities needed: {testName,enableVideo,enableVNC,name,enableLog,videoName,screenResolution}");
         //CAPABILITIES FOR SELENOID
