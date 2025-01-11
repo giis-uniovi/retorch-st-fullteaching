@@ -26,22 +26,23 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.openqa.selenium.logging.LogType.BROWSER;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
 
-    final static Logger log = getLogger(lookup().lookupClass());
+    static final Logger log = getLogger(lookup().lookupClass());
 
     public String courseName;
     protected List<String> studentPassList;
@@ -87,21 +88,21 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      */
     private void initializeStudents(String pathData) throws IOException, URISyntaxException, NotLoggedException, ElementNotFoundException, InterruptedException {
         log.info("Initializing students");
-        String users_data = loadStudentsData(pathData);
+        String usersData = loadStudentsData(pathData);
         studentNameList = new ArrayList<>();
         studentPassList = new ArrayList<>();
         studentNamesList = new ArrayList<>();
         studentBrowserUserList = new ArrayList<>();
-        String[] students_data = users_data.split(";");
+        String[] studentsData = usersData.split(";");
 
-        for (int i = 0; i < students_data.length; i++) {
-            String userid = students_data[i].split(":")[0];
+        for (int i = 0; i < studentsData.length; i++) {
+            String userid = studentsData[i].split(":")[0];
             studentNameList.add(userid);
-            String user_password = students_data[i].split(":")[1];
-            studentPassList.add(user_password);
-            String STUDENT_BROWSER = students_data[i].split(":")[2];
-            BrowserUser studentD = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" + TEST_NAME, userid, WAIT_SECONDS);
-            this.slowLogin(studentD, userid, user_password);
+            String userPassword = studentsData[i].split(":")[1];
+            studentPassList.add(userPassword);
+            String studentBrowser = studentsData[i].split(":")[2];
+            BrowserUser studentD = setupBrowser(studentBrowser, TJOB_NAME + "-" + TEST_NAME, userid, WAIT_SECONDS);
+            this.slowLogin(studentD, userid, userPassword);
             studentNamesList.add(userid);
             studentBrowserUserList.add(studentD);
         }
@@ -114,7 +115,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      * @throws ElementNotFoundException if an element is not found during navigation
      */
     private void createNewSession(String sessionName) throws ElementNotFoundException {
-        String sessionDate = getCurrentDate();
+
         String sessionHour = getCurrentTime();
         String sessionDescription = "Wow today session will be amazing";
 
@@ -123,35 +124,36 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         WebElement modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_NEW_SESSION_MODAL));
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TITLE).sendKeys(sessionName);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_CONTENT).sendKeys(sessionDescription);
-        introduceSessionDate(user,modal,sessionDate);
+        introduceSessionDate(user,modal);
         modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_TIME).sendKeys(sessionHour);
         Click.element(user.getDriver(), modal.findElement(SESSION_LIST_NEW_SESSION_MODAL_POST_BUTTON));
         Wait.notTooMuch(user.getDriver());
         // Verify session creation
         Wait.waitForPageLoaded(user.getDriver());
         user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(SESSION_LIST_SESSION_ROW,3),"Incorrect number of sessions (never more than 2)");
-        List<String> session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
-        assertTrue(session_titles.contains(sessionName), "Session has not been created");
+        List<String> sessionTitles = SessionNavigationUtilities.getFullSessionList(user.getDriver());
+        assertTrue(sessionTitles.contains(sessionName), "Session has not been created");
     }
 
-    private void introduceSessionDate(BrowserUser user, WebElement element, String date) {
+    private void introduceSessionDate(BrowserUser user, WebElement element) {
+        String sessionDate = getCurrentDate();
+        String expectedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
         boolean success = false;
         int attempts = 3;
-        log.info("The date is going to be:{}",date);
+        log.info("The date is going to be:{}",sessionDate);
         for (int i = 0; i < attempts; i++) {
             try {
                 user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).clear();
-                String[] splitDate = date.split("-");
-                user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(date);
-                String invertedDate = splitDate[2] + "-" + splitDate[1] + "-" + splitDate[0];
-                String actualValue= user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).getAttribute("value");
-                if(!actualValue.equals(invertedDate)) { // Use JavaScript to set the value of the date input
+                user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).sendKeys(sessionDate);
+                String actualValue= user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).getDomProperty("value");
+                if(actualValue != null && !actualValue.equals(expectedDate)) { // Use JavaScript to set the value of the date input
                     log.info("Selenium sendKeys dont working properly, using JS..");
                     user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE).clear();
                     JavascriptExecutor js = (JavascriptExecutor) user.getDriver();
-                    js.executeScript("arguments[0].value = arguments[1];", user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE), invertedDate);
+                    js.executeScript("arguments[0].value = arguments[1];", user.getDriver().findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE), sessionDate);
                 }
-                user.getWaiter().until(ExpectedConditions.textToBePresentInElementValue(element.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE), invertedDate));
+                user.getWaiter().until(ExpectedConditions.textToBePresentInElementValue(element.findElement(SESSION_LIST_NEW_SESSION_MODAL_DATE), expectedDate));
                 success = true;
                 break; //
             } catch (TimeoutException e) {
@@ -163,15 +165,18 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         }
     }
     /**
-     * This method gets the current date in the format DDMMYYYY. for the video session name
+     * This method gets the current date in the formats DD-MM-YYYY  if the locale is Spain and
+     * MM-DD-YYYY in case that the locale is different
      */
     private String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int mYear = calendar.get(Calendar.YEAR);
-        int mMonth = calendar.get(Calendar.MONTH);
+        int mMonth = calendar.get(Calendar.MONTH) + 1;
         int mDay = calendar.get(Calendar.DAY_OF_MONTH);
-        return "" + (mDay < 10 ? "0" + mDay : mDay)+"-" + (mMonth < 10 ? "0" + mMonth : mMonth)+"-"+ mYear;
+        return Locale.getDefault().toString().equals("es_ES")
+                ? (mDay < 10 ? "0" + mDay : mDay) + "-" + (mMonth < 10 ? "0" + mMonth : mMonth) + "-" + mYear
+                : (mMonth < 10 ? "0" + mMonth : mMonth) + "-" + (mDay < 10 ? "0" + mDay : mDay) + "-" + mYear;
     }
     /**
      * This method gets the current time in the format HHmmA/P, where A/P indicates AM or PM for the video session name
@@ -189,8 +194,8 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      * This method navigates and joins the session, checking that it exist
      */
     private void joinSession(String sessionName, BrowserUser usr) throws ElementNotFoundException {
-        List<String> session_titles = SessionNavigationUtilities.getFullSessionList(usr.getDriver());
-        assertTrue(session_titles.contains(sessionName), "Session has not been created");
+        List<String> sessionTitles = SessionNavigationUtilities.getFullSessionList(usr.getDriver());
+        assertTrue(sessionTitles.contains(sessionName), "Session has not been created");
         WebElement session = SessionNavigationUtilities.getSession(usr.getDriver(), sessionName);
         Click.element(usr.getDriver(), session.findElement(SESSION_LIST_SESSION_ACCESS));
     }
@@ -240,7 +245,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
      * @param sessionName string with the session name
      */
     private void deleteSession(String sessionName) throws ElementNotFoundException {
-        List<String> session_titles;
+        List<String> sessionTitles;
         WebElement modal;
         WebElement session;
         session = SessionNavigationUtilities.getSession(user.getDriver(), sessionName);
@@ -249,8 +254,8 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("label")));
         Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("a")));
         Wait.waitForPageLoaded(user.getDriver());//13 lines
-        session_titles = SessionNavigationUtilities.getFullSessionList(user.getDriver()); //7 lines
-        assertFalse(session_titles.contains(sessionName), "Session has not been deleted");
+        sessionTitles = SessionNavigationUtilities.getFullSessionList(user.getDriver()); //7 lines
+        assertFalse(sessionTitles.contains(sessionName), "Session has not been deleted");
     }
 
     public String loadStudentsData(String path) throws IOException {
@@ -263,6 +268,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
             key.append(line);
             line = reader.readLine();
         }
+        reader.close();
         System.out.println(key);
         return key.toString();
     }
