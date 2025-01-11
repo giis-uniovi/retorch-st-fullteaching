@@ -11,7 +11,6 @@ import com.fullteaching.e2e.no_elastest.utils.DOMManager;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,13 +54,13 @@ class LoggedForumTest extends BaseLoggedTest {
      * someone that have comments on it.Finally, with the two previous conditions,
      * makes an assertEquals() to ensure that both are accomplishment
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Forum"})
-    @AccessMode(resID = "Course", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @DisplayName("studentCourseMainTest")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "forum", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
+    @DisplayName("forumLoadEntriesTest")
     @ParameterizedTest
     @MethodSource("data")
     void forumLoadEntriesTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { //47lines +115 +28 set up +13 lines teardown =203
@@ -120,13 +119,13 @@ class LoggedForumTest extends BaseLoggedTest {
      * the entry was created correctly and ensures that there are only one comment that
      * corresponds with the body of that entry.
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Forum"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @DisplayName("studentCourseMainTest")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "forum", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
+    @DisplayName("forumNewEntryTest")
     @ParameterizedTest
     @MethodSource("data")
     void forumNewEntryTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException {// 48+ 104 +   28 set up +13 lines teardown =193
@@ -194,12 +193,12 @@ class LoggedForumTest extends BaseLoggedTest {
      * in this entry with the custom content(the current date and hour).Finally, we iterate
      * over all comments looking for the comment that previously we create.
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Forum"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "forum", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("forumNewCommentTest")
     @ParameterizedTest
     @MethodSource("data")
@@ -281,12 +280,12 @@ class LoggedForumTest extends BaseLoggedTest {
      * previously created, go to the first and replies to the same comment.After it, we check
      * that the comment was correctly published.
      */
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Forum"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "forum", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("forumNewReply2CommentTest")
     @ParameterizedTest
     @MethodSource("data")

@@ -23,7 +23,6 @@ import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundExceptio
 import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -59,12 +58,12 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         return ParameterLoader.getTestTeachers();
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
-    @Resource(resID = "Course", replaceable = {"Configuration"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READONLY")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
+    @AccessMode(resID = "configuration", concurrency = 1, sharing = false, accessMode = "READONLY")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("oneToOneChatInSessionChrome")
     @ParameterizedTest
     @MethodSource("data")
