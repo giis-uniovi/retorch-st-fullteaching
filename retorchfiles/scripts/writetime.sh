@@ -1,8 +1,10 @@
 #!/bin/bash
+# The writetime.sh script appends different timestamps for each TJob to a separate file. These files are then
+# processed and combined into a single file containing all COI and TJob lifecycle durations.
 
 # Check if the correct number of parameters is provided
 if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <STAGE> <TJOBNAME>"
+    "$SCRIPTS_FOLDER/printLog.sh" "ERROR" "writeTime-$1" "Usage: $0 <STAGE> <TJOBNAME>"
     exit 1
 fi
 STAGE=$2
@@ -16,7 +18,7 @@ append_timestamp() {
   if [ -f "$1" ]; then
     echo -n ";$(date +%s%3N)" >>"$1"
   else
-    echo "Error: File $1 does not exist."
+    "$SCRIPTS_FOLDER/printLog.sh" "ERROR" "writeTime-$1" "Error: File $1 does not exist."
     exit 1
   fi
 }
