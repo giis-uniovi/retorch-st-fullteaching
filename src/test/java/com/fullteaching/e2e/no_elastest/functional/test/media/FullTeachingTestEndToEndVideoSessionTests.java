@@ -23,7 +23,6 @@ import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundExceptio
 import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -57,13 +56,13 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
     }
 
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
-    @Resource(resID = "Course", replaceable = {"Session"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
-    @DisplayName("sessionTest")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidu", concurrency = 10, sharing = true, accessMode = "READWRITE")
+    @AccessMode(resID = "session", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
+    @DisplayName("oneToOneVideoAudioSessionChrome")
     @ParameterizedTest
     @MethodSource("data")
     void oneToOneVideoAudioSessionChrome(String mail, String password, String role) throws URISyntaxException, MalformedURLException, NotLoggedException, ElementNotFoundException, InterruptedException { //124+ 232+ 20 set up +8 lines teardown = 564
