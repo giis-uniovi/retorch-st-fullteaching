@@ -5,7 +5,6 @@ import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.SpiderNavigation;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,12 +30,12 @@ class UnLoggedLinksTests extends BaseLoggedTest {
         return ParameterLoader.getTestTeachers();
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {})
-    @AccessMode(resID = "Course", concurrency = 15, sharing = true, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "course", concurrency = 15, sharing = true, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
     @DisplayName("spiderUnloggedTest")
