@@ -30,7 +30,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <surefire.version>3.5.3</surefire.version>
+        <surefire.version>3.5.4</surefire.version>
 
         <slf4j-api.version>2.0.17</slf4j-api.version>
 
@@ -40,7 +40,7 @@
 
         <selenium-java.version>4.35.0</selenium-java.version>
 
-        <webdrivermanager.version>6.3.1</webdrivermanager.version>
+        <webdrivermanager.version>6.3.2</webdrivermanager.version>
 
         <retorch-annotations.version>1.1.0</retorch-annotations.version>
 
