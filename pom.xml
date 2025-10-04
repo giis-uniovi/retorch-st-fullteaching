@@ -36,9 +36,9 @@
 
         <log4j-slf4j2-impl.version>2.25.2</log4j-slf4j2-impl.version>
 
-        <junit-jupiter-api.version>5.13.4</junit-jupiter-api.version>
+        <junit-jupiter-api.version>6.0.0</junit-jupiter-api.version>
 
-        <selenium-java.version>4.35.0</selenium-java.version>
+        <selenium-java.version>4.36.0</selenium-java.version>
 
         <webdrivermanager.version>6.3.2</webdrivermanager.version>
 
