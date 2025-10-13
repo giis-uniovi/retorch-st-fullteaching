@@ -55,7 +55,7 @@ if [ ! -f "$COVERAGE_PATH/app.jar" ]; then
 
     # Obtenemos el jar para calcular la cobertura
     wget "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.13/org.jacoco.cli-0.8.13-nodeps.jar"
-    wget "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.13/org.jacoco.cli-0.8.13.jar"
+
     mkdir classes
 
     mv "$COVERAGE_PATH/WEB-INF/classes" "$COVERAGE_PATH"
