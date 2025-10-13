@@ -91,6 +91,15 @@ stage('Generate Coverage Report') {
                --sourcefiles "$WORKSPACE/coverage/code/java" \
                --html ./jacoco-report \
                --name FullCoverageReport'
+          publishHTML(
+              allowMissing: true,
+              alwaysLinkToLastBuild: true,
+              keepAll: false,
+              reportDir: "jacoco-report",
+              reportFiles: 'index.html',
+              reportName: 'FullCoverageReport'
+          )
+
 
           sh 'echo "Here the report"'
 
