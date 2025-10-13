@@ -80,7 +80,10 @@ stage('Generate Coverage Report') {
           sh 'echo "Change directory to the coverage ones"'
           sh 'cd "$EXEC_PATH"'
           sh 'echo "Merging everything into a single exec file"'
-          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" merge --destfile "$EXEC_PATH/merged.exec" "$EXEC_PATH/execfiles/*.exec"'
+
+          sh 'EXEC_FILES=$(find "$EXEC_PATH" -type f -name "*.exec")'
+          sh 'echo "$EXEC_FILES"'
+          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" merge --destfile "$EXEC_PATH/merged.exec" "$EXEC_FILES"'
 
           sh 'echo "Generating report!"'
           sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" report merged.exec \
