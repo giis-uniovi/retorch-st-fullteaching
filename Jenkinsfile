@@ -4,6 +4,7 @@ pipeline {
     SELENOID_PRESENT = "TRUE"
     SUT_LOCATION = "$WORKSPACE"
     SCRIPTS_FOLDER = "$WORKSPACE/retorchfiles/scripts"
+    EXEC_PATH="$WORKSPACE/target/coverage"
   }// EndEnvironment
   options {
     disableConcurrentBuilds()
@@ -153,9 +154,47 @@ stage('TEARDOWN-Infrastructure') {
         sh '$SCRIPTS_FOLDER/coilifecycles/coi-teardown.sh'
       }// EndStepsTearDownInf
 }// EndStageTearDown
+
+stage('PUBLISH COV REPORT') {
+      steps {
+
+          sh 'echo "Change directory to the coverage ones"'
+          sh 'cd "$EXEC_PATH"'
+          sh 'echo "Merging everything into a single exec file"'
+
+          sh 'find "$EXEC_PATH" -type f -name "*.exec" > exec_files.txt'
+          sh 'cat ./exec_files.txt'
+          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" merge --destfile "$EXEC_PATH/merged.exec" $(cat "./exec_files.txt")'
+
+          sh 'echo "Generating report (HTML)!"'
+          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" report "$EXEC_PATH/merged.exec" \
+               --classfiles "$EXEC_PATH/classes" \
+               --sourcefiles "$WORKSPACE/coverage/code/java" \
+               --html ./jacoco-report \
+               --name FullCoverageReport'
+          sh 'echo "Generating report (XML)!"'
+          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" report "$EXEC_PATH/merged.exec" \
+              --classfiles "$EXEC_PATH/classes" \
+              --sourcefiles "$WORKSPACE/coverage/code/java" \
+              --xml ./jacoco-report/coverage.xml \
+              --name FullCoverageReport'
+
+          publishHTML(
+              allowMissing: true,
+              alwaysLinkToLastBuild: true,
+              keepAll: false,
+              reportDir: "jacoco-report",
+              reportFiles: 'index.html',
+              reportName: 'FullCoverageReport'
+          )
+
+
+      }// EndStepsTearDownInf
+}// EndStageTearDown
   }// EndStagesPipeline
  post { 
       always {
+          archiveArtifacts artifacts: 'jacoco-report/coverage.xml', onlyIfSuccessful: true
           archiveArtifacts artifacts: 'artifacts/*.csv', onlyIfSuccessful: true
           archiveArtifacts artifacts: 'target/testlogs/**/*.*', onlyIfSuccessful: false
           archiveArtifacts artifacts: 'target/containerlogs/**/*.*', onlyIfSuccessful: false
