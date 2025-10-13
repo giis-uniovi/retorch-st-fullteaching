@@ -86,7 +86,7 @@ stage('Generate Coverage Report') {
           sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" merge --destfile "$EXEC_PATH/merged.exec" $(cat "./exec_files.txt")'
 
           sh 'echo "Generating report!"'
-          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" report merged.exec \
+          sh 'java -jar "$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar" report "$EXEC_PATH/merged.exec" \
                --classfiles "$EXEC_PATH/classes" \
                --sourcefiles "$WORKSPACE/coverage/code/java" \
                --html ./jacoco-report \
