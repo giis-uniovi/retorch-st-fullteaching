@@ -1,4 +1,3 @@
-version: '3'
 services:
   full-teaching-mysql:
     container_name: full-teaching-mysql-${tjobname}
@@ -11,6 +10,12 @@ services:
       - MYSQL_PASSWORD=pass
     networks:
       - jenkins_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     ulimits:
       nofile:
         soft: 65536
@@ -36,11 +41,14 @@ services:
 
   full-teaching:
     container_name: full-teaching-${tjobname}
-    image: codeurjc/full-teaching:demo
+    image: augustocristian/full-teaching:jacococlient
+
     init: true
     depends_on:
-      - full-teaching-mysql
-      - full-teaching-openvidu-server-kms
+      full-teaching-mysql:
+        condition: service_healthy
+      full-teaching-openvidu-server-kms:
+        condition: service_started
     expose:
       - 5000
     environment:
