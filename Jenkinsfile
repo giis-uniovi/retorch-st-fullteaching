@@ -33,7 +33,7 @@ pipeline {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobc 0'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobc 0 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#attendersRestOperations"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobc 0 https://full-teaching- 5000 "UserTest#loginTest,FullTeachingEndToEndRESTTests#sessionRestOperations"'
               }// EndExecutionStageErrorTJobC
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobc 0'
           }// EndStepsTJobC
@@ -41,8 +41,8 @@ pipeline {
         stage('TJobD IdResource: Configuration LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobd 0'
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobd 0 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseRestOperations,CourseTeacherTest#teacherEditCourseValues"'
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {                                         //Course RW                          //Course RW,
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobd 0 https://full-teaching- 5000 "CourseTeacherTest#teacherEditCourseValues"'
               }// EndExecutionStageErrorTJobD
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobd 0'
           }// EndStepsTJobD
@@ -50,8 +50,8 @@ pipeline {
         stage('TJobE IdResource: Configuration LoginService OpenVidu ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobe 0'
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobe 0 https://full-teaching- 5000 "FullTeachingEndToEndEChatTests#oneToOneChatInSessionChrome"'
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {                                                          //Course RW, Openvidu RW
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobe 0 https://full-teaching- 5000 "FullTeachingTestEndToEndVideoSessionTests#oneToOneVideoAudioSessionChrome"'
               }// EndExecutionStageErrorTJobE
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobe 0'
           }// EndStepsTJobE
@@ -59,8 +59,8 @@ pipeline {
         stage('TJobF IdResource: Course LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobf 0'
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobf 0 https://full-teaching- 5000 "LoggedLinksTests#spiderLoggedTest,UnLoggedLinksTests#spiderUnloggedTest,CourseTeacherTest#teacherDeleteCourseTest"'
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {                                                          //Course RW
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobf 0 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#forumRestOperations"'
               }// EndExecutionStageErrorTJobF
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobf 0'
           }// EndStepsTJobF
@@ -68,8 +68,8 @@ pipeline {
         stage('TJobG IdResource: Course LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobg 0'
-              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobg 0 https://full-teaching- 5000 "CourseStudentTest#studentCourseMainTest,CourseTeacherTest#teacherCourseMainTest,CourseTeacherTest#teacherCreateAndDeleteCourseTest"'
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {                                                          //Course RW (REEMP CONF)
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobg 0 https://full-teaching- 5000 "UnLoggedLinksTests#spiderUnLoggedTest,FullTeachingEndToEndRESTTests#filesRestOperations"'
               }// EndExecutionStageErrorTJobG
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobg 0'
           }// EndStepsTJobG
@@ -79,20 +79,20 @@ pipeline {
     stage('Stage 1'){
       failFast false
       parallel{
-        stage('TJobH IdResource: Information LoginService OpenViduMock ') {
+        stage('TJobM IdResource: Information LoginService OpenVidu ') {
           steps {
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 1'
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobm 1'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobh 1 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseInfoRestOperations"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobm 1 https://full-teaching- 5000 "FullTeachingEndToEndEChatTests#oneToOneChatInSessionChrome,FullTeachingLoggedVideoSessionTests#sessionTest"'
               }// EndExecutionStageErrorTJobH
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobh 1'
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobm 1'
           }// EndStepsTJobH
         }// EndStageTJobH
         stage('TJobI IdResource: Files LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobi 1'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobi 1 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#filesRestOperations"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobi 1 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#attendersRestOperations,CourseTeacherTest#teacherCreateAndDeleteCourseTest"'
               }// EndExecutionStageErrorTJobI
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobi 1'
           }// EndStepsTJobI
@@ -101,7 +101,7 @@ pipeline {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobj 1'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobj 1 https://full-teaching- 5000 "LoggedForumTest#forumLoadEntriesTest"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobj 1 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseInfoRestOperations,LoggedForumTest#forumNewCommentTest"'
               }// EndExecutionStageErrorTJobJ
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobj 1'
           }// EndStepsTJobJ
@@ -110,7 +110,7 @@ pipeline {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobk 1'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobk 1 https://full-teaching- 5000 "LoggedForumTest#forumNewCommentTest,LoggedForumTest#forumNewEntryTest,LoggedForumTest#forumNewReply2CommentTest,FullTeachingEndToEndRESTTests#forumRestOperations"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobk 1 https://full-teaching- 5000 "CourseStudentTest#studentCourseMainTest,CourseTeacherTest#teacherCourseMainTest"'
               }// EndExecutionStageErrorTJobK
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobk 1'
           }// EndStepsTJobK
@@ -119,7 +119,7 @@ pipeline {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobl 1'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobl 1 https://full-teaching- 5000 "UserTest#loginTest"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobl 1 https://full-teaching- 5000 "LoggedForumTest#forumNewEntryTest"'
               }// EndExecutionStageErrorTJobL
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobl 1'
           }// EndStepsTJobL
@@ -129,20 +129,20 @@ pipeline {
     stage('Stage 2'){
       failFast false
       parallel{
-        stage('TJobM IdResource: Session LoginService OpenVidu ') {
+        stage('TJobH IdResource: Session LoginService OpenViduMock ') {
           steps {
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobm 2'
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 2'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobm 2 https://full-teaching- 5000 "FullTeachingTestEndToEndVideoSessionTests#oneToOneVideoAudioSessionChrome,FullTeachingLoggedVideoSessionTests#sessionTest"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobh 2 https://full-teaching- 5000 "LoggedForumTest#forumNewReply2CommentTest,CourseTeacherTest#teacherDeleteCourseTest"'
               }// EndExecutionStageErrorTJobM
-              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobm 2'
+              sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobh 2'
           }// EndStepsTJobM
         }// EndStageTJobM
         stage('TJobN IdResource: Session LoginService OpenViduMock ') {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobn 2'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobn 2 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#sessionRestOperations"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobn 2 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseRestOperations,LoggedLinksTests#spiderLoggedTest,LoggedForumTest#forumLoadEntriesTest"'
               }// EndExecutionStageErrorTJobN
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobn 2'
           }// EndStepsTJobN
