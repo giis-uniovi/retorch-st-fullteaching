@@ -33,7 +33,7 @@ pipeline {
           steps {
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobc 0'
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobc 0 https://full-teaching- 5000 "UserTest#loginTest,UnLoggedLinksTests#spiderUnloggedTest,CourseTeacherTest#teacherEditCourseValues,FullTeachingEndToEndRESTTests#forumRestOperations"'
+                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobc 0 https://full-teaching- 5000 "UserTest#loginTest,UnLoggedLinksTests#spiderUnloggedTest,CourseTeacherTest#teacherEditCourseValues,FullTeachingEndToEndRESTTests#forumRestOperations,FullTeachingEndToEndRESTTests#filesRestOperations,"'
               }// EndExecutionStageErrorTJobC
               sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobc 0'
           }// EndStepsTJobC
