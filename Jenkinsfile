@@ -26,24 +26,16 @@ pipeline {
             sh '$SCRIPTS_FOLDER/coilifecycles/coi-setup.sh'
         }// EndStepsSETUPINF
       }// EndStageSETUPInf
-          stage('18') {
+
+           stage('20') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobc 0'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobu 18'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobc 0 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#attendersRestOperations"'
-                 }// EndExecutionStageErrorTJobC
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobc 0'
-             }// EndStepsTJobC
-           }// EndStageTJobC
-           stage('13') {
-             steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobd 1'
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobd 1 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseRestOperations"'
-                 }// EndExecutionStageErrorTJobD
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobd 1'
-             }// EndStepsTJobD
-           }// EndStageTJobD
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobu 18 https://full-teaching- 5000 "FullTeachingTestEndToEndVideoSessionTests#oneToOneVideoAudioSessionChrome"'
+                 }// EndExecutionStageErrorTJobM
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobu 18'
+             }// EndStepsTJobM
+                     }// EndStageTJobM
            stage('7 ') {
              steps {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobe 2'
@@ -53,7 +45,6 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobe 2'
              }// EndStepsTJobD
            }// EndStageTJobD
-
            stage('21') {
              steps {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobf 3'
@@ -63,33 +54,77 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobf 3'
              }// EndStepsTJobE
            }// EndStageTJobE
-           stage('2') {
+
+           stage('16') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobg 4'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobs 16'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobg 4 https://full-teaching- 5000 "LoggedLinksTests#spiderLoggedTest"'
-                 }// EndExecutionStageErrorTJobF
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobg 4'
-             }// EndStepsTJobF
-           }// EndStageTJobF
-           stage('3') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobs 16 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#forumRestOperations"'
+                 }// EndExecutionStageErrorTJobK
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobs 16'
+             }// EndStepsTJobK
+           }// EndStageTJobK
+
+           stage('17') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 5'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobn 11'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobh 5 https://full-teaching- 5000 "UnLoggedLinksTests#spiderUnloggedTest"'
-                 }// EndExecutionStageErrorTJobF
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobh 5'
-             }// EndStepsTJobF
-           }// EndStageTJobF
-           stage('8') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobn 11 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#filesRestOperations"'
+                 }// EndExecutionStageErrorTJobI
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobn 11'
+             }// EndStepsTJobI
+           }// EndStageTJobI
+
+
+
+           stage('15') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobi 6'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobw 20'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobi 6 https://full-teaching- 5000 "CourseTeacherTest#teacherDeleteCourseTest"'
-                 }// EndExecutionStageErrorTJobF
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobi 6'
-             }// EndStepsTJobF
-           }// EndStageTJobF
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobw 20 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#sessionRestOperations"'
+                 }// EndExecutionStageErrorTJobN
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobw 20'
+             }// EndStepsTJobN
+           }// EndStageTJobN
+          stage('18') {
+             steps {
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobc 0'
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobc 0 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#attendersRestOperations"'
+                 }// EndExecutionStageErrorTJobC
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobc 0'
+             }// EndStepsTJobC
+           }// EndStageTJobC
+
+           stage('19') {
+             steps {
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobv 19'
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobv 19 https://full-teaching- 5000 "FullTeachingLoggedVideoSessionTests#sessionTest"'
+                 }// EndExecutionStageErrorTJobM
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobv 19'
+             }// EndStepsTJobM
+           }// EndStageTJobM
+
+
+           stage('1') {
+             steps {
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobt 17'
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobt 17 https://full-teaching- 5000 "UserTest#loginTest"'
+                 }// EndExecutionStageErrorTJobL
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobt 17'
+             }// EndStepsTJobL
+           }// EndStageTJobL
+           stage('14') {
+             steps {
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobm 10'
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobm 10 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseInfoRestOperations"'
+                 }// EndExecutionStageErrorTJobH
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobm 10'
+             }// EndStepsTJobH
+           }// EndStageTJobH
            stage('4') {
              steps {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobj 7'
@@ -108,6 +143,15 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobk 8'
              }// EndStepsTJobG
            }// EndStageTJobG
+           stage('10') {
+             steps {
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobq 14'
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobq 14 https://full-teaching- 5000 "LoggedForumTest#forumNewEntryTest"'
+                 }// EndExecutionStageErrorTJobK
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobq 14'
+             }// EndStepsTJobK
+           }// EndStageTJobK
 
            stage('6') {
              steps {
@@ -118,33 +162,7 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobl 9'
              }// EndStepsTJobG
            }// EndStageTJobG
-           stage('14') {
-             steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobm 10'
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobm 10 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseInfoRestOperations"'
-                 }// EndExecutionStageErrorTJobH
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobm 10'
-             }// EndStepsTJobH
-           }// EndStageTJobH
-           stage('17') {
-             steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobn 11'
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobn 11 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#filesRestOperations"'
-                 }// EndExecutionStageErrorTJobI
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobn 11'
-             }// EndStepsTJobI
-           }// EndStageTJobI
-           stage('9') {
-             steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobo 12'
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobo 12 https://full-teaching- 5000 "LoggedForumTest#forumLoadEntriesTest"'
-                 }// EndExecutionStageErrorTJobJ
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobo 12'
-             }// EndStepsTJobJ
-           }// EndStageTJobJ
+
            stage('11') {
              steps {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobp 13'
@@ -154,15 +172,16 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobp 13'
              }// EndStepsTJobK
            }// EndStageTJobK
-           stage('10') {
+
+           stage('13') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobq 14'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobd 1'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobq 14 https://full-teaching- 5000 "LoggedForumTest#forumNewEntryTest"'
-                 }// EndExecutionStageErrorTJobK
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobq 14'
-             }// EndStepsTJobK
-           }// EndStageTJobK
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobd 1 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#courseRestOperations"'
+                 }// EndExecutionStageErrorTJobD
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobd 1'
+             }// EndStepsTJobD
+           }// EndStageTJobD
            stage('12') {
              steps {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobr 15'
@@ -172,51 +191,45 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobr 15'
              }// EndStepsTJobK
            }// EndStageTJobK
-           stage('16') {
+           stage('8') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobs 16'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobi 6'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobs 16 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#forumRestOperations"'
-                 }// EndExecutionStageErrorTJobK
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobs 16'
-             }// EndStepsTJobK
-           }// EndStageTJobK
-           stage('1') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobi 6 https://full-teaching- 5000 "CourseTeacherTest#teacherDeleteCourseTest"'
+                 }// EndExecutionStageErrorTJobF
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobi 6'
+             }// EndStepsTJobF
+           }// EndStageTJobF
+           stage('2') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobt 17'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobg 4'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobt 17 https://full-teaching- 5000 "UserTest#loginTest"'
-                 }// EndExecutionStageErrorTJobL
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobt 17'
-             }// EndStepsTJobL
-           }// EndStageTJobL
-           stage('20') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobg 4 https://full-teaching- 5000 "LoggedLinksTests#spiderLoggedTest"'
+                 }// EndExecutionStageErrorTJobF
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobg 4'
+             }// EndStepsTJobF
+           }// EndStageTJobF
+
+           stage('9') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobu 18'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobo 12'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobu 18 https://full-teaching- 5000 "FullTeachingTestEndToEndVideoSessionTests#oneToOneVideoAudioSessionChrome"'
-                 }// EndExecutionStageErrorTJobM
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobu 18'
-             }// EndStepsTJobM
-                     }// EndStageTJobM
-           stage('19') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobo 12 https://full-teaching- 5000 "LoggedForumTest#forumLoadEntriesTest"'
+                 }// EndExecutionStageErrorTJobJ
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobo 12'
+             }// EndStepsTJobJ
+           }// EndStageTJobJ
+           stage('3') {
              steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobv 19'
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 5'
                  catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobv 19 https://full-teaching- 5000 "FullTeachingLoggedVideoSessionTests#sessionTest"'
-                 }// EndExecutionStageErrorTJobM
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobv 19'
-             }// EndStepsTJobM
-           }// EndStageTJobM
-           stage('15') {
-             steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobw 20'
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobw 20 https://full-teaching- 5000 "FullTeachingEndToEndRESTTests#sessionRestOperations"'
-                 }// EndExecutionStageErrorTJobN
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobw 20'
-             }// EndStepsTJobN
-           }// EndStageTJobN
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobh 5 https://full-teaching- 5000 "UnLoggedLinksTests#spiderUnloggedTest"'
+                 }// EndExecutionStageErrorTJobF
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobh 5'
+             }// EndStepsTJobF
+           }// EndStageTJobF
+
+
 stage('TEARDOWN-Infrastructure') {
       steps {
         sh '$SCRIPTS_FOLDER/coilifecycles/coi-teardown.sh'
