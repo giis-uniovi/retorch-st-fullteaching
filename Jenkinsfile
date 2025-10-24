@@ -45,6 +45,15 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobe 2'
              }// EndStepsTJobD
            }// EndStageTJobD
+           stage('3') {
+             steps {
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 5'
+                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobh 5 https://full-teaching- 5000 "UnLoggedLinksTests#spiderUnloggedTest"'
+                 }// EndExecutionStageErrorTJobF
+                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobh 5'
+             }// EndStepsTJobF
+           }// EndStageTJobF
            stage('21') {
              steps {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobf 3'
@@ -219,15 +228,7 @@ pipeline {
                  sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobo 12'
              }// EndStepsTJobJ
            }// EndStageTJobJ
-           stage('3') {
-             steps {
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-setup.sh tjobh 5'
-                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                     sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-testexecution.sh tjobh 5 https://full-teaching- 5000 "UnLoggedLinksTests#spiderUnloggedTest"'
-                 }// EndExecutionStageErrorTJobF
-                 sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobh 5'
-             }// EndStepsTJobF
-           }// EndStageTJobF
+
 
 
 stage('TEARDOWN-Infrastructure') {
