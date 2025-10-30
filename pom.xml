@@ -38,7 +38,7 @@
 
         <junit-jupiter-api.version>6.0.0</junit-jupiter-api.version>
 
-        <selenium-java.version>4.37.0</selenium-java.version>
+        <selenium-java.version>4.38.0</selenium-java.version>
 
         <webdrivermanager.version>6.3.2</webdrivermanager.version>
 
