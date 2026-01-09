@@ -8,6 +8,8 @@ updates:
       time: "00:20"
       timezone: "Europe/Madrid"
     rebase-strategy: "disabled"
+    assignees:
+      - "ClaudiodelaRiva"
     open-pull-requests-limit: 20
 
   - package-ecosystem: github-actions
@@ -18,4 +20,6 @@ updates:
       time: "00:20"
       timezone: "Europe/Madrid"
     rebase-strategy: "disabled"
+    assignees:
+      - "ClaudiodelaRiva"
     open-pull-requests-limit: 20
