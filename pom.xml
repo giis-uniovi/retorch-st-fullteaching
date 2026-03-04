@@ -93,13 +93,18 @@
             <artifactId>retorch-annotations</artifactId>
             <version>${retorch-annotations.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.giis-uniovi</groupId>
+            <artifactId>retorch-orchestration</artifactId>
+            <version>1.1.1-ft_migrateschedulerorchestrator-SNAPSHOT</version>   <!--TO-DO Replace with the correct version when released-->
+        </dependency>
+
         <!--Dependencies related to webdrivers (near future remplaced by selema)-->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>${webdrivermanager.version}</version>
         </dependency>
-
         <!-- Dependency to create the parametrized tests (inclides the annotations) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
