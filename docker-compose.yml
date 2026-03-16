@@ -2,7 +2,7 @@ version: '3'
 services:
   full-teaching-mysql:
     container_name: full-teaching-mysql-${tjobname}
-    image: mysql:5.7.21
+    image: ${database}
     init: true
     environment:
       - MYSQL_ROOT_PASSWORD=pass
@@ -18,7 +18,7 @@ services:
 
   full-teaching-openvidu-server-kms:
     container_name: full-teaching-${tjobname}-openvidu-server-kms
-    image: ${OpenViduImage}
+    image: ${mediaserver}
     init: true
     expose:
       - 8443
@@ -36,7 +36,7 @@ services:
 
   full-teaching:
     container_name: full-teaching-${tjobname}
-    image: codeurjc/full-teaching:demo
+    image: ${webserver}
     init: true
     depends_on:
       - full-teaching-mysql
