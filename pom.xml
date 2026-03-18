@@ -30,17 +30,17 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <surefire.version>3.5.4</surefire.version>
+        <surefire.version>3.5.5</surefire.version>
 
         <slf4j-api.version>2.0.17</slf4j-api.version>
 
-        <log4j-slf4j2-impl.version>2.25.2</log4j-slf4j2-impl.version>
+        <log4j-slf4j2-impl.version>2.25.3</log4j-slf4j2-impl.version>
 
-        <junit-jupiter-api.version>6.0.0</junit-jupiter-api.version>
+        <junit-jupiter-api.version>6.0.3</junit-jupiter-api.version>
 
-        <selenium-java.version>4.36.0</selenium-java.version>
+        <selenium-java.version>4.41.0</selenium-java.version>
 
-        <webdrivermanager.version>6.3.2</webdrivermanager.version>
+        <webdrivermanager.version>6.3.3</webdrivermanager.version>
 
         <retorch-annotations.version>1.1.0</retorch-annotations.version>
 
@@ -147,7 +147,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.13</version>
+                    <version>0.8.14</version>
                     <executions>
                         <execution>
                             <id>pre-unit-test</id>
@@ -176,7 +176,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                     <executions>
                         <!-- Aggregate junit style reports -->
                         <execution>
@@ -217,7 +217,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
