@@ -26,12 +26,12 @@ services:
     image: ${OpenViduImage}
     init: true
     expose:
-      - 8443
+      - 4443
     environment:
       - KMS_STUN_IP=stun.l.google.com
       - KMS_STUN_PORT=19302
       - openvidu.secret=MY_SECRET
-      - openvidu.publicurl=https://full-teaching-${tjobname}-openvidu-server-kms:8443
+      - openvidu.publicurl=https://full-teaching-${tjobname}-openvidu-server-kms:4443
     networks:
       - jenkins_network
     ulimits:
@@ -41,7 +41,7 @@ services:
 
   full-teaching:
     container_name: full-teaching-${tjobname}
-    image: augustocristian/full-teaching:jacococlient
+    image: ghcr.io/augustocristian/fullteaching:latest
 
     init: true
     depends_on:
@@ -60,8 +60,8 @@ services:
       - MYSQL_ENV_MYSQL_USER=ft-root
       - MYSQL_ENV_MYSQL_PASSWORD=pass
       - server.port=5000
-      - openvidu.url=https://full-teaching-${tjobname}-openvidu-server-kms:8443
-      - openvidu.secret=MY_SECRET
+      - OPENVIDU_URL=https://full-teaching-${tjobname}-openvidu-server-kms:4443
+      - OPENVIDU_SECRET=MY_SECRET
     networks:
       - jenkins_network
     ulimits:
