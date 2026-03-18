@@ -31,8 +31,25 @@ mkdir -p "$WORKSPACE/retorchcostestimationdata/exec$BUILD_NUMBER"
 mkdir -p "$WORKSPACE/artifacts"
 mkdir -p "$SUT_LOCATION/tmp"
 
-# Pull Docker images
+# --- NEW section to add into the standard COI setup
+echo "Fetching full-teaching source code..."
+mkdir -p /coverage/code
 
+# Create a temporary directory to avoid cluttering the workspace
+TEMP_REPO_DIR=$(mktemp -d)
+
+# Perform a shallow clone to download only the latest commit (faster download)
+git clone --depth 1 https://github.com/augustocristian/full-teaching.git "$TEMP_REPO_DIR"
+
+# Copy the target folder into /coverage/code
+cp -r "$TEMP_REPO_DIR/src/main/java" /coverage/code/
+
+# Clean up the temporary directory
+rm -rf "$TEMP_REPO_DIR"
+echo "Source code successfully placed in /coverage/code."
+# -------------------------------------------------------
+
+# Pull Docker images
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "Checking that the browser and its recorder Docker image is present"
 IMAGES=("selenoid/vnc_chrome" "aerokube/video-recorder")
 ALL_FOUND=true
