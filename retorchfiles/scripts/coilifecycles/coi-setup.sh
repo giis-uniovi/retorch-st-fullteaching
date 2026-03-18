@@ -33,7 +33,9 @@ mkdir -p "$SUT_LOCATION/tmp"
 
 # --- NEW section to add into the standard COI setup
 echo "Fetching full-teaching source code..."
-mkdir -p /coverage/code
+TEMP_REPO_DIR=$(mktemp -d)
+DESTINATION_COVERAGE_DIR="$WORKSPACE/coverage/code"
+mkdir -p "$DESTINATION_COVERAGE_DIR"
 
 # Create a temporary directory to avoid cluttering the workspace
 TEMP_REPO_DIR=$(mktemp -d)
@@ -42,7 +44,7 @@ TEMP_REPO_DIR=$(mktemp -d)
 git clone --depth 1 https://github.com/augustocristian/full-teaching.git "$TEMP_REPO_DIR"
 
 # Copy the target folder into /coverage/code
-cp -r "$TEMP_REPO_DIR/src/main/java" /coverage/code/
+cp -r "$TEMP_REPO_DIR/src/main/java" "$DESTINATION_COVERAGE_DIR"
 
 # Clean up the temporary directory
 rm -rf "$TEMP_REPO_DIR"
