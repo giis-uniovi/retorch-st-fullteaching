@@ -36,7 +36,7 @@ services:
 
   full-teaching:
     container_name: full-teaching-${tjobname}
-    image: codeurjc/full-teaching:demo
+    image: ghcr.io/augustocristian/fullteaching:nightly
     init: true
     depends_on:
       - full-teaching-mysql
