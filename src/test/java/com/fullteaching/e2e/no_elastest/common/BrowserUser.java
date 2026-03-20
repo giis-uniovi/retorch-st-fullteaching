@@ -45,11 +45,17 @@ public class BrowserUser {
     protected boolean isOnSession;
     protected WebDriverWait waiter;
 
-    public BrowserUser(String clientData, int timeOfWaitInSeconds,String testName) {
+    public BrowserUser(String clientData, int timeOfWaitInSeconds, String testName) {
         log.debug("Creating BrowserUser for the test: {}", testName);
         this.clientData = clientData;
         this.timeOfWaitInSeconds = timeOfWaitInSeconds;
         this.isOnSession = false;
+    }
+
+    public BrowserUser(String clientData, int timeOfWaitInSeconds, String testName, WebDriver driver) {
+        this(clientData, timeOfWaitInSeconds, testName);
+        this.driver = driver;
+        this.configureDriver();
     }
 
     public void configureRemoteWebDriver(String testName,MutableCapabilities options) throws URISyntaxException, MalformedURLException {
@@ -72,7 +78,7 @@ public class BrowserUser {
         options.setCapability("selenoid:options", selenoidOptions);
         //END CAPABILITIES FOR SELENOID RETORCH
         log.debug("Configuring the remote WebDriver ");
-        RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
+        RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenium-hub:4444/wd/hub").toURL(), options);
         log.debug("Configuring the Local File Detector");
         remote.setFileDetector(new LocalFileDetector());
         this.driver = remote;
@@ -108,6 +114,9 @@ public class BrowserUser {
 
     protected void configureDriver() {
         this.waiter = new WebDriverWait(this.driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
+        if (this.driver instanceof RemoteWebDriver) {
+            ((RemoteWebDriver) this.driver).setFileDetector(new LocalFileDetector());
+        }
     }
 
     public void dispose() {
