@@ -45,11 +45,17 @@ public class BrowserUser {
     protected boolean isOnSession;
     protected WebDriverWait waiter;
 
-    public BrowserUser(String clientData, int timeOfWaitInSeconds,String testName) {
+    public BrowserUser(String clientData, int timeOfWaitInSeconds, String testName) {
         log.debug("Creating BrowserUser for the test: {}", testName);
         this.clientData = clientData;
         this.timeOfWaitInSeconds = timeOfWaitInSeconds;
         this.isOnSession = false;
+    }
+
+    public BrowserUser(String clientData, int timeOfWaitInSeconds, String testName, WebDriver driver) {
+        this(clientData, timeOfWaitInSeconds, testName);
+        this.driver = driver;
+        this.configureDriver();
     }
 
     public void configureRemoteWebDriver(String testName,MutableCapabilities options) throws URISyntaxException, MalformedURLException {
