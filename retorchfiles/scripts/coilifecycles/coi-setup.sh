@@ -31,13 +31,46 @@ mkdir -p "$WORKSPACE/retorchcostestimationdata/exec$BUILD_NUMBER"
 mkdir -p "$WORKSPACE/artifacts"
 mkdir -p "$SUT_LOCATION/tmp"
 
+# --- NEW section to add into the standard COI setup
+echo "Fetching full-teaching source code..."
+TEMP_REPO_DIR=$(mktemp -d)
+DESTINATION_COVERAGE_DIR="$WORKSPACE/coverage/code"
+mkdir -p "$DESTINATION_COVERAGE_DIR"
+
+# Create a temporary directory to avoid cluttering the workspace
+TEMP_REPO_DIR=$(mktemp -d)
+
+# Perform a shallow clone to download only the latest commit (faster download)
+git clone --depth 1 https://github.com/augustocristian/full-teaching.git "$TEMP_REPO_DIR"
+
+# Copy the target folder into /coverage/code
+cp -r "$TEMP_REPO_DIR/src/main/java" "$DESTINATION_COVERAGE_DIR"
+
+# Clean up the temporary directory
+rm -rf "$TEMP_REPO_DIR"
+echo "Source code successfully placed in /coverage/code."
+# -------------------------------------------------------
+
 # Pull Docker images
-echo "Pulling images"
-if docker pull selenoid/vnc_chrome:116.0 && docker pull selenoid/video-recorder:latest-release; then
-    echo "Images pulled successfully."
-else
-    echo "Failed to pull Docker images."
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "Checking that the browser and its recorder Docker image is present"
+IMAGES=("selenoid/vnc_chrome" "aerokube/video-recorder")
+ALL_FOUND=true
+
+for IMAGE in "${IMAGES[@]}"; do
+    if docker images --format "{{.Repository}}" | grep -q "^${IMAGE}$"; then
+        "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "Image '${IMAGE}' found locally."
+    else
+        "$SCRIPTS_FOLDER/printLog.sh" "ERROR" "COI-set-up" "Image '${IMAGE}' not found locally."
+        ALL_FOUND=false
+    fi
+done
+
+if [ "$ALL_FOUND" = false ]; then
+    "$SCRIPTS_FOLDER/printLog.sh" "ERROR" "COI-set-up" "One or more required Docker images are missing. Failing pipeline."
+    exit 1
 fi
+
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "All required images are present."
 
 echo "Building images of SUT"
 

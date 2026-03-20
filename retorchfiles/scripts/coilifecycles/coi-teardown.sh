@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e  # Exit immediately if any command exits with a non-zero status
-
 COITEARDOWNSTART="$(date +%s%3N)"
 
 echo "Switch off all containers that start with *tjob*..."
@@ -16,6 +15,7 @@ sh "$SCRIPTS_FOLDER/savetjoblifecycledata.sh"
 COITEARDOWNEND="$(date +%s%3N)"
 
 OUTPUTDIRCOI="$WORKSPACE/retorchcostestimationdata/exec$BUILD_NUMBER/COI.data"
+
 echo -n ";$COITEARDOWNSTART;$COITEARDOWNEND" >> "$OUTPUTDIRCOI"
 
 echo "COI teardown script completed successfully."
