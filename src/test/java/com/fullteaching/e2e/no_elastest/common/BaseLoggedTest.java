@@ -4,9 +4,12 @@ import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundExceptio
 import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
-import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
-import io.github.bonigarcia.wdm.managers.FirefoxDriverManager;
+import giis.selema.framework.junit5.LifecycleJunit5;
+import giis.selema.manager.SeleManager;
+import giis.selema.manager.SelemaConfig;
+import giis.selema.services.browser.DynamicGridBrowserService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -24,11 +27,13 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
 import static org.openqa.selenium.logging.LogType.BROWSER;
 
+@ExtendWith(LifecycleJunit5.class)
 public class BaseLoggedTest {
 
     public static final String CHROME = "chrome";
@@ -39,6 +44,9 @@ public class BaseLoggedTest {
     protected static final Class<? extends WebDriver> firefox = FirefoxDriver.class;
     public static String TEACHER_BROWSER;
     public static String STUDENT_BROWSER;
+    private static final SeleManager seleManager = new SeleManager(new SelemaConfig()
+            .setReportSubdir("target/" + (System.getProperty("tjob_name") == null ? "" : System.getProperty("tjob_name")))
+            .setName(System.getProperty("tjob_name") == null ? "locallogs" : System.getProperty("tjob_name")));
     public static String BROWSER_NAME;
     protected static String HOST = LOCALHOST;
     protected static String userName;
@@ -63,13 +71,6 @@ public class BaseLoggedTest {
         properties = new Properties();
         // Load a properties file for reading
         properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
-
-        // Check if running outside ElasTest
-        if (System.getenv("ET_EUS_API") == null) {
-            // Setup drivers for Chrome and Firefox
-            ChromeDriverManager.getInstance(chrome).setup();
-            FirefoxDriverManager.getInstance(firefox).setup();
-        }
 
         String envUrl = System.getProperty("SUT_URL") != null ? System.getProperty("SUT_URL") : System.getenv("SUT_URL");
         String envPort = System.getProperty("SUT_PORT") != null ? System.getProperty("SUT_PORT") : System.getenv("SUT_PORT");
@@ -101,19 +102,42 @@ public class BaseLoggedTest {
         STUDENT_BROWSER = (STUDENT_BROWSER == null || !STUDENT_BROWSER.equals(FIREFOX)) ? CHROME : STUDENT_BROWSER;
 
         log.info("Using URL {} to connect to OpenVidu-app", APP_URL);
+        configureSelema();
+    }
+
+    protected static void configureSelema() {
+        log.debug("Configuring Selema browser ({})", TEACHER_BROWSER);
+        seleManager.setBrowser(TEACHER_BROWSER)
+                .setArguments(new String[]{"--start-maximized"})
+                .setOptions(Map.of("acceptInsecureCerts", true));
+        BROWSER_NAME = TEACHER_BROWSER;
+        if (System.getenv("SELENOID_PRESENT") != null) {
+            seleManager.setDriverUrl("http://selenium-hub:4444/wd/hub").add(new DynamicGridBrowserService().setVideo().setVnc());
+        }
+        log.debug("Selema browser configuration finished");
     }
 
     @BeforeEach
-    void setup(TestInfo info) throws URISyntaxException, MalformedURLException {
+    void setup(TestInfo info) {
         if (info.getTestMethod().isPresent()) {
             TEST_NAME = info.getTestMethod().get().getName();
-            userName=info.getDisplayName().split(",")[2];
+            userName = info.getDisplayName().split(",")[2];
         }
-        log.info("##### Start test: {}" , TEST_NAME);
+        log.info("##### Start test: {}", TEST_NAME);
 
-        this.user = setupBrowser("chrome", TJOB_NAME + "-" +TEST_NAME, userName, WAIT_SECONDS);
+        WebDriver primaryDriver = seleManager.getDriver();
+        this.user = new BrowserUser(userName, WAIT_SECONDS, TEST_NAME, primaryDriver);
+        this.driver = primaryDriver;
 
-        this.driver = this.user.getDriver();
+        log.info("Navigating to {}", APP_URL);
+        primaryDriver.get(APP_URL);
+        final String GLOBAL_JS_FUNCTION = "window.MY_FUNC = function(containerQuerySelector) {"
+                + "var elem = document.createElement('div');"
+                + "elem.id = 'video-playing-div';"
+                + "elem.innerText = 'VIDEO PLAYING';"
+                + "document.body.appendChild(elem);"
+                + "console.log('Video check function successfully added to DOM by Selenium')};";
+        this.user.runJavascript(GLOBAL_JS_FUNCTION);
     }
 
     protected BrowserUser setupBrowser(String browser, String testName,
@@ -139,14 +163,12 @@ public class BaseLoggedTest {
         log.info("Navigating to {}", APP_URL);
 
         u.getDriver().get(APP_URL);
-        final String GLOBAL_JS_FUNCTION = "var s = window.document.createElement('script');"
-                + "s.innerText = 'window.MY_FUNC = function(containerQuerySelector) {"
-                + "var elem = document.createElement(\"div\");"
-                + "elem.id = \"video-playing-div\";"
-                + "elem.innerText = \"VIDEO PLAYING\";"
+        final String GLOBAL_JS_FUNCTION = "window.MY_FUNC = function(containerQuerySelector) {"
+                + "var elem = document.createElement('div');"
+                + "elem.id = 'video-playing-div';"
+                + "elem.innerText = 'VIDEO PLAYING';"
                 + "document.body.appendChild(elem);"
-                + "console.log(\"Video check function successfully added to DOM by Selenium\")}';"
-                + "window.document.head.appendChild(s);";
+                + "console.log('Video check function successfully added to DOM by Selenium')};";
         u.runJavascript(GLOBAL_JS_FUNCTION);
 
         return u;
@@ -156,20 +178,14 @@ public class BaseLoggedTest {
     void tearDown() { //13 lines
         if (this.user != null) {
             log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
-            log.info("Browser console at the end of the test");
-            LogEntries logEntries = user.getDriver().manage().logs().get(BROWSER);
-            logEntries.forEach(entry -> log.info("[{}] {} {}",
-                    new Date(entry.getTimestamp()), entry.getLevel(),
-                    entry.getMessage()));
             if (this.user.isOnSession()) {
                 this.logout(this.user);
             }
-
-            this.user.dispose();
+            // Driver lifecycle managed by Selema (LifecycleJunit5)
         }
 
         if (this.student != null) {
-            log.info("##### Finish test: {} - Driver {}",TEST_NAME, this.student.getDriver());
+            log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.student.getDriver());
             log.info("Browser console at the end of the test");
             LogEntries logEntries = student.getDriver().manage().logs().get(BROWSER);
             logEntries.forEach(entry -> log.info("[{}] {} {}",
@@ -178,10 +194,10 @@ public class BaseLoggedTest {
             if (this.student.isOnSession()) {
                 this.logout(student);
             }
-
-            student.dispose();}
+            student.dispose();
+        }
         //Logout and exit list of Students
-        if (this.studentBrowserUserList!=null) {
+        if (this.studentBrowserUserList != null) {
             for (BrowserUser memberStudent : this.studentBrowserUserList) {
                 if (memberStudent.isOnSession()) {
                     this.logout(memberStudent);
