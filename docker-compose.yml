@@ -41,7 +41,7 @@ services:
 
   full-teaching:
     container_name: full-teaching-${tjobname}
-    image: ghcr.io/augustocristian/fullteaching:nightly
+    image: ghcr.io/augustocristian/fullteaching:latest
 
     init: true
     depends_on:
