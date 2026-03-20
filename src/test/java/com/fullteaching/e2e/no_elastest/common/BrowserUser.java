@@ -78,7 +78,7 @@ public class BrowserUser {
         options.setCapability("selenoid:options", selenoidOptions);
         //END CAPABILITIES FOR SELENOID RETORCH
         log.debug("Configuring the remote WebDriver ");
-        RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenoid:4444/wd/hub").toURL(), options);
+        RemoteWebDriver remote = new RemoteWebDriver(new URI("http://selenium-hub:4444/wd/hub").toURL(), options);
         log.debug("Configuring the Local File Detector");
         remote.setFileDetector(new LocalFileDetector());
         this.driver = remote;
@@ -114,6 +114,9 @@ public class BrowserUser {
 
     protected void configureDriver() {
         this.waiter = new WebDriverWait(this.driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
+        if (this.driver instanceof RemoteWebDriver) {
+            ((RemoteWebDriver) this.driver).setFileDetector(new LocalFileDetector());
+        }
     }
 
     public void dispose() {

@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.fullteaching.e2e.no_elastest.common.Constants.*;
@@ -106,9 +107,12 @@ public class BaseLoggedTest {
 
     protected static void configureSelema() {
         log.debug("Configuring Selema browser ({})", TEACHER_BROWSER);
-        seleManager.setBrowser(TEACHER_BROWSER).setArguments(new String[]{"--start-maximized"});
+        seleManager.setBrowser(TEACHER_BROWSER)
+                .setArguments(new String[]{"--start-maximized"})
+                .setOptions(Map.of("acceptInsecureCerts", true));
+        BROWSER_NAME = TEACHER_BROWSER;
         if (System.getenv("SELENOID_PRESENT") != null) {
-            seleManager.setDriverUrl("http://selenoid:4444/wd/hub").add(new DynamicGridBrowserService().setVideo().setVnc());
+            seleManager.setDriverUrl("http://selenium-hub:4444/wd/hub").add(new DynamicGridBrowserService().setVideo().setVnc());
         }
         log.debug("Selema browser configuration finished");
     }
@@ -127,14 +131,12 @@ public class BaseLoggedTest {
 
         log.info("Navigating to {}", APP_URL);
         primaryDriver.get(APP_URL);
-        final String GLOBAL_JS_FUNCTION = "var s = window.document.createElement('script');"
-                + "s.innerText = 'window.MY_FUNC = function(containerQuerySelector) {"
-                + "var elem = document.createElement(\"div\");"
-                + "elem.id = \"video-playing-div\";"
-                + "elem.innerText = \"VIDEO PLAYING\";"
+        final String GLOBAL_JS_FUNCTION = "window.MY_FUNC = function(containerQuerySelector) {"
+                + "var elem = document.createElement('div');"
+                + "elem.id = 'video-playing-div';"
+                + "elem.innerText = 'VIDEO PLAYING';"
                 + "document.body.appendChild(elem);"
-                + "console.log(\"Video check function successfully added to DOM by Selenium\")}';"
-                + "window.document.head.appendChild(s);";
+                + "console.log('Video check function successfully added to DOM by Selenium')};";
         this.user.runJavascript(GLOBAL_JS_FUNCTION);
     }
 
@@ -161,14 +163,12 @@ public class BaseLoggedTest {
         log.info("Navigating to {}", APP_URL);
 
         u.getDriver().get(APP_URL);
-        final String GLOBAL_JS_FUNCTION = "var s = window.document.createElement('script');"
-                + "s.innerText = 'window.MY_FUNC = function(containerQuerySelector) {"
-                + "var elem = document.createElement(\"div\");"
-                + "elem.id = \"video-playing-div\";"
-                + "elem.innerText = \"VIDEO PLAYING\";"
+        final String GLOBAL_JS_FUNCTION = "window.MY_FUNC = function(containerQuerySelector) {"
+                + "var elem = document.createElement('div');"
+                + "elem.id = 'video-playing-div';"
+                + "elem.innerText = 'VIDEO PLAYING';"
                 + "document.body.appendChild(elem);"
-                + "console.log(\"Video check function successfully added to DOM by Selenium\")}';"
-                + "window.document.head.appendChild(s);";
+                + "console.log('Video check function successfully added to DOM by Selenium')};";
         u.runJavascript(GLOBAL_JS_FUNCTION);
 
         return u;

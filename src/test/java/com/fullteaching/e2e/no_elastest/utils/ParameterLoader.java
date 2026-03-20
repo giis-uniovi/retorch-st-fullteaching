@@ -17,13 +17,13 @@ public class ParameterLoader {
     public static Stream<Arguments> getTestUsers() throws IOException {
         //Be careful! Don't change it despite the analyzer recommends that!
         log.debug("[getTestUsers] INI");
-        Stream records = Stream.empty();
+        Stream<Arguments> records = Stream.empty();
 
         Collection<User> users = UserLoader.getAllUsers();
 
         for (User user : users) {
             log.debug("getTestUsers--{}", user.getUserCsv());
-            records = Stream.concat(records, Stream.of(arguments(user.getUserCsv().split(","))));
+            records = Stream.concat(records, Stream.of(arguments((Object[]) user.getUserCsv().split(","))));
             //records.add(user.getUserCsv().split(","));
         }
         log.debug("[getTestUsers] END");
@@ -32,14 +32,14 @@ public class ParameterLoader {
 
     public static Stream<Arguments> getTestStudents() throws IOException {
         log.debug("[getTestStudents] INI");
-        Stream records = Stream.empty();
+        Stream<Arguments> records = Stream.empty();
 
         Collection<User> users = UserLoader.getAllUsers();
 
         for (User user : users) {
             if (isStudent(user) && !isTeacher(user)) {
                 log.debug("getTestStudents--{}", user.getUserCsv());
-                records = Stream.concat(records, Stream.of(arguments(user.getUserCsv().split(","))));
+                records = Stream.concat(records, Stream.of(arguments((Object[]) user.getUserCsv().split(","))));
             }
         }
         log.debug("[getTestStudents] END");
@@ -48,14 +48,14 @@ public class ParameterLoader {
 
     public static Stream<Arguments> getTestTeachers() throws IOException {
         log.debug("[getTestTeachers] INI");
-        Stream records = Stream.empty();
+        Stream<Arguments> records = Stream.empty();
 
         Collection<User> users = UserLoader.getAllUsers();
 
         for (User user : users) {
             if (!isStudent(user) && isTeacher(user)) {
                 log.debug("getTestTeachers--{}", user.getUserCsv());
-                records = Stream.concat(records, Stream.of(arguments(user.getUserCsv().split(","))));
+                records = Stream.concat(records, Stream.of(arguments((Object[]) user.getUserCsv().split(","))));
             }
         }
         log.debug("[getTestTeachers] END");
