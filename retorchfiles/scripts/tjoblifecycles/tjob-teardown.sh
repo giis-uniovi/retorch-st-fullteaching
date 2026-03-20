@@ -27,7 +27,7 @@ done
 # Change to SUT location
 cd "$SUT_LOCATION"
 # Generate jacoco.exec for then calculate coverage
-docker exec "full-teaching-$1" java -jar org.jacoco.cli-0.8.13-nodeps.jar dump --address localhost --port 6300  --destfile /jacoco.exec
+docker exec "full-teaching-$1" java -jar /org.jacoco.cli-0.8.13-nodeps.jar dump --address localhost --port 6300 --destfile /jacoco.exec
 
 #extract the jacoco.exec and save into the target folder
 
