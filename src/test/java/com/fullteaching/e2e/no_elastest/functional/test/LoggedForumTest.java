@@ -66,7 +66,6 @@ class LoggedForumTest extends BaseLoggedTest {
     void forumLoadEntriesTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException, InterruptedException { //47lines +115 +28 set up +13 lines teardown =203
         this.slowLogin(user, mail, password);//24 lines
             //navigate to courses.
-            NavigationUtilities.toCoursesHome(driver);//3lines
             List<String> courses = CourseNavigationUtilities.getCoursesList(driver);//13lines
             assertFalse(courses.isEmpty(), "No courses in the list");
             //find course with forum activated
@@ -142,11 +141,8 @@ class LoggedForumTest extends BaseLoggedTest {
         String newEntryTitle = "New Entry Test " + mDay + mMonth + mYear + mHour + mMinute + mSecond;
         String newEntryContent = "This is the content written on the " + mDay + " of " + months[mMonth] + ", " + mHour + ":" + mMinute + "," + mSecond;
         log.info("Navigating to courses tab");
-            log.info("Navigating to courses tab");
             //navigate to courses.
-            if (NavigationUtilities.amINotHere(driver, COURSES_URL.replace("__HOST__", HOST))) {
-                NavigationUtilities.toCoursesHome(driver);//3lines
-            }
+            NavigationUtilities.toCoursesHome(driver);//3lines
             WebElement course = CourseNavigationUtilities.getCourseByName(driver, courseName);//14lines
             log.info("Entering the course List");
             course.findElement(COURSE_LIST_COURSE_TITLE).click();
