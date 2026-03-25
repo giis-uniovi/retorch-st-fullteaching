@@ -73,14 +73,13 @@ public class BaseLoggedTest {
         properties.load(new FileInputStream("src/test/resources/inputs/test.properties"));
 
         String envUrl = System.getProperty("SUT_URL") != null ? System.getProperty("SUT_URL") : System.getenv("SUT_URL");
-        String envPort = System.getProperty("SUT_PORT") != null ? System.getProperty("SUT_PORT") : System.getenv("SUT_PORT");
+
         String envTJobName = System.getProperty("tjob_name") != null ? System.getProperty("tjob_name") : System.getenv("tjob_name");
-        log.info("Using URL {} PORT: {} TJOB: {}", envUrl, envPort, envTJobName);
+        log.info("Using URL {} TJOB: {}", envUrl, envTJobName);
         // Check if SUT_URL is defined in the environment variables
-        if ((envUrl != null) & (envPort != null)) {
+        if ((envUrl != null)) {
             TJOB_NAME = envTJobName;
-            PORT = envPort;
-            APP_URL = envUrl + TJOB_NAME + ":" + PORT + "/";
+            APP_URL = envUrl ;
             log.debug("The URL is {}" , APP_URL);
             HOST = APP_URL;
         } else {

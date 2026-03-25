@@ -301,7 +301,7 @@
         "quantity": 0.92
       }
     ],
-    "dockerImage": "webserver;codeurjc/full-teaching:demo"
+    "dockerImage": "webserver;ghcr.io/augustocristian/fullteaching:v1.1"
   },
   "executor": {
     "hierarchyParent": [],
