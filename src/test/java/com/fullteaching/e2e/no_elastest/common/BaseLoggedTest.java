@@ -45,8 +45,8 @@ public class BaseLoggedTest {
     public static String TEACHER_BROWSER;
     public static String STUDENT_BROWSER;
     private static final SeleManager seleManager = new SeleManager(new SelemaConfig()
-            .setReportSubdir("target/" + (System.getProperty("tjob_name") == null ? "" : System.getProperty("tjob_name")))
-            .setName(System.getProperty("tjob_name") == null ? "locallogs" : System.getProperty("tjob_name")));
+            .setReportSubdir("target/" + (System.getProperty("TJOB_NAME") == null ? "" : System.getProperty("TJOB_NAME")))
+            .setName(System.getProperty("TJOB_NAME") == null ? "locallogs" : System.getProperty("TJOB_NAME")));
     public static String BROWSER_NAME;
     protected static String HOST = LOCALHOST;
     protected static String userName;
