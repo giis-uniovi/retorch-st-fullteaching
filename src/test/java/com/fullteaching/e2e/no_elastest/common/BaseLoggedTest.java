@@ -74,7 +74,7 @@ public class BaseLoggedTest {
 
         String envUrl = System.getProperty("SUT_URL") != null ? System.getProperty("SUT_URL") : System.getenv("SUT_URL");
 
-        String envTJobName = System.getProperty("tjob_name") != null ? System.getProperty("tjob_name") : System.getenv("tjob_name");
+        String envTJobName = System.getProperty("TJOB_NAME") != null ? System.getProperty("TJOB_NAME") : System.getenv("TJOB_NAME");
         log.info("Using URL {} TJOB: {}", envUrl, envTJobName);
         // Check if SUT_URL is defined in the environment variables
         if ((envUrl != null)) {
