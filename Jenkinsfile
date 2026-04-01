@@ -73,8 +73,8 @@ pipeline {
             sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobe 0'
           }// EndStepstjobe
         }// EndStagetjobe
-      } // End Parallel
-    } // End Stage
+      } // EndParallel
+    } // EndStage
     stage('Stage 1') {
       failFast false
       parallel {
@@ -114,8 +114,8 @@ pipeline {
             sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobi 1'
           }// EndStepstjobi
         }// EndStagetjobi
-      } // End Parallel
-    } // End Stage
+      } // EndParallel
+    } // EndStage
     stage('Stage 2') {
       failFast false
       parallel {
@@ -128,8 +128,8 @@ pipeline {
             sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobj 2'
           }// EndStepstjobj
         }// EndStagetjobj
-      } // End Parallel
-    } // End Stage
+      } // EndParallel
+    } // EndStage
 stage('TEARDOWN-Infrastructure') {
       failFast false
       steps {
