@@ -1,5 +1,5 @@
 package com.fullteaching.e2e.no_elastest.functional.test;
-/*
+
 
 
 import giis.retorch.orchestration.classifier.EmptyInputException;
@@ -22,4 +22,4 @@ class RetorchGenerateJenkinfileTest {
     }
 }
 
-*/
+
