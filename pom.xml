@@ -110,6 +110,11 @@
             <artifactId>retorch-orchestration</artifactId>
             <version>${retorch-tool.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.giis-uniovi</groupId>
+            <artifactId>retorch-profiling</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
     <!-- Plugins -->
