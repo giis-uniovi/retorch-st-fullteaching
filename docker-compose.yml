@@ -1,7 +1,7 @@
 version: '3'
 services:
   full-teaching-mysql:
-    container_name: full-teaching-mysql-${tjobname}
+    container_name: full-teaching-mysql-${TJOB_NAME}
     image: mysql:5.7.21
     init: true
     environment:
@@ -17,8 +17,8 @@ services:
         hard: 65536
 
   full-teaching-openvidu-server-kms:
-    container_name: full-teaching-${tjobname}-openvidu-server-kms
-    image: ${OpenViduImage}
+    container_name: full-teaching-${TJOB_NAME}-openvidu-server-kms
+    image: ${MEDIASERVER}
     init: true
     expose:
       - 8443
@@ -26,7 +26,7 @@ services:
       - KMS_STUN_IP=stun.l.google.com
       - KMS_STUN_PORT=19302
       - openvidu.secret=MY_SECRET
-      - openvidu.publicurl=https://full-teaching-${tjobname}-openvidu-server-kms:8443
+      - openvidu.publicurl=https://full-teaching-${TJOB_NAME}-openvidu-server-kms:8443
     networks:
       - jenkins_network
     ulimits:
@@ -35,8 +35,8 @@ services:
         hard: 65536
 
   full-teaching:
-    container_name: full-teaching-${tjobname}
-    image: codeurjc/full-teaching:demo
+    container_name: full-teaching-${TJOB_NAME}
+    image: ${WEBSERVER}
     init: true
     depends_on:
       - full-teaching-mysql
@@ -44,15 +44,15 @@ services:
     expose:
       - 5000
     environment:
-      - WAIT_HOSTS=full-teaching-mysql-${tjobname}:3306
+      - WAIT_HOSTS=full-teaching-mysql-${TJOB_NAME}:3306
       - WAIT_HOSTS_TIMEOUT=120
-      - MYSQL_PORT_3306_TCP_ADDR=full-teaching-mysql-${tjobname}
+      - MYSQL_PORT_3306_TCP_ADDR=full-teaching-mysql-${TJOB_NAME}
       - MYSQL_PORT_3306_TCP_PORT=3306
       - MYSQL_ENV_MYSQL_DATABASE=full_teaching
       - MYSQL_ENV_MYSQL_USER=ft-root
       - MYSQL_ENV_MYSQL_PASSWORD=pass
       - server.port=5000
-      - openvidu.url=https://full-teaching-${tjobname}-openvidu-server-kms:8443
+      - openvidu.url=https://full-teaching-${TJOB_NAME}-openvidu-server-kms:8443
       - openvidu.secret=MY_SECRET
     networks:
       - jenkins_network

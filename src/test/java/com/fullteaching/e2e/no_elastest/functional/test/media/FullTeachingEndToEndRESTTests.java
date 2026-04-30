@@ -23,7 +23,6 @@ import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundExceptio
 import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import giis.retorch.annotations.AccessMode;
-import giis.retorch.annotations.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -68,12 +67,12 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
 
     /*** ClassRule methods ***/
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Configuration"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "configuration", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("courseRestOperations")
     @ParameterizedTest
     @MethodSource("data")
@@ -104,12 +103,12 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         user.waitUntil(ExpectedConditions.textToBe(By.cssSelector("#course-list .course-list-item:last-child div.course-title span"), editedCourseName), "Unexpected course name");
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Information"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "information", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("courseInfoRestOperations")
     @ParameterizedTest
     @MethodSource("data")
@@ -128,12 +127,12 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Session"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "session", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("sessionRestOperations")
     @ParameterizedTest
     @MethodSource("data")
@@ -211,12 +210,12 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         Assertions.assertTrue(actualDateTime.equals(expectedDateTime1) || actualDateTime.equals(expectedDateTime2));
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Forum"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "forum", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("forumRestOperations")
     @ParameterizedTest
     @MethodSource("data")
@@ -285,12 +284,12 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Files"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "files", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("filesRestOperations")
     @ParameterizedTest
     @MethodSource("data")
@@ -388,12 +387,12 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         CourseNavigationUtilities.deleteCourse(user.getDriver(), COURSE_NAME);
     }
 
-    @Resource(resID = "LoginService", replaceable = {})
-    @AccessMode(resID = "LoginService", concurrency = 10, sharing = true, accessMode = "READONLY")
-    @Resource(resID = "OpenVidu", replaceable = {"OpenViduMock"})
-    @AccessMode(resID = "OpenVidu", concurrency = 10, sharing = true, accessMode = "NOACCESS")
-    @Resource(resID = "Course", replaceable = {"Attenders"})
-    @AccessMode(resID = "Course", concurrency = 1, sharing = false, accessMode = "READWRITE")
+    @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
+    @AccessMode(resID = "openvidumock", concurrency = 10, sharing = true, accessMode = "NOACCESS")
+    @AccessMode(resID = "attenders", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
+    @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @DisplayName("attendersRestOperations")
     @ParameterizedTest
     @MethodSource("data")
