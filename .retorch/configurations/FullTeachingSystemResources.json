@@ -11,20 +11,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "openvidumock",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.048
-      },
-      {
-        "name": "processor",
-        "quantity": 0.25
-      },
-      {
-        "name": "storage",
-        "quantity": 0.31
-      }
-    ],
     "dockerImage": "mediaserver;eexit/mirror-http-server"
   },
   "openvidu": {
@@ -37,21 +23,7 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "openvidu",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 8
-      },
-      {
-        "name": "processor",
-        "quantity": 2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.88
-      }
-    ],
-    "dockerImage": "mediaserver;openvidu/openvidu-server-kms:2.3.0"
+    "dockerImage": "mediaserver;openvidu/openvidu-server-kms:2.23.0"
   },
   "configuration": {
     "hierarchyParent": [
@@ -65,20 +37,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "configuration",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "course": {
@@ -93,20 +51,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "course",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "information": {
@@ -121,20 +65,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "information",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "files": {
@@ -149,20 +79,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "files",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "attenders": {
@@ -177,20 +93,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "attenders",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "loginservice": {
@@ -205,20 +107,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "loginservice",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "session": {
@@ -233,20 +121,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "session",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "forum": {
@@ -261,20 +135,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "forum",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.2929
-      },
-      {
-        "name": "processor",
-        "quantity": 0.2
-      },
-      {
-        "name": "storage",
-        "quantity": 0.5
-      }
-    ],
     "dockerImage": "database;mysql:5.7.21"
   },
   "webserver": {
@@ -287,20 +147,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "webserver",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 1.465
-      },
-      {
-        "name": "processor",
-        "quantity": 0.5
-      },
-      {
-        "name": "storage",
-        "quantity": 0.92
-      }
-    ],
     "dockerImage": "webserver;codeurjc/full-teaching:demo"
   },
   "executor": {
@@ -313,20 +159,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "executor",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 0.14
-      },
-      {
-        "name": "processor",
-        "quantity": 0.25
-      },
-      {
-        "name": "storage",
-        "quantity": 0.49
-      }
-    ],
     "dockerImage": "executor;xretorch-agent"
   },
   "webbrowser": {
@@ -339,24 +171,6 @@
     },
     "resourceType": "LOGICAL",
     "resourceID": "webbrowser",
-    "minimalCapacities": [
-      {
-        "name": "memory",
-        "quantity": 1
-      },
-      {
-        "name": "processor",
-        "quantity": 0.5
-      },
-      {
-        "name": "storage",
-        "quantity": 1.16
-      },
-      {
-        "name": "slots",
-        "quantity": 1
-      }
-    ],
     "dockerImage": "browser;vnc_chrome:lastest"
   }
 }

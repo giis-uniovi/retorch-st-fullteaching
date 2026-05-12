@@ -1,0 +1,63 @@
+{
+  "tjobs" : [ {
+    "id" : "tjoba",
+    "stage" : 0,
+    "resources" : [ "attenders", "executor", "loginservice", "openvidumock", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingEndToEndRESTTests#attendersRestOperations" ],
+    "predecessors" : [ ]
+  }, {
+    "id" : "tjobb",
+    "stage" : 0,
+    "resources" : [ "configuration", "executor", "loginservice", "openvidumock", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingEndToEndRESTTests#courseRestOperations", "CourseTeacherTest#teacherEditCourseValues" ],
+    "predecessors" : [ ]
+  }, {
+    "id" : "tjobc",
+    "stage" : 0,
+    "resources" : [ "executor", "files", "loginservice", "openvidumock", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingEndToEndRESTTests#filesRestOperations" ],
+    "predecessors" : [ ]
+  }, {
+    "id" : "tjobd",
+    "stage" : 0,
+    "resources" : [ "configuration", "executor", "loginservice", "openvidu", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingEndToEndEChatTests#oneToOneChatInSessionChrome" ],
+    "predecessors" : [ ]
+  }, {
+    "id" : "tjobe",
+    "stage" : 0,
+    "resources" : [ "course", "executor", "loginservice", "openvidumock", "webbrowser", "webserver" ],
+    "tests" : [ "LoggedLinksTests#spiderLoggedTest", "UnLoggedLinksTests#spiderUnloggedTest", "CourseStudentTest#studentCourseMainTest", "CourseTeacherTest#teacherCourseMainTest", "CourseTeacherTest#teacherCreateAndDeleteCourseTest", "CourseTeacherTest#teacherDeleteCourseTest" ],
+    "predecessors" : [ ]
+  }, {
+    "id" : "tjobf",
+    "stage" : 1,
+    "resources" : [ "executor", "information", "loginservice", "openvidumock", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingEndToEndRESTTests#courseInfoRestOperations" ],
+    "predecessors" : [ "tjobd" ]
+  }, {
+    "id" : "tjobg",
+    "stage" : 1,
+    "resources" : [ "executor", "forum", "loginservice", "openvidumock", "webbrowser", "webserver" ],
+    "tests" : [ "LoggedForumTest#forumLoadEntriesTest", "LoggedForumTest#forumNewCommentTest", "LoggedForumTest#forumNewEntryTest", "LoggedForumTest#forumNewReply2CommentTest", "FullTeachingEndToEndRESTTests#forumRestOperations" ],
+    "predecessors" : [ "tjoba" ]
+  }, {
+    "id" : "tjobh",
+    "stage" : 1,
+    "resources" : [ "executor", "loginservice", "openvidu", "session", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingTestEndToEndVideoSessionTests#oneToOneVideoAudioSessionChrome", "FullTeachingLoggedVideoSessionTests#sessionTest" ],
+    "predecessors" : [ "tjobb" ]
+  }, {
+    "id" : "tjobi",
+    "stage" : 1,
+    "resources" : [ "executor", "loginservice", "openvidumock", "session", "webbrowser", "webserver" ],
+    "tests" : [ "FullTeachingEndToEndRESTTests#sessionRestOperations" ],
+    "predecessors" : [ "tjobe" ]
+  }, {
+    "id" : "tjobj",
+    "stage" : 2,
+    "resources" : [ "executor", "loginservice", "openvidu", "webbrowser", "webserver" ],
+    "tests" : [ "UserTest#loginTest" ],
+    "predecessors" : [ "tjobh" ]
+  } ]
+}

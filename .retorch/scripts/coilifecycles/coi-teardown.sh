@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) Software Engineering Research Group (GIIS), University of Oviedo.
+# All intellectual property rights on this file belong to GIIS.
 # The coi-teardown.sh script provides all the necessary commands to tear-down the infrastructure after executing
 # the TJobs. It performs cleaning actions, like remove all the containers and docker volumes, but also ends, collects
 # and creates file with the different TJob and COI lifecycles using the savetjoblifecycledata.sh script.
@@ -46,12 +48,58 @@ if [ -n "$container_ids" ]; then
 else
     "$SCRIPTS_FOLDER/printLog.sh" "INFO" "COI-tear-down" "No containers with names starting with 'tjob' found to stop and remove."
 fi
+# START Custom COI tear-down commands
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-tear-down" "Start executing custom commands"
+# Coverage (JaCoCo) report of the whole execution: merges the exec files dumped by every TJob.
+# This code is inserted into coi-teardown.sh, so it must never exit the script: the steps use return instead.
+EXEC_PATH="$WORKSPACE/target/coverage"
+JACOCO_ENABLED="${JACOCO_ENABLED:-true}"
+
+generate_coverage_report() {
+  echo "Change directory to the coverage ones"
+  cd "$EXEC_PATH" || return 0
+  JACOCO_JAR="$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar"
+  if [ ! -f "$JACOCO_JAR" ]; then
+    echo "Jacoco CLI jar not found at $JACOCO_JAR, skipping report generation"
+    return 0
+  fi
+  find "$EXEC_PATH" -type f -name "*.exec" > exec_files.txt
+  if [ ! -s exec_files.txt ]; then
+    echo "No .exec files found, skipping report generation"
+    return 0
+  fi
+  echo "Merging exec files"
+  java -jar "$JACOCO_JAR" merge --destfile "$EXEC_PATH/merged.exec" $(cat exec_files.txt)
+  mkdir -p jacoco-report
+  echo "Generating HTML report"
+  java -jar "$JACOCO_JAR" report "$EXEC_PATH/merged.exec" \
+    --classfiles "$EXEC_PATH/classes" \
+    --sourcefiles "$WORKSPACE/coverage/code/java" \
+    --html ./jacoco-report \
+    --name FullCoverageReport
+  echo "Generating XML report"
+  java -jar "$JACOCO_JAR" report "$EXEC_PATH/merged.exec" \
+    --classfiles "$EXEC_PATH/classes" \
+    --sourcefiles "$WORKSPACE/coverage/code/java" \
+    --xml ./jacoco-report/coverage.xml \
+    --name FullCoverageReport
+}
+
+if [ "$JACOCO_ENABLED" = "true" ]; then
+  generate_coverage_report
+fi
+cd "$WORKSPACE"
+
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-tear-down" "End executing custom commands"
+# END Custom COI tear-down commands
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-tear-down" "Teardown process completed successfully."
+
+COITEARDOWNEND="$(date +%s%3N)"
+OUTPUTDIRCOI="$WORKSPACE/retorchcostestimationdata/exec$BUILD_NUMBER/COI.data"
+# The COI tear-down timestamps must be written BEFORE savetjoblifecycledata.sh, which reads them from this file
+echo -n ";$COITEARDOWNSTART;$COITEARDOWNEND" >> "$OUTPUTDIRCOI"
 
 # Run saveTJobLifecycledata.sh script
 echo "Running saveTJobLifecycledata.sh script..."
 sh "$SCRIPTS_FOLDER/savetjoblifecycledata.sh"
-COITEARDOWNEND="$(date +%s%3N)"
-OUTPUTDIRCOI="$WORKSPACE/retorchcostestimationdata/exec$BUILD_NUMBER/COI.data"
-echo -n ";$COITEARDOWNSTART;$COITEARDOWNEND" >> "$OUTPUTDIRCOI"
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-tear-down" "Script completed successfully."

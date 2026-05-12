@@ -1,4 +1,7 @@
-echo "This TJOB-teardown dont have any kind of specific commands"
+# Coverage (JaCoCo) of the TJob. It runs BEFORE the containers are removed, so the agent of the running SUT can be dumped.
+EXEC_PATH="$WORKSPACE/target/coverage/execfiles"
+COVERAGE_PATH="$WORKSPACE/target/coverage"
+JACOCO_ENABLED="${JACOCO_ENABLED:-true}"
 
 # Change to SUT location
 cd "$SUT_LOCATION"

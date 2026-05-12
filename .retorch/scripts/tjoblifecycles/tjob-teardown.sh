@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) Software Engineering Research Group (GIIS), University of Oviedo.
+# All intellectual property rights on this file belong to GIIS.
 # The tjob-teardown.sh script provides all the necessary commands to tear-down each TJob's Resources after the
 # test execution has ended. It stores the container logs of the current TJob, tear down the containers
 # and execute the custom commands provided in the custom-tjob-teardown file.
@@ -10,14 +12,18 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-EXEC_PATH="$WORKSPACE/target/coverage/execfiles"
-COVERAGE_PATH="$WORKSPACE/target/coverage"
-
 # Execute the script to write timestamp
 "$SCRIPTS_FOLDER/writetime.sh" "$2" "$1"
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-tear-down" "Starting the TJob tear-down"
 # Store docker logs
 "$SCRIPTS_FOLDER/storeContainerLogs.sh" "$1"
+
+# START Custom tear-down commands: they run BEFORE the containers are removed (e.g. to collect coverage data)
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-tear-down" "Start executing custom commands"
+# Coverage (JaCoCo) of the TJob. It runs BEFORE the containers are removed, so the agent of the running SUT can be dumped.
+EXEC_PATH="$WORKSPACE/target/coverage/execfiles"
+COVERAGE_PATH="$WORKSPACE/target/coverage"
+JACOCO_ENABLED="${JACOCO_ENABLED:-true}"
 
 # Change to SUT location
 cd "$SUT_LOCATION"
@@ -48,6 +54,11 @@ if [ "${JACOCO_ENABLED:-false}" = "true" ]; then
   fi
 fi
 
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-tear-down" "End executing custom commands"
+# END Custom tear-down commands
+
+# Change to SUT location
+cd "$SUT_LOCATION"
 
 # Tear down Docker containers and volumes
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-tear-down" "Tearing down Docker containers and volumes for TJOB $1"
@@ -56,12 +67,7 @@ docker compose -f docker-compose.yml --env-file "$WORKSPACE/.retorch/envfiles/$1
 # Return to the original working directory
 cd "$WORKSPACE"
 
-# START Custom Set-up commands
-"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-set-up" "Start executing custom commands"
-echo "This TJOB-teardown dont have any kind of specific commands"
-"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-set-up" "End executing custom commands"
-# END Custom Set-up commands
-
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-tear-down" "Tear-down ended"
+"$SCRIPTS_FOLDER/resourcemonitor.sh" stop "$1"
 # Execute the script to write timestamp again
 "$SCRIPTS_FOLDER/writetime.sh" "$2" "$1"

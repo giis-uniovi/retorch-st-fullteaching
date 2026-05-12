@@ -4,8 +4,6 @@ pipeline {
     SELENOID_PRESENT = "TRUE"
     SUT_LOCATION = "$WORKSPACE"
     SCRIPTS_FOLDER = "$WORKSPACE/.retorch/scripts"
-    EXEC_PATH = "$WORKSPACE/target/coverage"
-    JACOCO_ENABLED = "true"
   } // EndEnvironment
   options {
     disableConcurrentBuilds()
@@ -75,8 +73,8 @@ pipeline {
             sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobe 0'
           }// EndStepstjobe
         }// EndStagetjobe
-      } // End Parallel
-    } // End Stage
+} // End Parallel
+} // End Stage
     stage('Stage 1') {
       failFast false
       parallel {
@@ -116,8 +114,8 @@ pipeline {
             sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobi 1'
           }// EndStepstjobi
         }// EndStagetjobi
-      } // End Parallel
-    } // End Stage
+} // End Parallel
+} // End Stage
     stage('Stage 2') {
       failFast false
       parallel {
@@ -130,64 +128,28 @@ pipeline {
             sh '$SCRIPTS_FOLDER/tjoblifecycles/tjob-teardown.sh tjobj 2'
           }// EndStepstjobj
         }// EndStagetjobj
-      } // End Parallel
-    } // End Stage
-stage('TEARDOWN-Infrastructure') {
-      failFast false
+} // End Parallel
+} // End Stage
+    stage('TEARDOWN-Infrastructure') {
       steps {
           sh '$SCRIPTS_FOLDER/coilifecycles/coi-teardown.sh'
       } // EndStepsTearDownInf
-} // EndStageTearDown
-
-stage('PUBLISH COV REPORT') {
-      when { environment name: 'JACOCO_ENABLED', value: 'true' }
+    } // EndStageTearDown
+    stage('Usage-Profile') {
       steps {
-          sh '''
-            echo "Change directory to the coverage ones"
-            cd "$EXEC_PATH"
-            JACOCO_JAR="$EXEC_PATH/org.jacoco.cli-0.8.13-nodeps.jar"
-            if [ ! -f "$JACOCO_JAR" ]; then
-              echo "Jacoco CLI jar not found at $JACOCO_JAR, skipping report generation"
-              exit 0
-            fi
-            find "$EXEC_PATH" -type f -name "*.exec" > exec_files.txt
-            if [ ! -s exec_files.txt ]; then
-              echo "No .exec files found, skipping report generation"
-              exit 0
-            fi
-            echo "Merging exec files"
-            java -jar "$JACOCO_JAR" merge --destfile "$EXEC_PATH/merged.exec" $(cat exec_files.txt)
-            mkdir -p jacoco-report
-            echo "Generating HTML report"
-            java -jar "$JACOCO_JAR" report "$EXEC_PATH/merged.exec" \
-              --classfiles "$EXEC_PATH/classes" \
-              --sourcefiles "$WORKSPACE/coverage/code/java" \
-              --html ./jacoco-report \
-              --name FullCoverageReport
-            echo "Generating XML report"
-            java -jar "$JACOCO_JAR" report "$EXEC_PATH/merged.exec" \
-              --classfiles "$EXEC_PATH/classes" \
-              --sourcefiles "$WORKSPACE/coverage/code/java" \
-              --xml ./jacoco-report/coverage.xml \
-              --name FullCoverageReport
-          '''
-          publishHTML(
-              allowMissing: true,
-              alwaysLinkToLastBuild: true,
-              keepAll: false,
-              reportDir: "target/coverage/jacoco-report",
-              reportFiles: 'index.html',
-              reportName: 'FullCoverageReport'
-          )
-
-          archiveArtifacts artifacts: 'target/coverage/jacoco-report/coverage.xml', onlyIfSuccessful: true
-
-      }// EndStepsPublish
-}// EndStagePublish
+          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+              sh '$SCRIPTS_FOLDER/generateusageprofile.sh'
+          }
+      } // EndStepsUsageProfile
+    } // EndStageUsageProfile
 } // EndStagesPipeline
 post {
     always {
         archiveArtifacts artifacts: 'artifacts/*.csv', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'artifacts/usageprofile/*.html', allowEmptyArchive: true
+        publishHTML(target: [reportDir: 'artifacts/usageprofile', reportFiles: 'usageprofile.html', reportName: 'RETORCH Usage Profile', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: true])
+        archiveArtifacts artifacts: 'target/coverage/jacoco-report/coverage.xml', allowEmptyArchive: true
+        publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: false, reportDir: 'target/coverage/jacoco-report', reportFiles: 'index.html', reportName: 'FullCoverageReport'])
         archiveArtifacts artifacts: 'target/testlogs/**/*.*', onlyIfSuccessful: false
         archiveArtifacts artifacts: 'target/containerlogs/**/*.*', onlyIfSuccessful: false
     }// EndAlways
