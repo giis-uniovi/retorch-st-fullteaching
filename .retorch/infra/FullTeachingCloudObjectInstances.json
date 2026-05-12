@@ -1,0 +1,59 @@
+[
+  {
+    "objectName": "AzureVM",
+    "billingOption": {
+      "billingName": "As-you-go",
+      "provider": "Azure",
+      "invoicedPrices": {
+        "memory":    0.5,
+        "processor": 0.5,
+        "storage":   0.5,
+        "slots":     1.20
+      },
+      "timePeriod": 3600
+    },
+    "capacitiesContracted": {
+      "memory":    { "capacityName": "memory",    "quantity": 32.0, "granularity": 32.0 },
+      "processor": { "capacityName": "processor", "quantity": 12.0, "granularity": 12.0 },
+      "storage":   { "capacityName": "storage",   "quantity": 32.0, "granularity": 32.0 },
+      "slots":     { "capacityName": "slots",     "quantity":  8.0, "granularity":  1.0 }
+    }
+  },
+  {
+    "objectName": "AzureContainers",
+    "billingOption": {
+      "billingName": "As-you-go",
+      "provider": "Azure",
+      "invoicedPrices": {
+        "memory":    0.5,
+        "processor": 0.5,
+        "storage":   0.5,
+        "slots":     0.0
+      },
+      "timePeriod": 1
+    },
+    "capacitiesContracted": {
+      "memory":    { "capacityName": "memory",    "quantity": 32.0, "granularity": 0.1 },
+      "processor": { "capacityName": "processor", "quantity": 12.0, "granularity": 0.1 },
+      "storage":   { "capacityName": "storage",   "quantity": 32.0, "granularity": 0.1 },
+      "slots":     { "capacityName": "slots",     "quantity":  0.0, "granularity": 0.0 }
+    }
+  },
+  {
+    "objectName": "Selenoid",
+    "billingOption": {
+      "billingName": "As-you-go",
+      "provider": "Azure",
+      "invoicedPrices": {
+        "slots": 1.20
+      },
+      "timePeriod": 60
+    },
+    "capacitiesContracted": {
+      "memory":    { "capacityName": "memory",    "quantity": 0.0, "granularity": 0.0 },
+      "processor": { "capacityName": "processor", "quantity": 0.0, "granularity": 0.0 },
+      "storage":   { "capacityName": "storage",   "quantity": 0.0, "granularity": 0.0 },
+      "slots":     { "capacityName": "slots",     "quantity": 8.0, "granularity": 1.0 }
+    }
+  }
+]
