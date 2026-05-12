@@ -34,11 +34,11 @@
 
         <slf4j-api.version>2.0.17</slf4j-api.version>
 
-        <log4j-slf4j2-impl.version>2.26.0</log4j-slf4j2-impl.version>
+        <log4j-slf4j2-impl.version>2.25.4</log4j-slf4j2-impl.version>
 
         <junit-jupiter-api.version>6.0.3</junit-jupiter-api.version>
 
-        <selenium-java.version>4.43.0</selenium-java.version>
+        <selenium-java.version>4.41.0</selenium-java.version>
 
         <selema.version>4.0.2</selema.version>
 
@@ -109,6 +109,11 @@
             <groupId>io.github.giis-uniovi</groupId>
             <artifactId>retorch-orchestration</artifactId>
             <version>${retorch-tool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.giis-uniovi</groupId>
+            <artifactId>retorch-profiling</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -208,7 +213,7 @@
                         <dependency>
                             <groupId>org.apache.ant</groupId>
                             <artifactId>ant-junit</artifactId>
-                            <version>1.10.17</version>
+                            <version>1.10.16</version>
                         </dependency>
                         <dependency>
                             <groupId>org.apache.ant</groupId>
