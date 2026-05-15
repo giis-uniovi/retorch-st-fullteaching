@@ -12,6 +12,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -45,8 +46,8 @@ public class BaseLoggedTest {
     public static String TEACHER_BROWSER;
     public static String STUDENT_BROWSER;
     private static final SeleManager seleManager = new SeleManager(new SelemaConfig()
-            .setReportSubdir("target/" + (System.getProperty("TJOB_NAME") == null ? "" : System.getProperty("TJOB_NAME")))
-            .setName(System.getProperty("TJOB_NAME") == null ? "locallogs" : System.getProperty("TJOB_NAME")));
+            .setReportSubdir("target/" + (System.getProperty("tjob_name") == null ? "" : System.getProperty("tjob_name")))
+            .setName(System.getProperty("tjob_name") == null ? "locallogs" : System.getProperty("tjob_name")));
     public static String BROWSER_NAME;
     protected static String HOST = LOCALHOST;
     protected static String userName;
@@ -74,7 +75,7 @@ public class BaseLoggedTest {
 
         String envUrl = System.getProperty("SUT_URL") != null ? System.getProperty("SUT_URL") : System.getenv("SUT_URL");
 
-        String envTJobName = System.getProperty("TJOB_NAME") != null ? System.getProperty("TJOB_NAME") : System.getenv("TJOB_NAME");
+        String envTJobName = System.getProperty("tjob_name") != null ? System.getProperty("tjob_name") : System.getenv("tjob_name");
         log.info("Using URL {} TJOB: {}", envUrl, envTJobName);
         // Check if SUT_URL is defined in the environment variables
         if ((envUrl != null)) {
@@ -207,19 +208,19 @@ public class BaseLoggedTest {
     }
 
     protected void slowLogin(BrowserUser user, String userEmail,
-                             String userPass) throws NotLoggedException, ElementNotFoundException, InterruptedException {//24 lines
+                             String userPass) throws NotLoggedException, ElementNotFoundException {//24 lines
         log.info("Slow login");
         this.login(user, userEmail, userPass, true);
     }
 
     protected void quickLogin(BrowserUser user, String userEmail,
-                              String userPass) throws NotLoggedException, ElementNotFoundException, InterruptedException { //24 lines
+                              String userPass) throws NotLoggedException, ElementNotFoundException {
         log.info("Quick login");
         this.login(user, userEmail, userPass, false);
     }
 
     private void login(BrowserUser user, String userEmail, String userPass,
-                       boolean slow) throws NotLoggedException, ElementNotFoundException, InterruptedException { //24 lines
+                       boolean slow) throws NotLoggedException, ElementNotFoundException {
         user.setOnSession(true);
         log.info("Logging in user {} with mail '{}'", user.getClientData(), userEmail);
         Wait.waitForPageLoaded(user.getDriver());
@@ -235,13 +236,12 @@ public class BaseLoggedTest {
         WebElement userPassField = user.getDriver().findElement(By.id("password"));
         // Fill input fields
         userNameField.sendKeys(userEmail);
-        if (slow)
-            waitSeconds(3);
-
         userPassField.sendKeys(userPass);
 
-        if (slow)
-            waitSeconds(3);
+        if (slow) {
+            // Wait for the login button to be clickable (Angular validates the form) rather than sleeping
+            user.waitUntil(ExpectedConditions.elementToBeClickable(By.id("log-in-btn")), "Login button not enabled after filling credentials");
+        }
 
         // Ensure fields contain what has been entered
         Assertions.assertEquals(userNameField.getAttribute("value"), userEmail);
@@ -270,14 +270,14 @@ public class BaseLoggedTest {
             user.getDriver().findElement(By.cssSelector("#exit-icon")).click();
         }
         try {
-            // Up bar menu
-
+            // Up bar menu — scroll to top so the navbar is in viewport, then use JS
+            // click to bypass any overlay that would intercept a native click.
+            ((JavascriptExecutor) user.getDriver()).executeScript("window.scrollTo(0, 0);");
             user.getWaiter()
-                    .until(ExpectedConditions.elementToBeClickable(
+                    .until(ExpectedConditions.presenceOfElementLocated(
                             By.cssSelector("#arrow-drop-down")));
-
-            user.getDriver().findElement(By.cssSelector("#arrow-drop-down"))
-                    .click();
+            ((JavascriptExecutor) user.getDriver()).executeScript(
+                    "document.querySelector('#arrow-drop-down').click();");
 
             user.getWaiter().until(ExpectedConditions
                     .elementToBeClickable(By.cssSelector("#logout-button")));

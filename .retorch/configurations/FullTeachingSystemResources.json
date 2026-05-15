@@ -51,7 +51,7 @@
         "quantity": 0.88
       }
     ],
-    "dockerImage": "mediaserver;openvidu/openvidu-server-kms:1.7.0"
+    "dockerImage": "mediaserver;openvidu/openvidu-server-kms:2.3.0"
   },
   "configuration": {
     "hierarchyParent": [
