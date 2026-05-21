@@ -43,6 +43,8 @@ public class ChromeUser extends BrowserUser {
         // options.addArguments("--disable-gpu"); Commented for the moment
         //Problems with flakiness due to screen resolution solved with --start-maximized
         options.addArguments("--start-maximized");
+        options.addArguments("--use-fake-ui-for-media-stream");
+        options.addArguments("--use-fake-device-for-media-stream");
         options.setAcceptInsecureCerts(true);
         //This capability is to store the logs of the test case
         log.debug("Added Capabilities of acceptInsecureCerts and --start-maximized");

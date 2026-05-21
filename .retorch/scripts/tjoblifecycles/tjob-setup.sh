@@ -20,6 +20,8 @@ echo "This TJOB-setup dont have any kind of specific commands"
 
 # Deploy containers
 cd "$SUT_LOCATION"
+"$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-set-up" "Pulling latest images for TJOB $1"
+docker compose -f docker-compose.yml --env-file "$WORKSPACE/.retorch/envfiles/$1.env" --ansi never -p "$1" pull
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-set-up" "Deploying containers for TJOB $1"
 docker compose -f docker-compose.yml --env-file "$WORKSPACE/.retorch/envfiles/$1.env" --ansi never -p "$1" up -d
 
