@@ -105,11 +105,6 @@
             <artifactId>selema</artifactId>
             <version>${selema.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.giis-uniovi</groupId>
-            <artifactId>retorch-orchestration</artifactId>
-            <version>${retorch-tool.version}</version>
-        </dependency>
 
     </dependencies>
     <!-- Plugins -->
