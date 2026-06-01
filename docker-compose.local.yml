@@ -1,0 +1,24 @@
+# docker-compose.local.yml  -  Local development override
+# Exposes SUT ports to the host and uses localhost URLs so tests can run
+# directly with 'mvn test' from the developer machine (no hosts file changes).
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml \
+#     --env-file retorchfiles/envfiles/tjobd.env -p tjobd up -d
+#
+# Then run the test:
+#   mvn test -Dtest="FullTeachingEndToEndEChatTests" \
+#     -DTJOB_NAME="tjobd" -DSUT_URL="https://localhost:5000"
+
+services:
+  full-teaching:
+    ports:
+      - "5000:5000"
+    # OPENVIDU_URL stays as defined in docker-compose.yml (container hostname for internal REST calls)
+
+  full-teaching-openvidu-server-kms:
+    ports:
+      - "4443:4443"
+    environment:
+      # Override public URL to localhost so the browser token points to the exposed port
+      - OPENVIDU_PUBLICURL=https://localhost:4443

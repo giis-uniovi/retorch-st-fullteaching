@@ -5,7 +5,9 @@ import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.DOMManager;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,7 +37,6 @@ public class CourseNavigationUtilities {
         WebElement nameField = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(NEW_COURSE_MODAL_NAME_FIELD));
         nameField.sendKeys(courseName);
         Click.element(wd, By.id(NEW_COURSE_MODAL_SAVE_ID));
-        Wait.waitForPageLoaded(wd);
 
         checkIfCourseExists(wd, courseName);
 
@@ -60,6 +61,10 @@ public class CourseNavigationUtilities {
             } catch (NoSuchElementException ignored) {
                 // Do nothing and look for the next item
                 log.debug("The current course is:{} and the course that we are searching is {}",courseTitle,titleText);
+            } catch (StaleElementReferenceException e) {
+                // DOM was updated during iteration — signal not found so caller retries
+                log.debug("Stale element while checking for course '{}', will retry", courseTitle);
+                return false;
             }
         }
         return false;
@@ -67,10 +72,10 @@ public class CourseNavigationUtilities {
 
     public static boolean checkIfCourseExists(WebDriver wd, String course_title, int retries) throws InterruptedException { //10 lines
         for (int i = 0; i < retries; i++) {
-            TimeUnit.SECONDS.sleep(1);
             if (checkIfCourseExists(wd, course_title)) {
                 return true;
             }
+            TimeUnit.SECONDS.sleep(1);
         }
 
         return false;
@@ -87,10 +92,12 @@ public class CourseNavigationUtilities {
 
             log.info("Changing the course Name");
             WebElement nameField = Wait.aLittle(wd).until(ExpectedConditions.visibilityOfElementLocated(EDIT_COURSE_MODAL_NAME_FIELD));
-            nameField.clear();
-            nameField.sendKeys(newName);
+            // Use keyboard select-all + type so Angular's ngModel detects the change (clear() doesn't fire input events)
+            nameField.sendKeys(Keys.chord(Keys.CONTROL, "a"), newName);
 
             saveChanges(wd);
+            // Wait for the edit modal to close before returning so the DOM is stable
+            Wait.notTooMuch(wd).until(ExpectedConditions.invisibilityOfElementLocated(EDIT_DELETE_MODAL));
 
         } catch (NoSuchElementException noSuchElementException) {
             log.info("[END] changeCourseName KO: Course \"{}\" probably doesn't exist", oldName);

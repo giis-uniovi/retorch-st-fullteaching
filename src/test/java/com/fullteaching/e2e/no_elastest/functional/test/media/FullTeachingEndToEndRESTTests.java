@@ -99,7 +99,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         courseNameInput.clear();
         courseNameInput.sendKeys(editedCourseName);
         user.getDriver().findElement(By.id("submit-put-course-btn")).click();
-        waitForDialogClosed("course-modal", "Edition of course failed", user);
+        waitForDialogClosed("put-delete-course-modal", "Edition of course failed", user);
         user.waitUntil(ExpectedConditions.textToBe(By.cssSelector("#course-list .course-list-item:last-child div.course-title span"), editedCourseName), "Unexpected course name");
     }
 

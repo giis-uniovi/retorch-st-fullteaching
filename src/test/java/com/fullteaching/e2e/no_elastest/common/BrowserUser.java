@@ -115,7 +115,11 @@ public class BrowserUser {
     protected void configureDriver() {
         this.waiter = new WebDriverWait(this.driver, Duration.ofSeconds(this.timeOfWaitInSeconds));
         if (this.driver instanceof RemoteWebDriver) {
-            ((RemoteWebDriver) this.driver).setFileDetector(new LocalFileDetector());
+            try {
+                ((RemoteWebDriver) this.driver).setFileDetector(new LocalFileDetector());
+            } catch (org.openqa.selenium.WebDriverException ignored) {
+                // Local ChromeDriver/FirefoxDriver extend RemoteWebDriver but don't support setFileDetector
+            }
         }
     }
 

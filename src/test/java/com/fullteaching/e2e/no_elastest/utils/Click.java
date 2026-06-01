@@ -72,19 +72,24 @@ public class Click {
         String tagName = ele.getTagName();
         String text = ele.getText();
 
+        boolean scrolled = true;
         try {
             Scroll.toElement(wd, ele);
         } catch (Exception e) {
             log.error("Click.element: Scroll failed continuing...");
+            scrolled = false;
         }
-        //try by click
-        try {
-            Wait.notTooMuch(wd).until(ExpectedConditions.elementToBeClickable(ele));
-            ele.click();
-            log.info("Click.element (click): ele:{}:{} ==>OK", tagName, text);
-            return wd;
-        } catch (Exception e) {
-            log.error("Click.element (click): ele:{}:{} ==>KO {}:{}", tagName, text, e.getClass().getName(), e.getLocalizedMessage());
+        // Only wait for clickability when scroll succeeded; if scroll failed the element
+        // is likely off-screen or zero-size, so go straight to JS to avoid a 20-second wait.
+        if (scrolled) {
+            try {
+                Wait.notTooMuch(wd).until(ExpectedConditions.elementToBeClickable(ele));
+                ele.click();
+                log.info("Click.element (click): ele:{}:{} ==>OK", tagName, text);
+                return wd;
+            } catch (Exception e) {
+                log.error("Click.element (click): ele:{}:{} ==>KO {}:{}", tagName, text, e.getClass().getName(), e.getLocalizedMessage());
+            }
         }
         //Try by Js
         try {

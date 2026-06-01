@@ -174,7 +174,7 @@ public class ForumNavigationUtilities {
         Wait.waitForPageLoaded(wd);
         log.info("Click save button");
         Click.element(wd, save_button);
-        Wait.waitForPageLoaded(wd);
+        Wait.notTooMuch(wd).until(ExpectedConditions.invisibilityOfElementLocated(ENABLE_FORUM_MODAL));
         WebElement forum_tab_content = CourseNavigationUtilities.wait4TabContent(wd, FORUM_ICON);
         Wait.waitForPageLoaded(wd);
         log.info("Checking that the forum es enabled");
@@ -195,6 +195,7 @@ public class ForumNavigationUtilities {
         WebElement save_button = edit_modal.findElement(ENABLE_FORUM_MODAL_SAVE_BUTTON);
         log.info("Click into the save button");
         Click.element(wd, save_button);
+        Wait.notTooMuch(wd).until(ExpectedConditions.invisibilityOfElementLocated(ENABLE_FORUM_MODAL));
         WebElement forum_tab_content = CourseNavigationUtilities.wait4TabContent(wd, FORUM_ICON);
         Wait.waitForPageLoaded(wd);
         log.info("Finally checks that the Forum is enabled");
