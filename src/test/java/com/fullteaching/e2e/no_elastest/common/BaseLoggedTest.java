@@ -11,6 +11,7 @@ import giis.selema.services.browser.DynamicGridBrowserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -108,7 +109,7 @@ public class BaseLoggedTest {
     protected static void configureSelema() {
         log.debug("Configuring Selema browser ({})", TEACHER_BROWSER);
         seleManager.setBrowser(TEACHER_BROWSER)
-                .setArguments(new String[]{"--start-maximized"})
+                .setArguments(new String[]{"--start-maximized", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"})
                 .setOptions(Map.of("acceptInsecureCerts", true));
         BROWSER_NAME = TEACHER_BROWSER;
         if (System.getenv("SELENOID_PRESENT") != null) {
@@ -259,15 +260,15 @@ public class BaseLoggedTest {
            log.info("Logging out {}", user.getClientData());
 
         if (!user.getDriver().findElements(By.cssSelector("#fixed-icon")).isEmpty()) {
-            // Get out of video session page
-            if (!isClickable("#exit-icon", user)) { // Side menu not opened
-                user.getDriver().findElement(By.cssSelector("#fixed-icon"))
-                        .click();
-
+            // Get out of video session page — ensure side menu is open so exit-icon is visible
+            if (!isClickable("#exit-icon", user)) {
+                user.getDriver().findElement(By.cssSelector("#fixed-icon")).click();
             }
             user.getWaiter().until(ExpectedConditions
-                    .elementToBeClickable(By.cssSelector("#exit-icon")));
-            user.getDriver().findElement(By.cssSelector("#exit-icon")).click();
+                    .presenceOfElementLocated(By.cssSelector("#exit-icon")));
+            // JS click bypasses any overlay that would intercept a native click
+            ((JavascriptExecutor) user.getDriver()).executeScript(
+                    "document.querySelector('#exit-icon').click();");
         }
         try {
             // Up bar menu — scroll to top so the navbar is in viewport, then use JS
