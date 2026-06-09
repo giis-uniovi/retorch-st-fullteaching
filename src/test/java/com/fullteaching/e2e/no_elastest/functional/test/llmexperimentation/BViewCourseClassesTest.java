@@ -5,6 +5,7 @@ import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.ForumNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -54,7 +55,7 @@ class BViewCourseClassesTest extends BaseLoggedTest {
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void forumNewEntryTest(String mail, String password, String role) {// 48+ 104 +   28 set up +13 lines teardown =193
+    void forumNewEntryTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {// 48+ 104 +   28 set up +13 lines teardown =193
         this.slowLogin(user, mail, password); //24 lines
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -120,7 +121,7 @@ class BViewCourseClassesTest extends BaseLoggedTest {
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void accessCoursesAndViewClassesFS4oTest(String mail, String password, String role) {
+    void accessCoursesAndViewClassesFS4oTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         this.slowLogin(user, mail, password);
         try {
             // Navigate to courses
@@ -156,7 +157,7 @@ class BViewCourseClassesTest extends BaseLoggedTest {
     }
     @ParameterizedTest
     @MethodSource("data")
-    void userAccessCoursesAndViewClassesCOT4oTest(String mail, String password, String role) {
+    void userAccessCoursesAndViewClassesCOT4oTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         // Step 1: User logs into the application
         this.slowLogin(user, mail, password);
 
@@ -195,7 +196,7 @@ class BViewCourseClassesTest extends BaseLoggedTest {
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void userAccessCoursesAndViewClassesFS4oMiniTest(String mail, String password, String role) {
+    void userAccessCoursesAndViewClassesFS4oMiniTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         // Step 1: User logs into the application
         this.slowLogin(user, mail, password);
 
@@ -234,7 +235,7 @@ class BViewCourseClassesTest extends BaseLoggedTest {
     @AccessMode(resID = "course", concurrency = 15, sharing = true, accessMode = "READONLY")
     @ParameterizedTest
     @MethodSource("data") // Assuming data() provides test users
-    void userAccessCoursesAndViewClassesCOT4oMiniTest(String mail, String password, String role) {
+    void userAccessCoursesAndViewClassesCOT4oMiniTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         // Step 1: Login to the application
         this.slowLogin(user, mail, password);
 

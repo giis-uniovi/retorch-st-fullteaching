@@ -5,6 +5,7 @@ import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.ForumNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.NavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -51,7 +52,7 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
     @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
     @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
-    void teachercourseMainTest(String mail, String password, String role) {
+    void teachercourseMainTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         this.slowLogin(user, mail, password);
         try {
 
@@ -96,7 +97,7 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @ParameterizedTest
     @MethodSource("data")
-    void userAccessCalendarFS4oTest(String mail, String password, String role) {
+    void userAccessCalendarFS4oTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         this.slowLogin(user,mail, password);
         try {
             // Navigate to the calendar page
@@ -113,7 +114,7 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
     }
     @ParameterizedTest
     @MethodSource("data")
-    void userCanAccessAndViewCalendarCOT4oTest(String mail, String password, String role) {
+    void userCanAccessAndViewCalendarCOT4oTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         this.slowLogin(user,mail, password);
 
         try {
@@ -145,7 +146,7 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
     @ParameterizedTest
     @MethodSource("data")
     @DisplayName("User Accessing Calendar Test")
-    void userAccessingCalendarFS4oMiniTest(String mail, String password, String role) {
+    void userAccessingCalendarFS4oMiniTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         // Step 1: User logs into the application
         this.slowLogin(user, mail, password);
 
@@ -172,7 +173,7 @@ class DUserAccessCalendarTest extends BaseLoggedTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    void userCanAccessAndViewCalendarCOT4MiniTest(String mail, String password, String role) {
+    void userCanAccessAndViewCalendarCOT4MiniTest(String mail, String password, String role) throws NotLoggedException, ElementNotFoundException {
         // Step 1: User logs into the application
         this.slowLogin(user, mail, password);
 
