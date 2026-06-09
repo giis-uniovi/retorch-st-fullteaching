@@ -3,6 +3,7 @@ package com.fullteaching.e2e.no_elastest.functional.test.llmexperimentation;
 import com.fullteaching.e2e.no_elastest.common.BaseLoggedTest;
 import com.fullteaching.e2e.no_elastest.common.CourseNavigationUtilities;
 import com.fullteaching.e2e.no_elastest.common.exception.ElementNotFoundException;
+import com.fullteaching.e2e.no_elastest.common.exception.NotLoggedException;
 import com.fullteaching.e2e.no_elastest.utils.Click;
 import com.fullteaching.e2e.no_elastest.utils.ParameterLoader;
 import com.fullteaching.e2e.no_elastest.utils.Wait;
@@ -50,7 +51,7 @@ class CTeacherCreatesCourseTest extends BaseLoggedTest {
     @AccessMode(resID = "executor", concurrency = 1, accessMode = "READWRITE")
     @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
-    void teacherCreateAndDeletecourseTest (String mail, String password, String role) throws ElementNotFoundException {
+    void teacherCreateAndDeletecourseTest (String mail, String password, String role) throws ElementNotFoundException, NotLoggedException {
         // Setup
         this.slowLogin(user, mail, password);
 
@@ -71,7 +72,7 @@ class CTeacherCreatesCourseTest extends BaseLoggedTest {
         user.getDriver().get(APP_URL);
     }
     @Test
-    void teacherCreateCourseFS4oTest() {
+    void teacherCreateCourseFS4oTest() throws NotLoggedException, ElementNotFoundException {
         String teacherEmail = "teacher@gmail.com"; // Replace with actual test data
         String teacherPassword = "pass"; // Replace with actual test data
         this.slowLogin(user, teacherEmail, teacherPassword);
@@ -109,7 +110,7 @@ class CTeacherCreatesCourseTest extends BaseLoggedTest {
         }
     }
     @Test
-    void teacherCreateCourseCOT4oTest() {
+    void teacherCreateCourseCOT4oTest() throws NotLoggedException, ElementNotFoundException {
         String teacherEmail = "teacher@gmail.com"; // Replace with actual test data
         String teacherPassword = "pass"; // Replace with actual test data
         this.slowLogin(user, teacherEmail, teacherPassword);
@@ -152,7 +153,7 @@ class CTeacherCreatesCourseTest extends BaseLoggedTest {
     @AccessMode(resID = "webbrowser", concurrency = 1, accessMode = "READWRITE")
     @AccessMode(resID = "webserver", concurrency = 1, accessMode = "READWRITE")
     @Test
-    void teacherCreatesCourseFS4oMiniTest() {
+    void teacherCreatesCourseFS4oMiniTest() throws NotLoggedException, ElementNotFoundException {
         String teacherEmail = "teacher@gmail.com"; // Replace with actual test data
         String teacherPassword = "pass"; // Replace with actual test data
         // Log in with provided credentials
@@ -191,7 +192,7 @@ class CTeacherCreatesCourseTest extends BaseLoggedTest {
     }
 
     @Test
-    void teacherCreatesCourseCOT4oMiniTest() throws ElementNotFoundException {
+    void teacherCreatesCourseCOT4oMiniTest() throws ElementNotFoundException, NotLoggedException {
         // Test data
         String teacherEmail = "teacher@gmail.com"; // Replace with actual test data
         String teacherPassword = "pass"; // Replace with actual test data
