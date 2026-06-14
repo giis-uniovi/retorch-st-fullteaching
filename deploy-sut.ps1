@@ -33,9 +33,9 @@ if ($nets -notcontains $Network) {
     docker network create $Network | Out-Null; OK "Created"
 } else { OK "Already exists" }
 
-# 2. Pull latest full-teaching image
-Step "Pulling latest full-teaching image"
-docker compose -f $ComposeFile -f $LocalOverride --env-file $EnvFile pull full-teaching 2>&1 | Out-Null
+# 2. Build full-teaching image from sut/
+Step "Building full-teaching image from sut/"
+docker compose -f $ComposeFile -f $LocalOverride --env-file $EnvFile build full-teaching 2>&1 | Out-Null
 OK "Done"
 
 # 3. Start stack

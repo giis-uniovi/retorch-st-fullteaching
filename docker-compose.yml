@@ -41,7 +41,9 @@ services:
 
   full-teaching:
     container_name: full-teaching-${TJOB_NAME}
-    image: ghcr.io/augustocristian/fullteaching:v2.1
+    build:
+      context: ./sut
+      dockerfile: Dockerfile
     init: true
     depends_on:
       full-teaching-mysql:

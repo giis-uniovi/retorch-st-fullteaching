@@ -33,9 +33,9 @@ else
     ok "Already exists"
 fi
 
-# 2. Pull latest full-teaching image
-step "Pulling latest full-teaching image"
-docker compose -f "$COMPOSE_FILE" -f "$LOCAL_OVERRIDE" --env-file "$ENV_FILE" pull full-teaching 2>&1 | tail -2
+# 2. Build full-teaching image from sut/
+step "Building full-teaching image from sut/"
+docker compose -f "$COMPOSE_FILE" -f "$LOCAL_OVERRIDE" --env-file "$ENV_FILE" build full-teaching 2>&1 | tail -2
 ok "Done"
 
 # 3. Start stack
