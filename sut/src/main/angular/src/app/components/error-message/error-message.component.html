@@ -1,0 +1,7 @@
+<div class="card-panel" [ngClass]="customClass">
+  @if (closable) {
+    <button class="btn-flat no-padding right" aria-label="Close" (click)="closeAlert()"><i class="material-icons" aria-hidden="true">clear</i></button>
+  }
+  <h5>{{this.errorTitle}}</h5>
+  <p [innerHTML]="this.errorContent"></p>
+</div>

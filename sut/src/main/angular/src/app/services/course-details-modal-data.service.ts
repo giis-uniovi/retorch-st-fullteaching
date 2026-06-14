@@ -1,0 +1,17 @@
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+
+@Injectable()
+export class CourseDetailsModalDataService {
+
+  postModeAnnounced$: Subject<any>;
+  putdeleteModeAnnounced$: Subject<any>;
+
+  constructor() {
+    this.postModeAnnounced$ = new Subject<any>();
+    this.putdeleteModeAnnounced$ = new Subject<any>();
+  }
+
+  announcePostMode(objs: any) { this.postModeAnnounced$.next(objs); }
+  announcePutdeleteMode(objs: any) { this.putdeleteModeAnnounced$.next(objs); }
+}

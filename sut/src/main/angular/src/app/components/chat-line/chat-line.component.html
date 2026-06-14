@@ -1,0 +1,26 @@
+<div class="outer-message">
+
+  @if ((this.chatLine.type === 'own-msg') || (this.chatLine.type === 'stranger-msg')) {
+    <div [ngClass]="[this.chatLine.type]">
+      <div class="message-header">
+        @if (this.chatLine.type === 'stranger-msg') {
+          <img [src]="this.chatLine.picture" [alt]="this.chatLine.author" class="circle responsive-img">
+        }
+        <span class='user-name' [style.color]="this.chatLine.color">{{this.chatLine.author}}</span>
+        @if (this.chatLine.type === 'own-msg') {
+          <img [src]="this.chatLine.picture" [alt]="this.chatLine.author" class="circle responsive-img">
+        }
+      </div>
+      <div class="message-content">
+        <span class='user-message'>{{this.chatLine.message}}</span>
+      </div>
+    </div>
+  }
+
+  @if ((this.chatLine.type === 'system-msg') || (this.chatLine.type === 'system-err')) {
+    <div [ngClass]="[this.chatLine.type]">
+      {{this.chatLine.message}}
+    </div>
+  }
+
+</div>
