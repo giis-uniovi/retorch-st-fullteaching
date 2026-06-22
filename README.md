@@ -1,5 +1,5 @@
 [![Build Status](https://github.com/giis-uniovi/retorch-st-fullteaching/actions/workflows/build.yml/badge.svg)](https://github.com/giis-uniovi/retorch-st-fullteaching/actions)
-
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=my%3Aretorch-st-fullteaching&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=my%3Aretorch-st-fullteaching)
 # RETORCH FullTeaching End-to-End Test Suite
 
 This repo contains a detached fork of 
