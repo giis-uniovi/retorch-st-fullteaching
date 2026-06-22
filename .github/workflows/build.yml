@@ -50,7 +50,7 @@ jobs:
         working-directory: sut
 
       - name: Save JaCoCo coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-report
           path: sut/target/site/jacoco/
@@ -60,7 +60,7 @@ jobs:
         run: mvn test-compile -U --no-transfer-progress
 
       - name: SonarCloud analysis
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
