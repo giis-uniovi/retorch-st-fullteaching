@@ -13,15 +13,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     #if: ${{ false }}  # disable for now
-    permissions: 
+    permissions:
       statuses: write
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: pass
+          MYSQL_DATABASE: full_teaching
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v7
       - name: Select Java Version
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
           cache: 'maven'
 
       - name: Init jenkins commit status (optional)
@@ -32,5 +45,22 @@ jobs:
              -H "X-GitHub-Api-Version: 2022-11-28" \
              -d "{\"state\":\"pending\", \"context\":\"Jenkins CI\"}"
 
-      - name: Build only, tests run in on-premises Jenkins
+      - name: Compile and test SUT, generate JaCoCo coverage report
+        run: mvn verify -B --no-transfer-progress
+        working-directory: sut
+
+      - name: Save JaCoCo coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-report
+          path: sut/target/site/jacoco/
+          retention-days: 7
+
+      - name: Build E2E test suite
         run: mvn test-compile -U --no-transfer-progress
+
+      - name: SonarCloud analysis
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
