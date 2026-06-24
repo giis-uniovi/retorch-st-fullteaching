@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
@@ -54,8 +53,6 @@ public class FileController {
     private final AuthorizationService authorizationService;
     private final FileOperationsService fileOperationsService;
     private static final String HTTPS_PROTOCOL = "https://";
-    @Value("${profile.stage}")
-    private String profileStage;
 
     @Autowired
     public FileController(FileOperationsService fileOpServ, ObjectProvider<UserComponent> userComp, AuthorizationService authServ, UserRepository userRep, CommentRepository commentRepo, CourseRepository courseRepo, FileRepository fileRepo, FileGroupRepository fileGroupRepo) {
@@ -81,17 +78,8 @@ public class FileController {
             return authorized;
         }
 
-        long idCourse;
-        long idFileGroup;
-        try {
-            idCourse = Long.parseLong(courseId);
-            idFileGroup = Long.parseLong(fileGroupId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or FileGroup ID '{}' are not of type Long", courseId, fileGroupId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
+        long idFileGroup = Long.parseLong(fileGroupId);
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
         if (c == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -115,7 +103,7 @@ public class FileController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         fileGroupRepository.save(fg);
-        return new ResponseEntity<>(this.getRootFileGroup(fg), HttpStatus.CREATED);
+        return new ResponseEntity<>(fg.findRoot(), HttpStatus.CREATED);
     }
 
     private FileGroup processUploadedFile(MultipartFile file, long idFileGroup) throws IOException {
@@ -138,7 +126,7 @@ public class FileController {
         File uploadedFile = new File(FILES_FOLDER.toFile(), customFile.getNameIdent());
         file.transferTo(uploadedFile);
 
-        if (this.isProductionStage()) {
+        if (fileOperationsService.isProductionStage()) {
             saveFileProduction(customFile, uploadedFile);
         } else {
             customFile.setLink(uploadedFile.getPath());
@@ -179,18 +167,8 @@ public class FileController {
             return;
         }
 
-        long idCourse;
-        long idFile;
-        try {
-            idCourse = Long.parseLong(courseId);
-            idFile = Long.parseLong(fileId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or File ID '{}' are not of type Long", courseId, fileId);
-            response.sendError(422, "Invalid format");
-            return;
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
+        long idFile = Long.parseLong(fileId);
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
         if (c == null) {
             response.sendError(404, "Course not found");
             return;
@@ -209,7 +187,7 @@ public class FileController {
 
         log.info(LOG_FILE_NAME, f.getName());
 
-        if (this.isProductionStage()) {
+        if (fileOperationsService.isProductionStage()) {
             fileOperationsService.productionFileDownloader(f.getNameIdent(), response);
         } else {
             downloadFileDev(f, response);
@@ -244,15 +222,7 @@ public class FileController {
             return authorized;
         }
 
-        long idUser;
-        try {
-            idUser = Long.parseLong(userId);
-        } catch (NumberFormatException e) {
-            log.error("User ID '{}' is not of type Long", userId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        User u = userRepository.findById(idUser).orElse(null);
+        User u = userRepository.findById(Long.parseLong(userId)).orElse(null);
 
         ResponseEntity<Object> userAuthorized = authorizationService.checkAuthorization(u, this.userProvider.getObject().getLoggedUser());
         if (userAuthorized != null) {
@@ -291,7 +261,7 @@ public class FileController {
         File uploadedPicture = new File(PICTURES_FOLDER.toFile(), encodedName);
         file.transferTo(uploadedPicture);
 
-        if (this.isProductionStage()) {
+        if (fileOperationsService.isProductionStage()) {
             savePictureProduction(encodedName, uploadedPicture, u);
         } else {
             savePictureDevelopment(uploadedPicture, u);
@@ -336,17 +306,8 @@ public class FileController {
             return authorized;
         }
 
-        long idCourse;
-        long idComment;
-        try {
-            idCourse = Long.parseLong(courseId);
-            idComment = Long.parseLong(commentId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or Comment ID '{}' are not of type Long", courseId, commentId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
+        long idComment = Long.parseLong(commentId);
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
         if (c == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -400,7 +361,7 @@ public class FileController {
         File uploadedFile = new File(VIDEOS_FOLDER.toFile(), finalName);
         file.transferTo(uploadedFile);
 
-        if (this.isProductionStage()) {
+        if (fileOperationsService.isProductionStage()) {
             saveVideoProduction(finalName, uploadedFile, comment);
         } else {
             saveVideoDevelopment(finalName, courseId, comment);
@@ -422,18 +383,6 @@ public class FileController {
 
     private void saveVideoDevelopment(String finalName, String courseId, Comment comment) {
         comment.setVideourl("/assets/videos/" + courseId + "/" + finalName);
-    }
-
-    // Method to get the root FileGroup of a FileGroup tree structure, given a FileGroup
-    private FileGroup getRootFileGroup(FileGroup fg) {
-        while (fg.getFileGroupParent() != null) {
-            fg = fg.getFileGroupParent();
-        }
-        return fg;
-    }
-
-    private boolean isProductionStage() {
-        return this.profileStage.equals("prod");
     }
 
 }

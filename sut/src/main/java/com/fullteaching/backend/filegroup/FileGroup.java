@@ -34,10 +34,7 @@ public class FileGroup {
     }
 
     public FileGroup(String title) {
-        this.title = title;
-        this.files = new ArrayList<>();
-        this.fileGroups = new ArrayList<>();
-        this.fileGroupParent = null;
+        this(title, null);
     }
 
     public FileGroup(String title, FileGroup fileGroupParent) {
@@ -99,6 +96,15 @@ public class FileGroup {
     @Override
     public int hashCode() {
         return Long.hashCode(id);
+    }
+
+    /** Returns the root ancestor of this FileGroup tree (itself if already root). */
+    public FileGroup findRoot() {
+        FileGroup current = this;
+        while (current.getFileGroupParent() != null) {
+            current = current.getFileGroupParent();
+        }
+        return current;
     }
 
     public void updateFileIndexOrder() {

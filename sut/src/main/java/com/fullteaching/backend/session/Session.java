@@ -3,7 +3,7 @@ package com.fullteaching.backend.session;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fullteaching.backend.course.Course;
-import com.fullteaching.backend.course.Course.SimpleCourseList;
+import com.fullteaching.backend.course.AbstractCourseData.SimpleCourseList;
 import jakarta.persistence.*;
 
 @Entity

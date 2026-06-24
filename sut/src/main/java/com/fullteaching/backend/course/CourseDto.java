@@ -1,44 +1,19 @@
 package com.fullteaching.backend.course;
 
+import com.fullteaching.backend.IdRef;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CourseDto {
+public class CourseDto extends AbstractCourseData {
 
-    private long id;
-    private String title;
-    private String image;
     private CourseDetailsRef courseDetails;
-    private Set<UserRef> attenders;
+    private Set<IdRef> attenders;
 
     public CourseDto() {
         // Required by Jackson for deserialization
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public CourseDetailsRef getCourseDetails() {
@@ -49,18 +24,18 @@ public class CourseDto {
         this.courseDetails = courseDetails;
     }
 
-    public Set<UserRef> getAttenders() {
+    public Set<IdRef> getAttenders() {
         return attenders;
     }
 
-    public void setAttenders(Set<UserRef> attenders) {
+    public void setAttenders(Set<IdRef> attenders) {
         this.attenders = attenders;
     }
 
     /** Returns the IDs of all attenders, or an empty set if none were sent. */
     public Set<Long> getAttenderIds() {
         if (attenders == null) return Collections.emptySet();
-        return attenders.stream().map(UserRef::getId).collect(Collectors.toCollection(HashSet::new));
+        return attenders.stream().map(IdRef::getId).collect(Collectors.toCollection(HashSet::new));
     }
 
     /** Captures id, info, and forum.activated from the nested courseDetails object in the JSON. */
@@ -104,24 +79,6 @@ public class CourseDto {
             public void setActivated(boolean activated) {
                 this.activated = activated;
             }
-        }
-    }
-
-    /** Captures only the id from each attender object in the JSON. */
-    public static class UserRef {
-
-        private long id;
-
-        public UserRef() {
-            // Required by Jackson for deserialization
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public void setId(long id) {
-            this.id = id;
         }
     }
 }

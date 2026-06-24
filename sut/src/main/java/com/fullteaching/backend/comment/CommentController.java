@@ -53,17 +53,8 @@ public class CommentController {
         }
 
 
-        long idEntry = -1;
-        long idCourseDetails = -1;
-        try {
-            idEntry = Long.parseLong(entryId);
-            idCourseDetails = Long.parseLong(courseDetailsId);
-        } catch (NumberFormatException e) {
-            log.error("Entry ID '{}' or CourseDetails ID '{}' are not of type Long", entryId, courseDetailsId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        CourseDetails cd = courseDetailsRepository.findById(idCourseDetails).orElse(null);
+        long idEntry = Long.parseLong(entryId);
+        CourseDetails cd = courseDetailsRepository.findById(Long.parseLong(courseDetailsId)).orElse(null);
         if (cd == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
