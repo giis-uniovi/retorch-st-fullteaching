@@ -24,12 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
 public class FileOperationsService {
 
     private static final Logger log = LoggerFactory.getLogger(FileOperationsService.class);
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private static final String LOG_ERROR_MESSAGE    = "Error Message:    {}";
     private static final String LOG_HTTP_STATUS_CODE = "HTTP Status Code: {}";
@@ -198,7 +200,7 @@ public class FileOperationsService {
         // Getting the image extension, discarding any path-like characters it may contain
         String picExtension = this.getFileExtension(originalFileName).replaceAll("[^A-Za-z0-9]", "");
         // Appending a random integer to the name
-        originalFileName += (Math.random() * (Integer.MIN_VALUE - Integer.MAX_VALUE));
+        originalFileName += SECURE_RANDOM.nextLong();
         // Encoding original file name + random integer
         originalFileName = new BCryptPasswordEncoder().encode(originalFileName);
         if (originalFileName == null) {

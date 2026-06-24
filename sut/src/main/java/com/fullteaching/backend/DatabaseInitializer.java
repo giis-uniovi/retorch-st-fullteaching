@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 @Controller
@@ -207,19 +209,19 @@ public class DatabaseInitializer implements CommandLineRunner {
         c2.getAttenders().add(user1);
         c2.getAttenders().add(user3);
 
-        Calendar calendar = Calendar.getInstance();
-        int milliSecondsInADay = 86400000;
+        long now = Instant.now().toEpochMilli();
+        long milliSecondsInADay = Duration.ofDays(1).toMillis();
         String defaultDescription = "This is a nice description about this session.";
         //Sample sessions
-        Session s1 = new Session("Session 1: Introduction to Web", defaultDescription, calendar.getTimeInMillis());
+        Session s1 = new Session("Session 1: Introduction to Web", defaultDescription, now);
         s1.setCourse(c1);
-        Session s2 = new Session("Nice examples", defaultDescription, calendar.getTimeInMillis() + milliSecondsInADay);
+        Session s2 = new Session("Nice examples", defaultDescription, now + milliSecondsInADay);
         s2.setCourse(c1);
-        Session s3 = new Session("Project analisys", defaultDescription, calendar.getTimeInMillis() + milliSecondsInADay - 8000000);
+        Session s3 = new Session("Project analisys", defaultDescription, now + milliSecondsInADay - 8000000);
         s3.setCourse(c1);
-        Session s4 = new Session("Session 3: New Web Technologies", defaultDescription, calendar.getTimeInMillis() + 4 * milliSecondsInADay);
+        Session s4 = new Session("Session 3: New Web Technologies", defaultDescription, now + 4 * milliSecondsInADay);
         s4.setCourse(c2);
-        Session s5 = new Session("Session 2: Databse integration", defaultDescription, calendar.getTimeInMillis() + 6 * milliSecondsInADay);
+        Session s5 = new Session("Session 2: Databse integration", defaultDescription, now + 6 * milliSecondsInADay);
         s5.setCourse(c2);
 
         c1.getSessions().add(s1);

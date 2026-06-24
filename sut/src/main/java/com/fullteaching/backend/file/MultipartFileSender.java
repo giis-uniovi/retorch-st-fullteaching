@@ -315,15 +315,11 @@ public class MultipartFileSender {
          */
         public static boolean accepts(String acceptHeader, String toAccept) {
             if (acceptHeader == null || toAccept == null) return false;
-
-            // 1. Split using a non-backtracking regex or simple split
-            // Using \s*+ to be possessive and prevent ReDoS
-            String[] parts = acceptHeader.split("\\s*+[,;]\\s*+");
-
-            // 2. Use a Set for O(1) lookups instead of sorting/binary search
-            Set<String> acceptValues = new HashSet<>(Arrays.asList(parts));
-
-            // 3. Check specific conditions
+            String[] parts = acceptHeader.split("[,;]");
+            Set<String> acceptValues = new HashSet<>();
+            for (String part : parts) {
+                acceptValues.add(part.strip());
+            }
             return acceptValues.contains(toAccept)
                     || acceptValues.contains(toAccept.replaceAll("/.*$", "/*"))
                     || acceptValues.contains("*/*");
@@ -337,7 +333,10 @@ public class MultipartFileSender {
          * @return True if the given match header matches the given value.
          */
         public static boolean matches(String matchHeader, String toMatch) {
-            String[] matchValues = matchHeader.split("\\s*,\\s*");
+            String[] matchValues = matchHeader.split(",");
+            for (int i = 0; i < matchValues.length; i++) {
+                matchValues[i] = matchValues[i].strip();
+            }
             Arrays.sort(matchValues);
             return Arrays.binarySearch(matchValues, toMatch) > -1 || Arrays.binarySearch(matchValues, "*") > -1;
         }
