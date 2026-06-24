@@ -1,12 +1,12 @@
 package com.fullteaching.backend.filereader;
 
 import com.fullteaching.backend.course.Course;
+import com.fullteaching.backend.course.CourseAttenderService;
 import com.fullteaching.backend.course.CourseRepository;
 import com.fullteaching.backend.file.FileController;
 import com.fullteaching.backend.file.FileOperationsService;
 import com.fullteaching.backend.security.AuthorizationService;
 import com.fullteaching.backend.user.User;
-import com.fullteaching.backend.user.UserRepository;
 import com.fullteaching.backend.util.LogSanitizer;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -31,16 +31,18 @@ public class FileReaderController {
     private final FileReader fileReader = new FileReader();
 
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
     private final AuthorizationService authorizationService;
     private final FileOperationsService fileOperationsService;
+    private final CourseAttenderService courseAttenderService;
 
     @Autowired
-    public FileReaderController(CourseRepository courseRepo,UserRepository userRepo,AuthorizationService authService,FileOperationsService fileOpService){
-        this.courseRepository=courseRepo;
-        this.userRepository=userRepo;
-        this.authorizationService=authService;
-        this.fileOperationsService=fileOpService;
+    public FileReaderController(CourseRepository courseRepo,
+                                AuthorizationService authService, FileOperationsService fileOpService,
+                                CourseAttenderService courseAttenderService) {
+        this.courseRepository = courseRepo;
+        this.authorizationService = authService;
+        this.fileOperationsService = fileOpService;
+        this.courseAttenderService = courseAttenderService;
     }
 
     @PostMapping(value = "/upload/course/{courseId}")
@@ -54,21 +56,9 @@ public class FileReaderController {
             return authorized;
         }
 
-        long idCourse = -1;
-        try {
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' is not of type Long", courseId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-        if (c == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
-        if (teacherAuthorized != null) { // If the user is not the teacher of the course
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
+        if (teacherAuthorized != null) {
             return teacherAuthorized;
         }
 
@@ -145,53 +135,15 @@ public class FileReaderController {
             }
         }
 
-        Collection<User> newPossibleAttenders = userRepository.findByNameIn(attenderEmailsValid);
-        Collection<User> newAddedAttenders = new HashSet<>();
-        Collection<User> alreadyAddedAttenders = new HashSet<>();
-
-        for (String email : attenderEmailsValid) {
-            if (!this.userListContainsEmail(newPossibleAttenders, email)) {
-                attenderEmailsNotRegistered.add(email);
-            }
-        }
-
-        for (User attender : newPossibleAttenders) {
-            boolean newAtt = true;
-            if (!attender.getCourses().contains(c))
-                attender.getCourses().add(c);
-            else
-                newAtt = false;
-            if (!c.getAttenders().contains(attender))
-                c.getAttenders().add(attender);
-            else
-                newAtt = false;
-            (newAtt ? newAddedAttenders : alreadyAddedAttenders).add(attender);
-        }
-
-        // Saving the attenders (all of them, just in case a field of the bidirectional
-        // relationship is missing in a Course or a User)
-        userRepository.saveAll(newPossibleAttenders);
-        // Saving the modified course
-        courseRepository.save(c);
+        CourseAttenderService.AttenderUpdateResult result =
+                courseAttenderService.updateAttenders(c, attenderEmailsValid, attenderEmailsNotRegistered);
 
         AddAttendersByFileResponse customResponse = new AddAttendersByFileResponse();
-        customResponse.attendersAdded = newAddedAttenders;
-        customResponse.attendersAlreadyAdded = alreadyAddedAttenders;
+        customResponse.attendersAdded = result.added();
+        customResponse.attendersAlreadyAdded = result.alreadyAdded();
         customResponse.emailsValidNotRegistered = attenderEmailsNotRegistered;
 
         return customResponse;
-    }
-
-    // Checks if a User collection contains a user with certain email
-    private boolean userListContainsEmail(Collection<User> users, String email) {
-        boolean isContained = false;
-        for (User u : users) {
-            if (u.getName().equals(email)) {
-                isContained = true;
-                break;
-            }
-        }
-        return isContained;
     }
 
     private static class AddAttendersByFileResponse {

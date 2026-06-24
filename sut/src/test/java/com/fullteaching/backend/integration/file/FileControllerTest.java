@@ -204,7 +204,7 @@ class FileControllerTest extends AbstractLoggedControllerUnitTest {
             fail("UNAUTHORIZED: //test OK");
         }
 
-        //test BAD_REQUEST UNPROCESSABLE_ENTITY
+        //test BAD_REQUEST (invalid ID format)
         try {
 
             MvcResult result = mvc.perform(get(DOWNLOAD_URI.replace("{courseId}", "" + c.getId()) + "not_a_long")
@@ -214,7 +214,7 @@ class FileControllerTest extends AbstractLoggedControllerUnitTest {
 
             int status = result.getResponse().getStatus();
 
-            int expected = HttpStatus.UNPROCESSABLE_CONTENT.value();
+            int expected = HttpStatus.BAD_REQUEST.value();
 
             String content = result.getResponse().getContentAsString();
             System.out.println(content);
@@ -223,7 +223,7 @@ class FileControllerTest extends AbstractLoggedControllerUnitTest {
 
         } catch (Exception e) {
             log.error("Unexpected exception during test execution", e);
-            fail("UNAUTHORIZED: //test UNPROCESSABLE_CONTENT");
+            fail("Unexpected exception: //test BAD_REQUEST invalid format");
         }
     }
 
