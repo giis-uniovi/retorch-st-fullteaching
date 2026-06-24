@@ -1,0 +1,32 @@
+services:
+
+  full-teaching-mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=pass
+      - MYSQL_DATABASE=full_teaching
+
+  full-teaching-openvidu-server-kms:
+    image: openvidu/openvidu-server-kms:2.3.0
+    ports:
+      - 4443:4443
+    environment:
+      - openvidu.secret=MY_SECRET
+      - openvidu.publicurl=docker
+
+  full-teaching:
+    build: .
+    depends_on:
+      - full-teaching-mysql
+      - full-teaching-openvidu-server-kms
+    ports:
+      - 5000:5000
+    environment:
+      - WAIT_HOSTS=full-teaching-mysql:3306
+      - WAIT_HOSTS_TIMEOUT=60
+      - SPRING_DATASOURCE_URL=jdbc:mysql://full-teaching-mysql:3306/full_teaching?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=pass
+      - SERVER_PORT=5000
+      - OPENVIDU_URL=https://full-teaching-openvidu-server-kms:4443
+      - OPENVIDU_SECRET=MY_SECRET

@@ -1,0 +1,531 @@
+@if (!this.course) {
+  <div class="loading"></div>
+}
+
+@if (this.course) {
+  <div class="container course-detail-div">
+    <!--POST DIALOG-->
+    <div id="course-details-modal" class="modal my-modal-class course-details-modal" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions2">
+      @if (processingPost) {
+        <div class="loading"></div>
+      }
+      <div class="modal-content" [class.filtered]="processingPost">
+        <p class="p-bold-modal-header">{{this.postModalTitle}}</p>
+        @if (isCurrentPostMode(['1', '6'])) {
+          <h5>{{this.postModalEntry?.title}}</h5>
+        }
+        @if (isCurrentPostMode(['1', '6'])) {
+          <p>{{this.postModalCommentReplay?.message}}</p>
+        }
+        <div class="row no-margin">
+          <form materialize #courseDetailsForm id="courseDetailsForm" class="col s12" (ngSubmit)="onCourseDetailsSubmit(); courseDetailsForm.reset();">
+            <div class="row no-margin">
+              @if (isCurrentPostMode(['0', '2', '3', '4'])) {
+                <div class="row row-mobile">
+                  <div class="input-field col s12">
+                    <input [(ngModel)]="inputTitle" name="inputTitle" id="input-post-title" type="text" class="validate" autocomplete="off" required>
+                    @if (isCurrentPostMode(['0', '3'])) {
+                      <label for="inputTitle">Entry title</label>
+                    }
+                    @if (isCurrentPostMode(['2'])) {
+                      <label for="inputTitle">Session title</label>
+                    }
+                    @if (isCurrentPostMode(['4'])) {
+                      <label for="inputTitle">File group title</label>
+                    }
+                  </div>
+                </div>
+              }
+              @if (isCurrentPostMode(['0', '1', '2'])) {
+                <div class="row row-mobile">
+                  <div class="input-field col s12">
+                    <textarea maxlength="2500" [(ngModel)]="inputComment" name="inputComment" id="input-post-comment" class="materialize-textarea validate" required></textarea>
+                    @if (isCurrentPostMode(['0', '1'])) {
+                      <label for="inputComment">Write your comment here</label>
+                    }
+                    @if (isCurrentPostMode(['2'])) {
+                      <label for="inputComment">Description</label>
+                    }
+                  </div>
+                </div>
+              }
+              @if (isCurrentPostMode(['3', '6'])) {
+                <div class="row row-mobile">
+                  <div class="col s12 center-align">
+                    @if (!this.publisher) {
+                      <a (click)="recordVideo(this.getPublisherOptions('video'))" class="waves-effect waves-light btn">Record video</a>
+                    }
+                    @if (!this.publisherErrorMessage) {
+                      <div>
+                        <div id="record-form-div">
+                          @if (!!this.publisher) {
+                            <form>
+                              <input name="record-radio" type="radio" id="record-video" value="video" checked (change)="recordRadioChange($event)" [disabled]="!recordRadioEnabled"/>
+                              <label for="record-video">Video</label>
+                              <input name="record-radio" type="radio" id="record-audio" value="audio" (change)="recordRadioChange($event)" [disabled]="!recordRadioEnabled"/>
+                              <label for="record-audio">Audio</label>
+                              <input name="record-radio" type="radio" id="record-screen" value="screen" (change)="recordRadioChange($event)" [disabled]="!recordRadioEnabled"/>
+                              <label for="record-screen">Screen</label>
+                            </form>
+                          }
+                        </div>
+                        <div id="post-video"></div>
+                      </div>
+                    }
+                    @if (!!this.publisherErrorMessage) {
+                      <div id="record-error-div">
+                        <app-error-message (eventShowable)="cleanRecording()" [errorTitle]="'Error when initializing a Publisher!'" [errorContent]="publisherErrorMessage" [customClass]="'fail'" [closable]="true"></app-error-message>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              <div class="row no-margin">
+                <div class="col l6 m6 s6">
+                  @if (isCurrentPostMode(['2'])) {
+                    <div class="row">
+                      <label for="inputDate">Date</label>
+                      <div class="input-field col s12">
+                        <input [(ngModel)]="inputDate" name="inputDate" id="input-post-date" type="date" required>
+                      </div>
+                    </div>
+                  }
+                </div>
+                <div class="col l6 m6 s6">
+                  @if (isCurrentPostMode(['2'])) {
+                    <div class="row">
+                      <label for="inputTime">Time</label>
+                      <div class="input-field col s12">
+                        <input type="time" [(ngModel)]="inputTime" name="inputTime" id="input-post-time" class="validate" required>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+              @if (isCurrentPostMode(['5'])) {
+                <div class="row">
+                  <app-file-uploader (completeFileUpload)="filesUploadCompleted($event)" (uploadStarted)="filesUploadStarted($event)" [uniqueID]="1" [isMultiple]="true" [URLUPLOAD]="this.url_file_upload" [typeOfFile]="'files'" [buttonText]="'Select files'"></app-file-uploader>
+                </div>
+              }
+            </div>
+            <div class="row no-margin-bottom right-align">
+              @if (!isCurrentPostMode(['5'])) {
+                <a (click)="courseDetailsForm.reset(); this.cleanRecording()" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</a>
+              }
+              @if (isCurrentPostMode(['5'])) {
+                <a (click)="courseDetailsForm.reset(); this.uploaderModalService.announceUploaderClosed(true);" id="close-upload-modal-btn" class="modal-action modal-close waves-effect btn-flat modal-footer-button">Close</a>
+              }
+              @if (!isCurrentPostMode(['5', '3'])) {
+                <button id="post-modal-btn" type="submit" class="waves-effect btn-flat modal-footer-button">Send</button>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!--POST DIALOG-->
+    <!--PUT/DELETE DIALOG-->
+    @if (this.authenticationService.isTeacher()) {
+      <div id="put-delete-modal" class="modal my-modal-class course-details-modal" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions3">
+        @if (processingPut) {
+          <div class="loading"></div>
+        }
+        <div class="modal-content" [class.filtered]="processingPut">
+          <p class="p-bold-modal-header">{{this.putdeleteModalTitle}}</p>
+          <div class="row no-margin">
+            <form materialize #putDeleteForm class="col s12" (ngSubmit)="onPutDeleteSubmit(); putDeleteForm.reset(); this.allowSessionDeletion = false;">
+              @if (isCurrentPutdeleteMode(['0'])) {
+                <div class="row no-margin">
+                  <div class="row row-mobile">
+                    <label for="inputSessionTitle">Session title</label>
+                    <div class="input-field col s12">
+                      <input [(ngModel)]="inputSessionTitle" name="inputSessionTitle" id="input-put-title" type="text" class="validate" required>
+                    </div>
+                  </div>
+                  <div class="row row-mobile">
+                    <label for="inputSessionDescription">Description</label>
+                    <div class="input-field col s12">
+                      <textarea [(ngModel)]="inputSessionDescription" name="inputSessionDescription" id="input-put-comment" class="materialize-textarea validate" required></textarea>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col l6 m6 s6">
+                      <div class="row row-mobile">
+                        <label for="inputSessionDate">Date</label>
+                        <div class="input-field col s12">
+                          <input [(ngModel)]="this.updatedSessionDate" name="inputSessionDate" id="input-put-date" type="date" [value]="this.updatedSessionDate" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col l6 m6 s6">
+                      <div class="row row-mobile">
+                        <label for="inputSessionTime">Time</label>
+                        <div class="input-field col s12">
+                          <input [(ngModel)]="this.inputSessionTime" type="time" name="inputSessionTime" id="input-put-time" class="validate" [value]="this.inputSessionTime" required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+              @if (isCurrentPutdeleteMode(['1'])) {
+                <div class="row no-margin-lateral">
+                  <input #forumCheckbox type="checkbox" class="filled-in" id="forum-checkbox" name="forum-checkbox" (change)="this.allowForumEdition = forumCheckbox.checked"/>
+                  <label for="forum-checkbox" id="label-forum-checkbox">Allow forum {{this.checkboxForumEdition}}?</label>
+                </div>
+              }
+              @if (isCurrentPutdeleteMode(['2', '3'])) {
+                <div class="row no-margin">
+                  <div class="row">
+                    @if (isCurrentPutdeleteMode(['2'])) {
+                      <label for="inputFileTitle">File group title</label>
+                    }
+                    @if (isCurrentPutdeleteMode(['3'])) {
+                      <label for="inputFileTitle">File name</label>
+                    }
+                    <div class="input-field col s12">
+                      <input [(ngModel)]="inputFileTitle" name="inputFileTitle" id="input-file-title" type="text" class="validate" required>
+                    </div>
+                  </div>
+                </div>
+              }
+              @if (isCurrentPutdeleteMode(['4'])) {
+                <div id="tabs-attenders" class="row no-margin">
+                  <ul class="tabs">
+                    <li class="tab" (click)="attenderTabSelected=0" (keydown.enter)="attenderTabSelected=0"><a [class.active]="attenderTabSelected===0">SIMPLE</a></li>
+                    <li class="tab" (click)="attenderTabSelected=1" (keydown.enter)="attenderTabSelected=1"><a [class.active]="attenderTabSelected===1">MULTIPLE</a></li>
+                    <li class="tab" (click)="attenderTabSelected=2" (keydown.enter)="attenderTabSelected=2"><a [class.active]="attenderTabSelected===2">FILE UPLOAD</a></li>
+                  </ul>
+                  <div [hidden]="attenderTabSelected !== 0" class="row no-margin att-row-padding">
+                    <div class="input-field col s12">
+                      <input [(ngModel)]="inputAttenderSimple" name="inputAttenderSimple" id="input-attender-simple" type="email" class="validate" required>
+                      <label for="inputAttenderSimple">Attender email</label>
+                    </div>
+                  </div>
+                  <div [hidden]="attenderTabSelected !== 1" class="row no-margin att-row-padding">
+                    <i materialize="tooltip" class="material-icons tooltipped att-info-tooltip" data-position="right" data-delay="65" data-html="true" data-tooltip="<p class='att-tooltip-text'>We always separate by <b>WHITE SPACES</b><br>and <b>NEW LINES</b>. If there's any other<br>combination of characters that should<br>be taken into account as separator,<br>include it here</p>">info</i>
+                    <div class="input-field col l4 m4 s6">
+                      <input [(ngModel)]="inputAttenderSeparator" name="inputAttenderSeparator" id="input-attender-separator" type="text" class="validate">
+                      <label for="inputAttenderSeparator">SEPARATOR</label>
+                    </div>
+                    <div class="input-field col s12">
+                      <textarea maxlength="1500" [(ngModel)]="inputAttenderMultiple" name="inputAttenderMultiple" id="input-attender-multiple" class="materialize-textarea validate" required></textarea>
+                      <label for="inputAttenderMultiple">Attender emails</label>
+                    </div>
+                  </div>
+                  <div [hidden]="attenderTabSelected !== 2" class="row no-margin att-row-padding">
+                    <i id="tooltip-file" materialize="tooltip" class="material-icons tooltipped att-info-tooltip" data-position="right" data-delay="65" data-html="true" data-tooltip="<p class='att-tooltip-text'>We will automatically find and add<br>to the course all the <b>EMAILS</b> in the file</p>">info</i>
+                    <app-file-uploader (completeFileUpload)="fileReaderUploadCompleted($event)" (uploadStarted)="fileReaderUploadStarted($event)" [uniqueID]="2" [URLUPLOAD]="this.URL_FILE_READER_UPLOAD + this.course.id" [isMultiple]="false" [typeOfFile]="'file'" [buttonText]="'Upload file'"></app-file-uploader>
+                  </div>
+                </div>
+              }
+              <div class="row no-margin-bottom right-align">
+                @if (isCurrentPutdeleteMode(['0'])) {
+                  <div class="valign-wrapper delete-div">
+                    <a id="delete-session-btn" (click)="this.deleteSession(); putDeleteForm.reset(); this.allowSessionDeletion = false;" class="waves-effect btn-flat modal-footer-button float-to-left" [class.disabled]="!this.allowSessionDeletion">Delete</a>
+                    <div class="float-to-left">
+                      <input #deleteCheckbox type="checkbox" class="filled-in" id="delete-checkbox" name="delete-checkbox" (change)="this.allowSessionDeletion = deleteCheckbox.checked"/>
+                      <label for="delete-checkbox" id="label-delete-checkbox">Allow deletion?</label>
+                    </div>
+                  </div>
+                }
+                <a (click)="putDeleteForm.reset(); this.allowSessionDeletion = false; this.allowForumEdition = false; this.uploaderModalService.announceUploaderClosed(true);" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</a>
+                @if (!((this.putdeleteModalMode === 4) && (this.attenderTabSelected === 2))) {
+                  <button id="put-modal-btn" type="submit" class="waves-effect btn-flat modal-footer-button" [class.disabled]="isCurrentPutdeleteMode(['1']) && (!this.allowForumEdition)">Send</button>
+                }
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    }
+    <!--PUT/DELETE DIALOG-->
+    <div class="row valign-wrapper">
+      <div class="col l1 m1 s2 valign"><a id="back-to-dashboard-btn" routerLink="/courses" [title]="'Back to courses'" class="btn-floating"><i class="material-icons medium back-icon">arrow_back</i></a></div>
+      <div class="col l11 m11 s10 valign">
+        <h4 id="main-course-title" class="course-title">{{course.title}}</h4></div>
+      </div>
+      <!--TABS-->
+      <div id="tabs-course-details" class="row">
+        <!-- Tab header icons -->
+        <div class="col s12 no-padding-lateral">
+          <ul class="tabs tabs-fixed-width">
+            <li class="tab" id="md-tab-label-0-0" (click)="tabId=0; changeUrlTab(0)" (keydown.enter)="tabId=0; changeUrlTab(0)"><a [class.active]="tabId===0"><i id="info-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Course info">home</i></a></li>
+            <li class="tab" id="md-tab-label-0-1" (click)="tabId=1; changeUrlTab(1)" (keydown.enter)="tabId=1; changeUrlTab(1)"><a [class.active]="tabId===1"><i id="sessions-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Sessions">school</i></a></li>
+            <li class="tab" id="md-tab-label-0-2" (click)="tabId=2; changeUrlTab(2)" (keydown.enter)="tabId=2; changeUrlTab(2)"><a [class.active]="tabId===2"><i id="forum-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Forum">forum</i></a></li>
+            <li class="tab" id="md-tab-label-0-3" (click)="tabId=3; changeUrlTab(3)" (keydown.enter)="tabId=3; changeUrlTab(3)"><a [class.active]="tabId===3"><i id="files-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Files">description</i></a></li>
+            <li class="tab" id="md-tab-label-0-4" (click)="tabId=4; changeUrlTab(4)" (keydown.enter)="tabId=4; changeUrlTab(4)"><a [class.active]="tabId===4"><i id="attenders-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Attenders">supervisor_account</i></a></li>
+          </ul>
+        </div>
+        <!--Course Info Tab-->
+        @if (tabId===0) {
+          <div id="md-tab-content-0-0" class="md-tab-body md-tab-active">
+            @if (processingCourseInfo) {
+              <div class="loading"></div>
+            }
+            <div class="tab-template-content" [class.filtered]="processingCourseInfo">
+              <div class="row no-margin">
+                @if (this.authenticationService.isTeacher() && !this.welcomeTextEdition) {
+                  <a (click)="this.welcomeTextEdition = true" class="right" [title]="'Edit info'">
+                    <i id="edit-course-info" class="material-icons add-element-icon">edit</i>
+                  </a>
+                }
+              </div>
+              @if (!this.welcomeTextEdition && this.course.courseDetails.info) {
+                <div class="ql-editor ql-editor-custom" [innerHTML]="this.course.courseDetails.info"></div>
+              }
+              <div [hidden]="!this.welcomeTextEdition">
+                <div [hidden]="this.welcomeTextPreview">
+                  <p-editor [(ngModel)]="this.welcomeText" [style]="{'height':'320px'}"></p-editor>
+                </div>
+                <div [hidden]="!this.welcomeTextPreview">
+                  <div class="ql-editor ql-editor-custom" [innerHTML]="this.welcomeText"></div>
+                </div>
+                <div id="textEditorRowButtons" class="row no-margin-bottom right-align">
+                  <a (click)="this.closeUpdateCourseInfo()" class="waves-effect btn-flat modal-footer-button">Cancel</a>
+                  <button id="send-info-btn" (click)="this.updateCourseInfo(); this.closeUpdateCourseInfo()" class="waves-effect btn-flat modal-footer-button">Send</button>
+                  <a (click)="this.welcomeTextPreview = !this.welcomeTextPreview; this.previewButton = (this.welcomeTextPreview ? 'edit' : 'preview');" class="left waves-effect btn-flat modal-footer-button">{{this.previewButton}}</a>
+                </div>
+              </div>
+              @if (!this.course.courseDetails.info && !this.welcomeTextEdition) {
+                <div><app-error-message [errorTitle]="'There is no info yet'" [errorContent]="''" [customClass]="'warning'" [closable]="false"></app-error-message></div>
+              }
+            </div>
+          </div>
+          }<!--/Course Info Tab-->
+          <!--Sessions Tab-->
+          @if (tabId===1) {
+            <div id="md-tab-content-0-1" class="md-tab-body md-tab-active">
+              <div class="tab-template-content">
+                <div class="row no-margin">
+                  @if (this.authenticationService.isTeacher()) {
+                    <a href="#course-details-modal" (click)="updatePostModalMode(2, 'New session', null, null, null); this.animationService.animateIfSmall()" class="right" [title]="'New session'">
+                      <i id="add-session-icon" class="material-icons add-element-icon">add_circle_outline</i>
+                    </a>
+                  }
+                </div>
+                <ul>
+                  @for (session of this.course.sessions; track session; let last1 = $last) {
+                    <div>
+                      <li class="session-data">
+                        <div class="row no-margin">
+                          <div (click)="goToSessionVideo(session)" (keydown.enter)="goToSessionVideo(session)" [class.session-ready]="this.isSessionReady(session)" class="col l7 m6 s6">
+                            <div class="session-title">{{session.title}}</div>
+                            <div class="session-description">{{session.description}}</div>
+                          </div>
+                          <div class="col l4 m5 s5 right-align session-datetime">
+                            {{numberToDate(session.date) | date}} - {{numberToDate(session.date) | date:'HH:mm' }}
+                          </div>
+                          <div class="col l1 m1 s1 right-align no-padding-lateral">
+                            @if (this.authenticationService.isTeacher()) {
+                              <a href="#put-delete-modal" (click)="updatePutDeleteModalMode(0, 'Modify session'); this.changeUpdatedSession(session); this.animationService.animateIfSmall()" [title]="'Modify session'">
+                                <i class="edit-session-icon material-icons forum-icon">mode_edit</i>
+                              </a>
+                            }
+                          </div>
+                        </div>
+                      </li>
+                      @if (!last1) {
+                        <li><div class="divider"></div></li>
+                      }
+                    </div>
+                  }
+                </ul>
+                @if (this.course.sessions.length === 0) {
+                  <div><app-error-message [errorTitle]="'There are no sessions'" [errorContent]="''" [customClass]="'warning'" [closable]="false"></app-error-message></div>
+                }
+              </div>
+            </div>
+            }<!--/Sessions Tab-->
+            <!--Forum Tab-->
+            @if (tabId===2 && courseLoaded) {
+              <div id="md-tab-content-0-2" class="md-tab-body md-tab-active">
+                <div class="tab-template-content row no-margin" [class.tab-template-content-2]="!this.course.courseDetails?.forum.activated || !this.course.courseDetails?.forum.entries.length > 0">
+                  <!--Forum view-->
+                  <ul [class.hide]="this.fadeAnim === 'commentsShown'" class="entries-side-view row no-margin">
+                    @if (this.course.courseDetails?.forum.activated) {
+                      @for (entry of this.course.courseDetails?.forum.entries; track entry; let last2 = $last) {
+                        <li (mousedown)="this.fadeAnim = 'commentsHidden';" (click)="this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" (keydown.enter)="this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" class="entry-title waves-effect" [class.teacher-forum]="isEntryTeacher(entry)">
+                          <div class="row no-margin entry-row-sep">
+                            <div class="col l6 m6 s6">
+                              <span class="forum-entry-title">{{entry.title}}</span>
+                            </div>
+                            <div class="col l6 m6 s6 user-date-column">
+                              <div class="row no-margin">
+                                <div class="col l6 m6 s6 user-name forum-entry-author" [class.teacher-name]="isEntryTeacher(entry)">{{entry?.user?.nickName}}</div>
+                                <div class="col l6 m6 s6 user-name forum-entry-date">{{entry?.date | timeAgo}}</div>
+                              </div>
+                            </div>
+                          </div>
+                          @if (entry.comments.length > 0) {
+                            <div class="row no-margin last-comment-row">
+                              <div class="col">Last comment:</div>
+                              <div class="col">{{getLastEntryComment(entry)?.user?.nickName}}, {{getLastEntryComment(entry)?.date | timeAgo}}</div>
+                            </div>
+                          }
+                          @if (entry.comments.length === 0) {
+                            <div class="row no-margin last-comment-row">
+                              <div class="col">No comments</div>
+                            </div>
+                          }
+                        </li>
+                        @if (!last2) {
+                          <li><div class="divider"></div></li>
+                        }
+                      }
+                    }
+                    <div class="center-align div-entry-icon">
+                      @if (this.course.courseDetails?.forum.activated) {
+                        <a href="#course-details-modal" (click)="updatePostModalMode(0, 'New entry', null, null, null); this.animationService.animateIfSmall()" [title]="'New entry'">
+                          <i id="add-entry-icon" class="material-icons forum-icon">chat</i>
+                        </a>
+                      }
+                      @if (this.course.courseDetails?.forum.activated) {
+                        <a href="#course-details-modal" (click)="updatePostModalMode(3, 'New video entry', null, null, null); this.animationService.animateIfSmall()" [title]="'New videoentry'">
+                          <i id="add-videoentry-icon" class="material-icons forum-icon">videocam</i>
+                        </a>
+                      }
+                      @if (this.authenticationService.isTeacher()) {
+                        <a href="#put-delete-modal" (click)="updatePutDeleteModalMode(1, 'Activate/Deactivate forum'); this.animationService.animateIfSmall()" class="float-to-right" title="Activate/Deactivate forum">
+                          <i id="edit-forum-icon" class="material-icons forum-icon">mode_edit</i>
+                        </a>
+                      }
+                    </div>
+                  </ul>
+                  @if (this.course.courseDetails?.forum.activated && this.fadeAnim === 'commentsShown') {
+                    <div id="row-of-comments" class="row no-margin">
+                      <div class="row no-margin-lateral">
+                        <a (click)="this.fadeAnim = 'commentsHidden'" (keydown.enter)="this.fadeAnim = 'commentsHidden'" aria-label="Back to entries list"><i id="entries-sml-btn" class="material-icons center-align col l1 m1 s1 no-padding-lateral">arrow_back</i></a>
+                        <div class="col l10 m10 s10 no-padding-lateral">
+                          <div class="row no-margin comment-section-title">
+                            <div class="col l6 m6 s6">{{selectedEntry?.title}}</div>
+                            <div class="col l6 m6 s6 user-date-column">
+                              <div class="row no-margin">
+                                <div class="col l6 m6 s6 user-name">{{selectedEntry?.user.nickName}}</div>
+                                <div class="col l6 m6 s6 user-name">{{selectedEntry?.date | date}} - {{selectedEntry?.date | date:'H:mm' }}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col l1 m1 s1 no-padding-lateral right-align">
+                          <a href="#course-details-modal" [title]="'New comment'" (click)="updatePostModalMode(1, 'New comment', selectedEntry, null, null); this.postModalCommentReplay = null; this.animationService.animateIfSmall()">
+                            <i class="material-icons forum-icon">chat</i>
+                          </a>
+                          <a href="#course-details-modal" [title]="'New video comment'" (click)="updatePostModalMode(6, 'New video comment', selectedEntry, null, null); this.postModalCommentReplay = null; this.animationService.animateIfSmall()">
+                            <i class="material-icons forum-icon">videocam</i>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="row no-margin comments-col">
+                        @for (comment of this.selectedEntry?.comments; track comment; let last3 = $last) {
+                          <div class="comment-block" [class.comment-divider]="!last3">
+                            <app-comment [comment]="comment"></app-comment>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  <!--Forum view-->
+                  @if (!this.course.courseDetails?.forum.activated) {
+                    <div><app-error-message [errorTitle]="'The forum is not activated!'" [errorContent]="'The teacher must activate it before you can comment'" [customClass]="'warning'" [closable]="false"></app-error-message></div>
+                  }
+                  @if (this.course.courseDetails?.forum.activated && this.course.courseDetails?.forum.entries.length === 0) {
+                    <div><app-error-message [errorTitle]="'There are no entries yet'" [errorContent]="'Be the first one! Just click on the icon above'" [customClass]="'warning'" [closable]="false"></app-error-message></div>
+                  }
+                </div>
+              </div>
+              }<!--/Forum Tab-->
+              <!--Files Tab-->
+              @if (tabId===3) {
+                <div id="md-tab-content-0-3" class="md-tab-body md-tab-active">
+                  <div class="tab-template-content row no-margin">
+                    @if (this.authenticationService.isTeacher()) {
+                      <div class="row no-margin">
+                        @if (!allowFilesEdition) {
+                          <a href="#course-details-modal" (click)="updatePostModalMode(4, 'New file group', null, null, null); this.animationService.animateIfSmall()" class="right" [title]="'New file group'">
+                            <i id="add-files-icon" class="material-icons add-element-icon">add_circle_outline</i>
+                          </a>
+                        }
+                        @if (this.course.courseDetails.files.length > 0) {
+                          <button (click)="this.changeModeEdition()" class="btn-flat no-padding right" [title]="'Modify file groups'"><i class="material-icons add-element-icon">{{this.filesEditionIcon}}</i></button>
+                        }
+                      </div>
+                    }
+                    @for (fileG of this.course.courseDetails?.files; track fileG; let last4 = $last) {
+                      <div>
+                        <app-file-group [fileGroup]="fileG" [courseId]="this.course.id" [depth]="0"></app-file-group>
+                        @if (!last4) {
+                          <div class="divider"></div>
+                        }
+                      </div>
+                    }
+                    @if (this.course.courseDetails?.files.length === 0) {
+                      <div><app-error-message [errorTitle]="'There are no files associated'" [errorContent]="'Need something? Just open an entry on the forum'" [customClass]="'warning'" [closable]="false"></app-error-message></div>
+                    }
+                  </div>
+                </div>
+                }<!--/Files Tab-->
+                <!--Attenders Tab-->
+                @if (tabId===4) {
+                  <div id="md-tab-content-0-4" class="md-tab-body md-tab-active">
+                    <div class="tab-template-content">
+                      @if (this.authenticationService.isTeacher()) {
+                        <div class="row no-margin">
+                          @if (!this.allowAttendersEdition) {
+                            <a  href="#put-delete-modal" (click)="updatePutDeleteModalMode(4, 'Add attenders'); this.animationService.animateIfSmall()" class="right" [title]="'Add attenders'">
+                              <i id="add-attenders-icon" class="material-icons add-element-icon">add_circle_outline</i>
+                            </a>
+                          }
+                          @if (this.course.attenders.length > 1) {
+                            <button (click)="this.changeModeAttenders()" id="edit-attenders-icon" class="btn-flat no-padding right" [title]="'Modify attenders'"><i class="material-icons add-element-icon">{{this.attendersEditionIcon}}</i></button>
+                          }
+                        </div>
+                      }
+                      @if (addAttendersCorrect) {
+                        <app-error-message (eventShowable)="addAttendersCorrect = false" [errorTitle]="attCorrectTitle" [errorContent]="attCorrectContent" [customClass]="'correct'" [closable]="true"></app-error-message>
+                      }
+                      @if (addAttendersError) {
+                        <app-error-message (eventShowable)="addAttendersError = false" [errorTitle]="attErrorTitle" [errorContent]="attErrorContent" [customClass]="'fail'" [closable]="true"></app-error-message>
+                      }
+                      <div class="row no-margin valign-wrapper user-attender-row attender-row-div">
+                        <div class="col l2 m2 s3 valign attender-col">
+                          <img materialize="materialbox" class="circle materialboxed userImage" src={{this.authenticationService.getCurrentUser().picture}} alt="Your profile">
+                        </div>
+                        <div class="col l5 m5 s9 valign attender-col">
+                          <p class="attender-name-p">{{this.authenticationService.getCurrentUser().nickName}}</p>
+                        </div>
+                      </div>
+                      @for (attender of this.course.attenders; track attender; let j = $index) {
+                        <div>
+                          @if (attender.id != this.authenticationService.getCurrentUser().id) {
+                            <div class="row no-margin valign-wrapper attender-row-div">
+                              <div class="col l2 m2 s3 valign attender-col">
+                                <img materialize="materialbox" class="circle materialboxed userImage" src={{attender.picture}} [alt]="attender.nickName">
+                              </div>
+                              <div class="col l9 l9 s7 no-margin-left">
+                                <div class="row no-margin">
+                                  <div class="col l6 m6 s12 no-padding-lateral valign attender-col">
+                                    <p class="p-nickName">{{attender?.nickName}}</p>
+                                  </div>
+                                  <div class="col l6 m6 s12 no-padding-lateral valign attender-col">
+                                    <p class="p-name">{{attender?.name}}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              @if (this.allowAttendersEdition && this.authenticationService.isTeacher() && !this.arrayOfAttDels[j]) {
+                                <button (click)="deleteAttender(attender, j)" class="btn-flat no-padding" [title]="'Remove ' + attender.nickName"><i class="material-icons del-attender-icon">clear</i></button>
+                              }
+                              @if (this.allowAttendersEdition && this.authenticationService.isTeacher() && this.arrayOfAttDels[j]) {
+                                <i class="material-icons del-attender-icon rotating">cached</i>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  }<!--/Attenders Tab-->
+                </div>
+                <!--TABS-->
+              </div>
+            }

@@ -1,0 +1,19 @@
+<div id="sticky-footer-div">
+
+  @if (!isVideoSessionUrl()) {
+    <header>
+      <navbar></navbar>
+    </header>
+  }
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+
+  @if (!isVideoSessionUrl()) {
+    <footer class="page-footer secondaryColor-back">
+      <app-footer></app-footer>
+    </footer>
+  }
+
+</div>

@@ -1,0 +1,100 @@
+@if (this.authenticationService.isLoggedIn()) {
+  <div id="video-session-div">
+    <a id="side-menu-button" materialize="sideNav" data-activates="slide-out" [materializeParams]="[{draggable: false}]"><i id="fixed-icon" class="material-icons video-icon" (onclick)="document.getElementsByTagName('body')[0].style.overflowY = 'hidden'">menu</i></a>
+    <div id="div-header-buttons" class="row no-margin">
+      <div class="col s12 m12 l12 no-padding-right"><a class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="toggleFullScreen()"><i class="material-icons">{{fullscreenIcon}}</i></a></div>
+      <div class="col s12 m12 l12 no-padding-right">@if (this.authenticationService.isStudent() && !this.myStudentAccessGranted) {
+        <a class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="askForIntervention()"><i class="material-icons">{{interventionIcon}}</i></a>
+      }</div>
+      @if (this.authenticationService.isTeacher()) {
+        <div class="row no-margin">
+          @for (userData of this.userData | interventionAskedFilter ; track userData; let i = $index) {
+            <div class="col s12 m12 l12 no-padding-right">
+              @if (!studentAccessGranted || userData.accessGranted) {
+                <a  materialize="tooltip" data-position="left" data-delay="65" [attr.data-tooltip]="userData.name" class="btn-floating btn-large waves-effect floating-button white usr-btn" (click)="grantIntervention(!studentAccessGranted, userData)" [style.border-color]="userData.color">
+                  @if (this.studentAccessGranted) {
+                    <i class="material-icons" [style.color]="userData.color">cancel</i>
+                  }
+                  @if (!this.studentAccessGranted) {
+                    <img class="circle responsive-img" [src]="userData.picture" [alt]="userData.name">
+                  }
+                </a>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+    @if (OVSession) {
+      <div>
+        <div class="session-title-div">
+          <h2 id="session-title">{{this.sessionName}}</h2>
+        </div>
+        <div>
+          @if (bigStream) {
+            <stream [stream]="bigStream" [small]="false" [muted]="(this.authenticationService.isTeacher() && !studentAccessGranted) || (!this.authenticationService.isTeacher() && myStudentAccessGranted)"></stream>
+          }
+          @if (smallStream && studentAccessGranted) {
+            <stream [stream]="smallStream" [small]="true" [muted]="this.authenticationService.isTeacher()"></stream>
+          }
+        </div>
+        <div class="session-bottom-div valign-wrapper" (mouseenter)="this.controlsShown = true"  (mouseleave)="this.controlsShown = false">
+          <div id="div-video-control" [class.div-video-control-shown]="this.playPauseIcon==='play_arrow'" [class.fade-in-controls]="this.controlsShown" [class.fade-out-controls]="!this.controlsShown">
+            <div class="box-video-control">
+              <a class="btn-floating waves-effect video-control" (click)="togglePlayPause()">
+                <i class="material-icons video-control-icon">{{this.playPauseIcon}}</i>
+              </a>
+              <a class="btn-floating waves-effect video-control" (click)="toggleMute()">
+                <i class="material-icons video-control-icon">{{this.volumeMuteIcon}}</i>
+              </a>
+              <input id="slider-volume" name="slider-volume" type="range" min="0" max="1" step="0.01" [(ngModel)]="this.volumeLevel" (ngModelChange)="changeVolume($event)"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    <ul id="slide-out" class="side-nav">
+      <button (click)="this.exitFromSession()" id="exit-icon" class="right side-nav-btn" aria-label="Exit"><i class="material-icons video-icon" aria-hidden="true">exit_to_app</i></button>
+      <button (click)="changeShowChat()" id="show-chat-icon" class="left side-nav-btn" [attr.aria-label]="showChat ? 'Show attenders' : 'Show chat'"><i class="material-icons video-icon" aria-hidden="true">{{this.showChatIcon}}</i></button>
+      <div class="chat_wrapper">
+        @if (showChat) {
+          <div id="message-box-cont">
+            <div class="message_box" id="message_box">
+              @for (chatline of this.chatLines; track chatline) {
+                <div>
+                  <app-chat-line [chatLine]="chatline"></app-chat-line>
+                </div>
+              }
+            </div>
+            <div class="panel">
+              <form (ngSubmit)="sendChatMessage()">
+                <input [(ngModel)]="myMessage" type="text" name="message" id="message" placeholder="Message" maxlength="400" autocomplete="off"/>
+                @if (this.myMessage) {
+                  <input type="submit" id="send-btn" class="btn waves-effect button-small" value="Send">
+                }
+                @if (!this.myMessage) {
+                  <a id="fake-send-btn" class="btn waves-effect button-small disabled">Send</a>
+                }
+              </form>
+            </div>
+          </div>
+        }
+        @if (!showChat) {
+          <div>
+            <div class="num-attenders-div">
+              <span class="num-connected">{{this.userData.length}}</span>
+              of
+              <span class="num-total">{{this.course.attenders.length}}</span>
+              attenders connected
+            </div>
+            @for (user of this.userData; track user) {
+              <div class="attender-name" [style.color]="user.color">
+                {{user.name}}
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </ul>
+  </div>
+}
