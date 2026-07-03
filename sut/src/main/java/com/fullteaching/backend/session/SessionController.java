@@ -38,15 +38,7 @@ public class SessionController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            log.error("Session ID '{}' is not of type Long", id);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course course = courseRepository.findById(idI).orElse(null);
+        Course course = courseRepository.findById(Long.parseLong(id)).orElse(null);
         if (course == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -116,15 +108,7 @@ public class SessionController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            log.error("Session ID '{}' is not of type Long", id);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Session session = sessionRepository.findById(idI).orElse(null);
+        Session session = sessionRepository.findById(Long.parseLong(id)).orElse(null);
         assert session != null;
         ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(session, session.getCourse().getTeacher());
         if (teacherAuthorized != null) { // If the user is not the teacher of the course
@@ -137,7 +121,7 @@ public class SessionController {
                 log.info("Deleting session: {}", session);
 
                 course.getSessions().remove(session);
-                sessionRepository.deleteById(idI);
+                sessionRepository.deleteById(session.getId());
                 courseRepository.save(course);
 
                 log.info("Session successfully deleted");

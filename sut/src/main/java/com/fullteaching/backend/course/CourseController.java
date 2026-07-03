@@ -1,7 +1,7 @@
 package com.fullteaching.backend.course;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fullteaching.backend.course.Course.SimpleCourseList;
+import com.fullteaching.backend.course.AbstractCourseData.SimpleCourseList;
 import com.fullteaching.backend.coursedetails.CourseDetails;
 import com.fullteaching.backend.security.AuthorizationService;
 import com.fullteaching.backend.user.User;
@@ -26,20 +26,22 @@ import java.util.Set;
 public class CourseController {
 
     private static final Logger log = LoggerFactory.getLogger(CourseController.class);
-    private static final String COURSE_ID_NOT_LONG = "Course ID '{}' is not of type Long";
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final ObjectProvider<UserComponent> userProvider;
     private final AuthorizationService authorizationService;
+    private final CourseAttenderService courseAttenderService;
 
     public CourseController(CourseRepository courseRepository, UserRepository userRepository,
                             ObjectProvider<UserComponent> userProvider,
-                            AuthorizationService authorizationService) {
+                            AuthorizationService authorizationService,
+                            CourseAttenderService courseAttenderService) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
         this.userProvider = userProvider;
         this.authorizationService = authorizationService;
+        this.courseAttenderService = courseAttenderService;
     }
 
     @JsonView(SimpleCourseList.class)
@@ -53,13 +55,7 @@ public class CourseController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            log.error(COURSE_ID_NOT_LONG, id);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        long idI = Long.parseLong(id);
         Set<Long> s = new HashSet<>();
         s.add(idI);
         Collection<User> users = userRepository.findAllById(s);
@@ -80,14 +76,7 @@ public class CourseController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            log.error(COURSE_ID_NOT_LONG, id);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        Course course = courseRepository.findById(idI).orElse(null);
+        Course course = courseRepository.findById(Long.parseLong(id)).orElse(null);
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
@@ -138,11 +127,7 @@ public class CourseController {
         }
 
         Course c = courseRepository.findById(courseDto.getId()).orElse(null);
-        if (c == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
         if (teacherAuthorized != null) {
             return teacherAuthorized;
         }
@@ -173,20 +158,8 @@ public class CourseController {
             return authorized;
         }
 
-        long idCourse = -1;
-        try {
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error(COURSE_ID_NOT_LONG, courseId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-        if (c == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
         if (teacherAuthorized != null) {
             return teacherAuthorized;
         }
@@ -212,20 +185,8 @@ public class CourseController {
             return authorized;
         }
 
-        long idCourse = -1;
-        try {
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error(COURSE_ID_NOT_LONG, courseId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-        if (c == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
         if (teacherAuthorized != null) {
             return teacherAuthorized;
         }
@@ -243,27 +204,11 @@ public class CourseController {
             (emailValidator.isValid(attenderEmail) ? attenderEmailsValid : attenderEmailsInvalid).add(attenderEmail);
         }
 
-        Collection<User> newPossibleAttenders = userRepository.findByNameIn(attenderEmailsValid);
-        Collection<User> newAddedAttenders = new HashSet<>();
-        Collection<User> alreadyAddedAttenders = new HashSet<>();
-
-        for (String s : attenderEmailsValid) {
-            if (!this.userListContainsEmail(newPossibleAttenders, s)) {
-                attenderEmailsNotRegistered.add(s);
-            }
-        }
-
-        for (User attender : newPossibleAttenders) {
-            (updateAttenderCourseRelationship(c, attender) ? newAddedAttenders : alreadyAddedAttenders).add(attender);
-        }
-
-        //Saving the attenders (all of them, just in case a field of the bidirectional relationship is missing in a Course or a User)
-        userRepository.saveAll(newPossibleAttenders);
-        //Saving the modified course
-        courseRepository.save(c);
+        CourseAttenderService.AttenderUpdateResult result =
+                courseAttenderService.updateAttenders(c, attenderEmailsValid, attenderEmailsNotRegistered);
 
         AddAttendersResponse customResponse = new AddAttendersResponse(
-                newAddedAttenders, alreadyAddedAttenders, attenderEmailsInvalid, attenderEmailsNotRegistered);
+                result.added(), result.alreadyAdded(), attenderEmailsInvalid, attenderEmailsNotRegistered);
 
         if (log.isInfoEnabled()) {
             log.info("Attenders added: {} | Attenders already exist: {} | Emails not valid: {} | Emails valid but no registered: {}",
@@ -287,11 +232,7 @@ public class CourseController {
         }
 
         Course c = courseRepository.findById(courseDto.getId()).orElse(null);
-        if (c == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
         if (teacherAuthorized != null) {
             return teacherAuthorized;
         }
@@ -307,31 +248,6 @@ public class CourseController {
         //Saving the modified course
         courseRepository.save(c);
         return new ResponseEntity<>(c.getAttenders(), HttpStatus.OK);
-    }
-
-    private boolean updateAttenderCourseRelationship(Course c, User attender) {
-        boolean isNew = true;
-        if (!attender.getCourses().contains(c)) {
-            attender.getCourses().add(c);
-        } else {
-            isNew = false;
-        }
-        if (!c.getAttenders().contains(attender)) {
-            c.getAttenders().add(attender);
-        } else {
-            isNew = false;
-        }
-        return isNew;
-    }
-
-    //Checks if a User collection contains a user with certain email
-    private boolean userListContainsEmail(Collection<User> users, String email) {
-        for (User u : users) {
-            if (u.getName().equals(email)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private record AddAttendersResponse(Collection<User> attendersAdded, Collection<User> attendersAlreadyAdded,

@@ -10,16 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Course {
+public class Course extends AbstractCourseData {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonView(SimpleCourseList.class)
-    private long id;
-    @JsonView(SimpleCourseList.class)
-    private String title;
-    @JsonView(SimpleCourseList.class)
-    private String image;
     @ManyToOne
     private User teacher;
     @OneToOne(cascade = CascadeType.ALL)
@@ -34,12 +26,7 @@ public class Course {
     }
 
     public Course(String title, String image, User teacher) {
-        this.title = title;
-        this.image = image;
-        this.teacher = teacher;
-        this.courseDetails = null;
-        this.sessions = new HashSet<>();
-        this.attenders = new HashSet<>();
+        this(title, image, teacher, null);
     }
 
     public Course(String title, String image, User teacher, CourseDetails courseDetails) {
@@ -49,30 +36,6 @@ public class Course {
         this.courseDetails = courseDetails;
         this.sessions = new HashSet<>();
         this.attenders = new HashSet<>();
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public User getTeacher() {
@@ -107,6 +70,16 @@ public class Course {
         this.sessions = sessions;
     }
 
+    /**
+     * Adds an attender to this course and maintains the bidirectional relationship.
+     * Returns true if the attender was not already present on both sides.
+     */
+    public boolean addAttender(User attender) {
+        boolean addedToCourse = this.attenders.add(attender);
+        boolean addedToUser = attender.getCourses().add(this);
+        return addedToCourse && addedToUser;
+    }
+
     //To make 'user.getCourse().remove(course)' possible
     @Override
     public boolean equals(Object other) {
@@ -124,8 +97,5 @@ public class Course {
     @Override
     public String toString() {
         return "Course[title: \"" + this.title + "\", teacher: \"" + this.teacher.getNickName() + "\", #attenders: " + this.attenders.size() + ", #sessions: " + this.sessions.size() + "]";
-    }
-
-    public interface SimpleCourseList {
     }
 }

@@ -1,5 +1,6 @@
 package com.fullteaching.backend.security;
 
+import com.fullteaching.backend.course.Course;
 import com.fullteaching.backend.user.User;
 import com.fullteaching.backend.user.UserComponent;
 import org.slf4j.Logger;
@@ -27,6 +28,11 @@ public class AuthorizationService {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         return null;
+    }
+
+    /** Checks that the logged user is the teacher of the given course (null course → NOT_FOUND). */
+    public ResponseEntity<Object> checkTeacherAuthorization(Course course) {
+        return checkAuthorization(course, course != null ? course.getTeacher() : null);
     }
 
     // Checks authorization of teacher

@@ -14,7 +14,6 @@ import com.fullteaching.backend.util.LogSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,9 +33,6 @@ public class FileGroupController {
     private final CourseDetailsRepository courseDetailsRepository;
     private final AuthorizationService authorizationService;
     private final FileOperationsService fileOperationsService;
-
-    @Value("${profile.stage}")
-    private String profileStage;
 
     @Autowired
     public FileGroupController(FileOperationsService fileOperationsServ, AuthorizationService authServ, CourseDetailsRepository courseDetRepo, CourseRepository courseRepo, FileRepository fileRepo, FileGroupRepository fileGroupRepo) {
@@ -58,14 +54,7 @@ public class FileGroupController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(courseDetailsId);
-        } catch (NumberFormatException e) {
-            log.error("CourseDetails ID '{}' is not of type Long", courseDetailsId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+        long idI = Long.parseLong(courseDetailsId);
         CourseDetails cd = courseDetailsRepository.findById(idI).orElse(null);
 
         assert cd != null;
@@ -130,40 +119,22 @@ public class FileGroupController {
             return authorized;
         }
 
-        long idCourse = -1;
-        try {
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' is not of type Long", courseId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-
-        assert c != null;
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
-        if (teacherAuthorized != null) { // If the user is not the teacher of the course
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
+        if (teacherAuthorized != null) {
             return teacherAuthorized;
-        } else {
-
-            FileGroup fg = fileGroupRepository.findById(fileGroupDto.getId()).orElse(null);
-
-            if (fg != null) {
-
-                log.info("Updating filegroup. Previous value: {}", fg);
-
-                fg.setTitle(fileGroupDto.getTitle());
-                fileGroupRepository.save(fg);
-
-                log.info("FileGroup succesfully updated. Modified value: {}", fg);
-
-                //Returning the root FileGroup of the added file
-                return new ResponseEntity<>(this.getRootFileGroup(fg), HttpStatus.OK);
-            } else {
-                log.error("FileGroup with id '{}' doesn't exist", fileGroupDto.getId());
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
         }
+
+        FileGroup fg = fileGroupRepository.findById(fileGroupDto.getId()).orElse(null);
+        if (fg != null) {
+            log.info("Updating filegroup. Previous value: {}", fg);
+            fg.setTitle(fileGroupDto.getTitle());
+            fileGroupRepository.save(fg);
+            log.info("FileGroup succesfully updated. Modified value: {}", fg);
+            return new ResponseEntity<>(fg.findRoot(), HttpStatus.OK);
+        }
+        log.error("FileGroup with id '{}' doesn't exist", fileGroupDto.getId());
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 
@@ -175,37 +146,16 @@ public class FileGroupController {
 
         log.info("CRUD operation: Deleting filegroup");
 
-        ResponseEntity<Object> authorized = authorizationService.checkBackendLogged();
-        if (authorized != null) {
-            return authorized;
-        }
-
-        long idFileGroup = -1;
-        long idCourse = -1;
-        try {
-            idFileGroup = Long.parseLong(fileGroupId);
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or FileGroup ID '{}' are not of type Long", courseId, fileGroupId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-
-        assert c != null;
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
-        if (teacherAuthorized != null) { // If the user is not the teacher of the course
-            return teacherAuthorized;
-        }
-
-        FileGroup fg = fileGroupRepository.findById(idFileGroup).orElse(null);
+        FileGroupAuth auth = authorizeAndFetchGroup(fileGroupId, courseId);
+        if (auth.error() != null) return auth.error();
+        Course c = auth.course();
+        FileGroup fg = auth.fileGroup();
 
         if (fg != null) {
 
             log.info("Deleting filegroup: {}", fg);
 
-            if (this.isProductionStage()) {
+            if (fileOperationsService.isProductionStage()) {
                 //Removing all the S3 stored files of the tree structure...
                 for (File f : fg.getFiles()) {
                     fileOperationsService.deleteRemoteFile(f.getNameIdent(), "/files");
@@ -250,55 +200,35 @@ public class FileGroupController {
             return authorized;
         }
 
-        long idCourse = -1;
-        long idFile = -1;
-        long idSource = -1;
-        long idTarget = -1;
-        int pos = 0;
-        try {
-            idCourse = Long.parseLong(courseId);
-            idFile = Long.parseLong(fileId);
-            idSource = Long.parseLong(sourceId);
-            idTarget = Long.parseLong(targetId);
-            pos = Integer.parseInt(position);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or File ID '{}' or source ID '{}' or target ID '{}' are not of type Long; or position {} is not of type Integer",
-                    courseId, fileId, sourceId, targetId, pos);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-
-        assert c != null;
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
-        if (teacherAuthorized != null) { // If the user is not the teacher of the course
+        long idFile = Long.parseLong(fileId);
+        long idSource = Long.parseLong(sourceId);
+        long idTarget = Long.parseLong(targetId);
+        int pos = Integer.parseInt(position);
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
+        if (teacherAuthorized != null) {
             return teacherAuthorized;
-        } else {
-
-            FileGroup sourceFg = fileGroupRepository.findById(idSource).orElse(null);
-            FileGroup targetFg = fileGroupRepository.findById(idTarget).orElse(null);
-            File fileMoved = fileRepository.findById(idFile).orElse(null);
-
-            log.info("Moving file {} from filegroup {} to filegroup {} into position {}", fileMoved, sourceFg, targetFg, pos);
-
-            assert sourceFg != null;
-            assert targetFg != null;
-            sourceFg.getFiles().remove(fileMoved);
-            targetFg.getFiles().add(pos, fileMoved);
-
-            sourceFg.updateFileIndexOrder();
-            targetFg.updateFileIndexOrder();
-
-            List<FileGroup> l = new ArrayList<>();
-            l.add(sourceFg);
-            l.add(targetFg);
-            fileGroupRepository.saveAll(l);
-
-            log.info("File order succesfully updated");
-
-            //Returning the FileGroups of the course
-            return new ResponseEntity<>(c.getCourseDetails().getFiles(), HttpStatus.OK);
         }
+
+        FileGroup sourceFg = fileGroupRepository.findById(idSource).orElse(null);
+        FileGroup targetFg = fileGroupRepository.findById(idTarget).orElse(null);
+        File fileMoved = fileRepository.findById(idFile).orElse(null);
+
+        log.info("Moving file {} from filegroup {} to filegroup {} into position {}", fileMoved, sourceFg, targetFg, pos);
+
+        assert sourceFg != null;
+        assert targetFg != null;
+        sourceFg.getFiles().remove(fileMoved);
+        targetFg.getFiles().add(pos, fileMoved);
+
+        sourceFg.updateFileIndexOrder();
+        targetFg.updateFileIndexOrder();
+
+        fileGroupRepository.saveAll(List.of(sourceFg, targetFg));
+
+        log.info("File order succesfully updated");
+
+        return new ResponseEntity<>(c.getCourseDetails().getFiles(), HttpStatus.OK);
     }
 
 
@@ -310,53 +240,24 @@ public class FileGroupController {
 
         log.info("CRUD operation: Updating file");
 
-        ResponseEntity<Object> authorized = authorizationService.checkBackendLogged();
-        if (authorized != null) {
-            return authorized;
-        }
-
-        long idFileGroup = -1;
-        long idCourse = -1;
-        try {
-            idFileGroup = Long.parseLong(fileGroupId);
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or FileGroup ID '{}' are not of type Long", courseId, fileGroupId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-
-        assert c != null;
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
-        if (teacherAuthorized != null) { // If the user is not the teacher of the course
-            return teacherAuthorized;
-        } else {
-
-            FileGroup fg = fileGroupRepository.findById(idFileGroup).orElse(null);
-
-            if (fg != null) {
-                for (int i = 0; i < fg.getFiles().size(); i++) {
-                    if (fg.getFiles().get(i).getId() == fileDto.getId()) {
-
-                        log.info("Updating file. Previous value: {}", fg.getFiles().get(i));
-
-                        fg.getFiles().get(i).setName(fileDto.getName());
-                        fileGroupRepository.save(fg);
-
-                        log.info("File succesfully updated. Modified value: {}", fg.getFiles().get(i));
-
-                        //Returning the root FileGroup of the added file
-                        return new ResponseEntity<>(this.getRootFileGroup(fg), HttpStatus.OK);
-                    }
+        FileGroupAuth auth = authorizeAndFetchGroup(fileGroupId, courseId);
+        if (auth.error() != null) return auth.error();
+        FileGroup fg = auth.fileGroup();
+        if (fg != null) {
+            for (int i = 0; i < fg.getFiles().size(); i++) {
+                if (fg.getFiles().get(i).getId() == fileDto.getId()) {
+                    log.info("Updating file. Previous value: {}", fg.getFiles().get(i));
+                    fg.getFiles().get(i).setName(fileDto.getName());
+                    fileGroupRepository.save(fg);
+                    log.info("File succesfully updated. Modified value: {}", fg.getFiles().get(i));
+                    return new ResponseEntity<>(fg.findRoot(), HttpStatus.OK);
                 }
-
-                log.error("File not found");
-            } else {
-                log.error("FileGroup not found");
             }
-            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+            log.error("File not found");
+        } else {
+            log.error("FileGroup not found");
         }
+        return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
 
@@ -374,23 +275,11 @@ public class FileGroupController {
             return authorized;
         }
 
-        long idFile = -1;
-        long idFileGroup = -1;
-        long idCourse = -1;
-        try {
-            idFile = Long.parseLong(fileId);
-            idFileGroup = Long.parseLong(fileGroupId);
-            idCourse = Long.parseLong(courseId);
-        } catch (NumberFormatException e) {
-            log.error("Course ID '{}' or FileGroup ID '{}' or File ID '{}' are not of type Long", courseId, fileGroupId, fileId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Course c = courseRepository.findById(idCourse).orElse(null);
-
-        assert c != null;
-        ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(c, c.getTeacher());
-        if (teacherAuthorized != null) { // If the user is not the teacher of the course
+        long idFile = Long.parseLong(fileId);
+        long idFileGroup = Long.parseLong(fileGroupId);
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> teacherAuthorized = authorizationService.checkTeacherAuthorization(c);
+        if (teacherAuthorized != null) {
             return teacherAuthorized;
         }
 
@@ -402,7 +291,7 @@ public class FileGroupController {
 
                 log.info("Deleting file: {}", file);
 
-                if (this.isProductionStage()) {
+                if (fileOperationsService.isProductionStage()) {
                     //ONLY ON PRODUCTION
                     //Deleting S3 stored file...
                     fileOperationsService.deleteRemoteFile(file.getNameIdent(), "/files");
@@ -435,6 +324,21 @@ public class FileGroupController {
         }
     }
 
+    private record FileGroupAuth(ResponseEntity<Object> error, Course course, FileGroup fileGroup) {}
+
+    /** Combines login check, teacher authorization and FileGroup fetch for course/{courseId} endpoints. */
+    private FileGroupAuth authorizeAndFetchGroup(String fileGroupId, String courseId) {
+        ResponseEntity<Object> logged = authorizationService.checkBackendLogged();
+        if (logged != null) return new FileGroupAuth(logged, null, null);
+
+        Course c = courseRepository.findById(Long.parseLong(courseId)).orElse(null);
+        ResponseEntity<Object> authz = authorizationService.checkTeacherAuthorization(c);
+        if (authz != null) return new FileGroupAuth(authz, null, null);
+
+        FileGroup fg = fileGroupRepository.findById(Long.parseLong(fileGroupId)).orElse(null);
+        return new FileGroupAuth(null, c, fg);
+    }
+
     private File findFileInGroup(FileGroup fg, long idFile) {
         for (File f : fg.getFiles()) {
             if (f.getId() == idFile) {
@@ -442,18 +346,6 @@ public class FileGroupController {
             }
         }
         return null;
-    }
-
-    //Method to get the root FileGroup of a FileGroup tree structure, given a FileGroup
-    private FileGroup getRootFileGroup(FileGroup fg) {
-        while (fg.getFileGroupParent() != null) {
-            fg = fg.getFileGroupParent();
-        }
-        return fg;
-    }
-
-    private boolean isProductionStage() {
-        return this.profileStage.equals("prod");
     }
 
 }

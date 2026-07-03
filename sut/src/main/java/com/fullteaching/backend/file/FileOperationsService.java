@@ -24,12 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
 public class FileOperationsService {
 
     private static final Logger log = LoggerFactory.getLogger(FileOperationsService.class);
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private static final String LOG_ERROR_MESSAGE    = "Error Message:    {}";
     private static final String LOG_HTTP_STATUS_CODE = "HTTP Status Code: {}";
@@ -43,9 +45,16 @@ public class FileOperationsService {
     @Value("${aws.namecard.bucket}")
     private String bucketAWS;
 
+    @Value("${profile.stage}")
+    private String profileStage;
+
     @Autowired(required = false)
     public FileOperationsService(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
+    }
+
+    public boolean isProductionStage() {
+        return "prod".equals(profileStage);
     }
 
     public String getBucketAWS() {
@@ -57,8 +66,6 @@ public class FileOperationsService {
         if (log.isInfoEnabled()) {
             log.info("Deleting local temp file '{}'", LogSanitizer.sanitize(path));
         }
-        // Deleting stored file...
-
         Path o1 = Paths.get(folder.toString());
         try {
             Files.delete(path);
@@ -70,7 +77,6 @@ public class FileOperationsService {
         } catch (DirectoryNotEmptyException x) {
             log.error("Directory '{}' not empty", o1);
         } catch (IOException x) {
-            // File permission problems are caught here
             log.error("Permission error: {}", x.toString());
         }
     }
@@ -82,15 +88,9 @@ public class FileOperationsService {
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
             log.info("S3 DELETION: File '{}' successfully deleted", fileName);
         } catch (AmazonServiceException ase) {
-            log.info("Caught an AmazonServiceException.");
-            log.info(LOG_ERROR_MESSAGE, ase.getMessage());
-            log.info(LOG_HTTP_STATUS_CODE, ase.getStatusCode());
-            log.info(LOG_AWS_ERROR_CODE, ase.getErrorCode());
-            log.info(LOG_ERROR_TYPE, ase.getErrorType());
-            log.info(LOG_REQUEST_ID, ase.getRequestId());
+            logAmazonServiceException(ase);
         } catch (AmazonClientException ace) {
-            log.info("Caught an AmazonClientException.");
-            log.info(LOG_CLIENT_ERROR_MSG, ace.getMessage());
+            logAmazonClientException(ace);
         }
     }
 
@@ -120,15 +120,11 @@ public class FileOperationsService {
     }
 
     public void productionFileSaver(String keyName, String folderName, File f) throws InterruptedException {
-
         log.info("Uploading an object to S3");
-
         String bucketName = bucketAWS + "/" + folderName;
         TransferManager tm = TransferManagerBuilder.standard().withS3Client(amazonS3).build();
-        // TransferManager processes all transfers asynchronously, so this call will return immediately
         Upload upload = tm.upload(bucketName, keyName, f);
         try {
-            // Or you can block and wait for the upload to finish
             upload.waitForCompletion();
             log.info("Upload completed");
         } catch (AmazonClientException amazonClientException) {
@@ -152,14 +148,10 @@ public class FileOperationsService {
 
         } catch (AmazonServiceException ase) {
             log.error("Caught an AmazonServiceException, which means your request made it to Amazon S3, but was rejected with an error response for some reason.");
-            log.error(LOG_ERROR_MESSAGE, ase.getMessage());
-            log.error(LOG_HTTP_STATUS_CODE, ase.getStatusCode());
-            log.error(LOG_AWS_ERROR_CODE, ase.getErrorCode());
-            log.error(LOG_ERROR_TYPE, ase.getErrorType());
-            log.error(LOG_REQUEST_ID, ase.getRequestId());
+            logAmazonServiceException(ase);
         } catch (AmazonClientException ace) {
             log.error("Caught an AmazonClientException, which means the client encountered an internal error while trying to communicate with S3, such as not being able to access the network.");
-            log.error(LOG_CLIENT_ERROR_MSG, ace.getMessage());
+            logAmazonClientException(ace);
         } catch (IOException ex) {
             throw new IOException("IOError writing file to output stream");
         }
@@ -171,15 +163,9 @@ public class FileOperationsService {
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
             log.info("S3 DELETION: File '{}' deleted successfully", fileName);
         } catch (AmazonServiceException ase) {
-            log.error("Caught an AmazonServiceException.");
-            log.error(LOG_ERROR_MESSAGE, ase.getMessage());
-            log.error(LOG_HTTP_STATUS_CODE, ase.getStatusCode());
-            log.error(LOG_AWS_ERROR_CODE, ase.getErrorCode());
-            log.error(LOG_ERROR_TYPE, ase.getErrorType());
-            log.error(LOG_REQUEST_ID, ase.getRequestId());
+            logAmazonServiceException(ase);
         } catch (AmazonClientException ace) {
-            log.error("Caught an AmazonClientException.");
-            log.error(LOG_CLIENT_ERROR_MSG, ace.getMessage());
+            logAmazonClientException(ace);
         }
     }
 
@@ -195,20 +181,29 @@ public class FileOperationsService {
         if (originalFileName == null) {
             originalFileName = "";
         }
-        // Getting the image extension, discarding any path-like characters it may contain
         String picExtension = this.getFileExtension(originalFileName).replaceAll("[^A-Za-z0-9]", "");
-        // Appending a random integer to the name
-        originalFileName += (Math.random() * (Integer.MIN_VALUE - Integer.MAX_VALUE));
-        // Encoding original file name + random integer
+        originalFileName += SECURE_RANDOM.nextLong();
         originalFileName = new BCryptPasswordEncoder().encode(originalFileName);
         if (originalFileName == null) {
             originalFileName = "";
         }
-        // Deleting all non-alphanumeric characters
         originalFileName = originalFileName.replaceAll("[^A-Za-z0-9\\$]", "");
-        // Adding the extension
         originalFileName += "." + picExtension;
         return originalFileName;
+    }
+
+    private void logAmazonServiceException(AmazonServiceException ase) {
+        log.error("Caught an AmazonServiceException.");
+        log.error(LOG_ERROR_MESSAGE, ase.getMessage());
+        log.error(LOG_HTTP_STATUS_CODE, ase.getStatusCode());
+        log.error(LOG_AWS_ERROR_CODE, ase.getErrorCode());
+        log.error(LOG_ERROR_TYPE, ase.getErrorType());
+        log.error(LOG_REQUEST_ID, ase.getRequestId());
+    }
+
+    private void logAmazonClientException(AmazonClientException ace) {
+        log.error("Caught an AmazonClientException.");
+        log.error(LOG_CLIENT_ERROR_MSG, ace.getMessage());
     }
 
 }

@@ -50,15 +50,7 @@ public class EntryController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(forumId);
-        } catch (NumberFormatException e) {
-            log.error("Forum ID '{}' is not of type Long", forumId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Forum forum = forumRepository.findById(idI).orElse(null);
+        Forum forum = forumRepository.findById(Long.parseLong(forumId)).orElse(null);
         if (forum == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

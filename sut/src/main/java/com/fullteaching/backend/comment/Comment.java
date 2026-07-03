@@ -9,14 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Comment {
+public class Comment extends AbstractCommentContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String videourl;
-    private boolean audioonly;
-    private String message;
     private long date;
     @OneToMany(mappedBy = "commentParent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
@@ -31,11 +28,7 @@ public class Comment {
     }
 
     public Comment(String message, long date, User user) {
-        this.message = message;
-        this.date = date;
-        this.user = user;
-        this.replies = new ArrayList<>();
-        this.commentParent = null;
+        this(message, date, user, null);
     }
 
     public Comment(String message, long date, User user, Comment commentParent) {
@@ -52,30 +45,6 @@ public class Comment {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getVideourl() {
-        return videourl;
-    }
-
-    public void setVideourl(String videourl) {
-        this.videourl = videourl;
-    }
-
-    public boolean getAudioonly() {
-        return audioonly;
-    }
-
-    public void setAudioonly(boolean audioonly) {
-        this.audioonly = audioonly;
     }
 
     public long getDate() {

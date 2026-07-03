@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.security.SecureRandom;
+
 @Entity
 public class File {
 
@@ -22,6 +24,8 @@ public class File {
     private String link;
 
     private int indexOrder;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     public File() {
     }
@@ -115,7 +119,7 @@ public class File {
 
     //Generates a string which acts as an identifier for the stored file in the system (local, S3...)
     private String generateNameIdent(String originalName) {
-        String s = originalName + (Math.random() * (Integer.MIN_VALUE - Integer.MAX_VALUE));
+        String s = originalName + SECURE_RANDOM.nextLong();
         s = new BCryptPasswordEncoder().encode(s);
         if (s == null) {
             s = "";

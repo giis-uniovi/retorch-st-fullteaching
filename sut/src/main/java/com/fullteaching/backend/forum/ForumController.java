@@ -35,15 +35,7 @@ public class ForumController {
             return authorized;
         }
 
-        long idI = -1;
-        try {
-            idI = Long.parseLong(courseDetailsId);
-        } catch (NumberFormatException e) {
-            log.error("CourseDetails ID '{}' is not of type Long", courseDetailsId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        CourseDetails cd = courseDetailsRepository.findById(idI).orElse(null);
+        CourseDetails cd = courseDetailsRepository.findById(Long.parseLong(courseDetailsId)).orElse(null);
         if (cd == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

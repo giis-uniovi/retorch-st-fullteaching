@@ -77,15 +77,7 @@ public class VideoSessionController {
             return authorized;
         }
 
-        long idI;
-        try {
-            idI = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            log.error("Session ID '{}' is not of type Long", id);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Session session = sessionRepository.findById(idI).orElse(null);
+        Session session = sessionRepository.findById(Long.parseLong(id)).orElse(null);
         if (session == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -94,12 +86,13 @@ public class VideoSessionController {
         ResponseEntity<Object> teacherAuthorized = authorizationService.checkAuthorization(session,
                 session.getCourse().getTeacher());
 
-        if (this.lessonIdSession.get(idI) == null) { // First user connecting to the session (only the teacher can)
+        long sessionId = session.getId();
+        if (this.lessonIdSession.get(sessionId) == null) { // First user connecting to the session (only the teacher can)
             if (teacherAuthorized != null) {
                 log.error("Error geting OpenVidu sessionId and token: First user must be the teacher of the course");
                 return teacherAuthorized;
             }
-            return handleFirstConnection(idI, responseJson);
+            return handleFirstConnection(sessionId, responseJson);
         } else { // The video session is already created
             ResponseEntity<Object> userAuthorized = authorizationService.checkAuthorizationUsers(session,
                     session.getCourse().getAttenders());
@@ -107,7 +100,7 @@ public class VideoSessionController {
                 log.error("Error geting OpenVidu token: user must be a student of the course");
                 return userAuthorized;
             }
-            return handleSubsequentConnection(idI, teacherAuthorized, responseJson);
+            return handleSubsequentConnection(sessionId, teacherAuthorized, responseJson);
         }
     }
 

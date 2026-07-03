@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 @Controller
@@ -30,6 +32,11 @@ public class DatabaseInitializer implements CommandLineRunner {
         this.userRepository = userRepo;
         this.courseRepository = courseRepo;
         }
+    private static void linkCommentReply(List<Comment> comments, int parentIdx, int childIdx) {
+        comments.get(parentIdx).getReplies().add(comments.get(childIdx));
+        comments.get(childIdx).setCommentParent(comments.get(parentIdx));
+    }
+
     @Override
     public void run(String... args) {
 
@@ -76,35 +83,23 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         //Recursiveness of comments
         //Entry 1
-        listComments.get(0).getReplies().add(listComments.get(1));
-        listComments.get(1).setCommentParent(listComments.get(0));
-        listComments.get(0).getReplies().add(listComments.get(2));
-        listComments.get(2).setCommentParent(listComments.get(0));
-        listComments.get(4).getReplies().add(listComments.get(5));
-        listComments.get(5).setCommentParent(listComments.get(4));
-        listComments.get(5).getReplies().add(listComments.get(6));
-        listComments.get(6).setCommentParent(listComments.get(5));
+        linkCommentReply(listComments, 0, 1);
+        linkCommentReply(listComments, 0, 2);
+        linkCommentReply(listComments, 4, 5);
+        linkCommentReply(listComments, 5, 6);
         //Entry 2
-        listComments.get(8).getReplies().add(listComments.get(9));
-        listComments.get(9).setCommentParent(listComments.get(8));
+        linkCommentReply(listComments, 8, 9);
         //Entry 3
-        listComments.get(12).getReplies().add(listComments.get(13));
-        listComments.get(13).setCommentParent(listComments.get(12));
-        listComments.get(13).getReplies().add(listComments.get(14));
-        listComments.get(14).setCommentParent(listComments.get(13));
+        linkCommentReply(listComments, 12, 13);
+        linkCommentReply(listComments, 13, 14);
         //Entry 5
-        listComments.get(16).getReplies().add(listComments.get(17));
-        listComments.get(17).setCommentParent(listComments.get(16));
-        listComments.get(17).getReplies().add(listComments.get(18));
-        listComments.get(18).setCommentParent(listComments.get(17));
-        listComments.get(16).getReplies().add(listComments.get(19));
-        listComments.get(19).setCommentParent(listComments.get(16));
+        linkCommentReply(listComments, 16, 17);
+        linkCommentReply(listComments, 17, 18);
+        linkCommentReply(listComments, 16, 19);
         //Entry 7
-        listComments.get(23).getReplies().add(listComments.get(24));
-        listComments.get(24).setCommentParent(listComments.get(23));
+        linkCommentReply(listComments, 23, 24);
         //Entry 8
-        listComments.get(25).getReplies().add(listComments.get(26));
-        listComments.get(26).setCommentParent(listComments.get(25));
+        linkCommentReply(listComments, 25, 26);
 
 
         //Sample entries
@@ -168,11 +163,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         //Setting index order in each group of files
         for (FileGroup fgAux : listFileGroups) {
-            int i = 0;
-            for (File fAux : fgAux.getFiles()) {
-                fAux.setIndexOrder(i);
-                i++;
-            }
+            fgAux.updateFileIndexOrder();
         }
 
         listFileGroups.get(0).setFileGroupParent(listFileGroups.get(1));
@@ -207,19 +198,19 @@ public class DatabaseInitializer implements CommandLineRunner {
         c2.getAttenders().add(user1);
         c2.getAttenders().add(user3);
 
-        Calendar calendar = Calendar.getInstance();
-        int milliSecondsInADay = 86400000;
+        long now = Instant.now().toEpochMilli();
+        long milliSecondsInADay = Duration.ofDays(1).toMillis();
         String defaultDescription = "This is a nice description about this session.";
         //Sample sessions
-        Session s1 = new Session("Session 1: Introduction to Web", defaultDescription, calendar.getTimeInMillis());
+        Session s1 = new Session("Session 1: Introduction to Web", defaultDescription, now);
         s1.setCourse(c1);
-        Session s2 = new Session("Nice examples", defaultDescription, calendar.getTimeInMillis() + milliSecondsInADay);
+        Session s2 = new Session("Nice examples", defaultDescription, now + milliSecondsInADay);
         s2.setCourse(c1);
-        Session s3 = new Session("Project analisys", defaultDescription, calendar.getTimeInMillis() + milliSecondsInADay - 8000000);
+        Session s3 = new Session("Project analisys", defaultDescription, now + milliSecondsInADay - 8000000);
         s3.setCourse(c1);
-        Session s4 = new Session("Session 3: New Web Technologies", defaultDescription, calendar.getTimeInMillis() + 4 * milliSecondsInADay);
+        Session s4 = new Session("Session 3: New Web Technologies", defaultDescription, now + 4 * milliSecondsInADay);
         s4.setCourse(c2);
-        Session s5 = new Session("Session 2: Databse integration", defaultDescription, calendar.getTimeInMillis() + 6 * milliSecondsInADay);
+        Session s5 = new Session("Session 2: Databse integration", defaultDescription, now + 6 * milliSecondsInADay);
         s5.setCourse(c2);
 
         c1.getSessions().add(s1);
