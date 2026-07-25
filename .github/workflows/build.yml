@@ -59,6 +59,17 @@ jobs:
       - name: Build E2E test suite
         run: mvn test-compile -U --no-transfer-progress
 
+  sonarqube:
+    needs: [ build ]
+    #if: ${{ false }}  # disable for now
+    #This job fails when comming from a dependabot PR (can't read the sonarqube token for security reasons).
+    #Links to discussions and workaround at: https://github.com/giis-uniovi/samples-giis-template/issues/4
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v7
+
       - name: SonarCloud analysis
         uses: SonarSource/sonarqube-scan-action@v8
         env:
