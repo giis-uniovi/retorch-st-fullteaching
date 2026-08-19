@@ -87,24 +87,43 @@ video {
 }
 
 .chat_wrapper {
+  /* #exit-icon/#show-chat-icon (siblings above, in the DOM) are float:right/float:left
+     (Materialize's .right/.left utility classes). Without clearing them, this element
+     rendered in the narrow gap between the two floated buttons instead of taking the
+     sidenav's full width on its own line below them. */
+  clear: both;
   position: relative;
   margin-top: 50px;
   height: 90%;
   padding: 10px;
-  padding-bottom: 7rem;
   margin-right: 10px;
   margin-left: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 #message-box-cont {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
+/* #message_box grows/shrinks to fill the space left over by .panel (which holds
+   the #message input) and scrolls internally, so the input stays pinned inside
+   the visible area no matter how many chat lines accumulate. Previously both
+   elements were height:100% siblings in normal flow, so .panel (and #message)
+   got pushed below the visible area once enough chat lines were added. */
 #message_box {
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   background: #f3f3f3;
-  overflow: auto;
+  overflow-y: auto;
   padding: 10px;
+}
+
+.panel {
+  flex: 0 0 auto;
 }
 
 .session-title-div {
@@ -125,6 +144,26 @@ video {
   width: 100%;
   bottom: 0;
   height: 80px;
+}
+
+/* #slide-out is a Materialize "fixed" sidenav (always open, no dark overlay) on
+   desktop widths, matching the pre-materialize-1.0 behavior this app was built
+   for: the exit/chat-toggle controls it holds need to stay reachable during a
+   video call, so it can't be a swipe-away mobile drawer. Materialize keeps it
+   permanently on-screen at 300px wide above the same 993px breakpoint it uses
+   internally (see Sidenav._isCurrentlyFixed), so offset the other fixed-width
+   bars to stop them rendering underneath it. */
+@media only screen and (min-width: 993px) {
+  #div-header-buttons,
+  .session-title-div,
+  .session-bottom-div {
+    left: 300px;
+    width: calc(100% - 300px);
+  }
+
+  .session-video-div {
+    margin-left: 300px;
+  }
 }
 
 .video-control {

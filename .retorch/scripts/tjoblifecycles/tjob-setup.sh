@@ -23,6 +23,9 @@ cd "$SUT_LOCATION"
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-set-up" "Pulling latest images for TJOB $1"
 docker compose -f docker-compose.yml --env-file "$WORKSPACE/.retorch/envfiles/$1.env" --ansi never -p "$1" pull
 "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "$1-set-up" "Deploying containers for TJOB $1"
+# full-teaching now has a fixed `image:` tag that coi-setup.sh builds once, up front,
+# before any TJob runs - so every TJob's `up -d` here just reuses that already-current
+# image instead of each of the ~10 parallel TJobs rebuilding it independently.
 docker compose -f docker-compose.yml --env-file "$WORKSPACE/.retorch/envfiles/$1.env" --ansi never -p "$1" up -d
 
 if [ $? -ne 0 ]; then

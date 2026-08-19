@@ -24,13 +24,13 @@
             <li class="dropdown-menu-button"><a id="contact-button" class="waves-effect">Contact</a></li>
           </ul>
           <!-- Dropdown Trigger -->
-          <li><a class="navbar-button"><i id="arrow-drop-down" class="material-icons white-text right dropdown-button" data-activates="dropdown1" data-beloworigin="true" materialize="dropdown" >arrow_drop_down</i></a></li>
+          <li><a class="navbar-button"><i id="arrow-drop-down" class="material-icons white-text right dropdown-button" data-target="dropdown1" data-beloworigin="true" materialize="dropdown" >arrow_drop_down</i></a></li>
         </ul>
       }
 
       <!--Side nav mobile-->
       @if (this.authenticationService.isLoggedIn()) {
-        <ul id="nav-mobile" class="side-nav">
+        <ul id="nav-mobile" class="sidenav" materialize="sidenav" [materializeParams]="[{closeOnClick: true, draggable: false}]">
           <li><a routerLink="/courses" class="waves-effect">Courses</a></li>
           <li><a routerLink="/settings" class="waves-effect">Settings</a></li>
           <li class="divider"></li>
@@ -39,7 +39,7 @@
         </ul>
       }
       @if (this.authenticationService.isLoggedIn()) {
-        <a class="button-collapse" materialize="sideNav" data-activates="nav-mobile" [materializeParams]="[{closeOnClick: true, draggable: false}]"><i class="material-icons">menu</i></a>
+        <a class="button-collapse sidenav-trigger" data-target="nav-mobile"><i class="material-icons">menu</i></a>
       }
     </div>
   </nav>

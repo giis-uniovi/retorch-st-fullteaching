@@ -1,6 +1,6 @@
 @if (this.authenticationService.isLoggedIn()) {
   <div id="video-session-div">
-    <a id="side-menu-button" materialize="sideNav" data-activates="slide-out" [materializeParams]="[{draggable: false}]"><i id="fixed-icon" class="material-icons video-icon" (onclick)="document.getElementsByTagName('body')[0].style.overflowY = 'hidden'">menu</i></a>
+    <a id="side-menu-button" class="sidenav-trigger" data-target="slide-out"><i id="fixed-icon" class="material-icons video-icon" (onclick)="document.getElementsByTagName('body')[0].style.overflowY = 'hidden'">menu</i></a>
     <div id="div-header-buttons" class="row no-margin">
       <div class="col s12 m12 l12 no-padding-right"><a class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="toggleFullScreen()"><i class="material-icons">{{fullscreenIcon}}</i></a></div>
       <div class="col s12 m12 l12 no-padding-right">@if (this.authenticationService.isStudent() && !this.myStudentAccessGranted) {
@@ -30,7 +30,7 @@
         <div class="session-title-div">
           <h2 id="session-title">{{this.sessionName}}</h2>
         </div>
-        <div>
+        <div class="session-video-div">
           @if (bigStream) {
             <stream [stream]="bigStream" [small]="false" [muted]="(this.authenticationService.isTeacher() && !studentAccessGranted) || (!this.authenticationService.isTeacher() && myStudentAccessGranted)"></stream>
           }
@@ -53,7 +53,7 @@
         </div>
       </div>
     }
-    <ul id="slide-out" class="side-nav">
+    <ul id="slide-out" class="sidenav sidenav-fixed" materialize="sidenav" [materializeParams]="[{draggable: false}]">
       <button (click)="this.exitFromSession()" id="exit-icon" class="right side-nav-btn" aria-label="Exit"><i class="material-icons video-icon" aria-hidden="true">exit_to_app</i></button>
       <button (click)="changeShowChat()" id="show-chat-icon" class="left side-nav-btn" [attr.aria-label]="showChat ? 'Show attenders' : 'Show chat'"><i class="material-icons video-icon" aria-hidden="true">{{this.showChatIcon}}</i></button>
       <div class="chat_wrapper">

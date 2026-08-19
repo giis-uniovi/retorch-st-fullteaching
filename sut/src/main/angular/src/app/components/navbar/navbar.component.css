@@ -40,6 +40,15 @@ a.button-collapse {
   color: #FFFFFF;
 }
 
+/* Materialize hides `.sidenav-trigger` above 992px (its own mobile-only-hamburger
+   default). BaseLoggedTest.logout() uses this button as its fallback logout path
+   at any viewport, including the tests' 1920px one, so keep it visible everywhere. */
+@media only screen and (min-width: 993px) {
+  nav a.sidenav-trigger {
+    display: inline-block;
+  }
+}
+
 ul li {
   text-transform: uppercase;
 }
