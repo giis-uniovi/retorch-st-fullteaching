@@ -41,6 +41,10 @@ services:
 
   full-teaching:
     container_name: full-teaching-${TJOB_NAME}
+    # the fixed image name ensures all TJobs share the one image coi-setup.sh builds (avoiding stale/mismatched images),
+    # and pull_policy: build prevents a doomed pull attempt for an image that only ever exists locally
+    image: full-teaching-sut:local
+    pull_policy: build
     build:
       context: ./sut
       dockerfile: Dockerfile

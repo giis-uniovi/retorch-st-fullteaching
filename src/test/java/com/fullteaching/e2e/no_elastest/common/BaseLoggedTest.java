@@ -179,6 +179,11 @@ public class BaseLoggedTest {
     void tearDown() { //13 lines
         if (this.user != null) {
             log.info("##### Finish test: {} - Driver {}", TEST_NAME, this.user.getDriver());
+            log.info("Browser console at the end of the test");
+            LogEntries userLogEntries = user.getDriver().manage().logs().get(BROWSER);
+            userLogEntries.forEach(entry -> log.info("[{}] {} {}",
+                    new Date(entry.getTimestamp()), entry.getLevel(),
+                    entry.getMessage()));
             if (this.user.isOnSession()) {
                 this.logout(this.user);
             }

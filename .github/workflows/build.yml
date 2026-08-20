@@ -80,13 +80,13 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Restore compiled classes from build job
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: sonar-compiled-classes
           path: sut/target
 
       - name: Restore JaCoCo coverage report from build job
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: jacoco-report
           path: sut/target/site/jacoco
@@ -98,7 +98,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Check SonarCloud Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.1
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -90,9 +90,11 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         // Check connected message
         user.getDriver().findElement(By.cssSelector("#fixed-icon")).click();
 
-        checkSystemMessage("Connected", user, 100); // 6 lines
+        // Teacher is first to join: no pre-existing peers, so OpenVidu fires a single
+        // connectionCreated event (self) -> exactly 1 system message, at index 0.
+        checkSystemMessage("Connected", user, 0); // 6 lines
         // STUDENT
-        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" +"oneToOneChatInSessionChrome", "STUDENT",5);//27 lines
+        student = setupBrowser(STUDENT_BROWSER, TJOB_NAME + "-" +"oneToOneChatInSessionChrome", "STUDENT", WAIT_SECONDS);//27 lines
 
         this.slowLogin(student, studentMail, studentPass);
 
@@ -106,11 +108,15 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         student.getDriver().findElement(By.cssSelector("ul div:first-child li.session-data div.session-ready")).click();
         student.getDriver().findElement(By.cssSelector("#fixed-icon")).click();
 
+        // Student joins a session where the teacher is already present: OpenVidu fires
+        // connectionCreated for self AND for each pre-existing peer, in that order, as one
+        // batch. So the student's chat gets 2 messages at once: "Connected!" (self, index 0)
+        // followed immediately by "Teacher Cheater has connected!" (pre-existing peer, index 1).
         checkSystemMessage("Connected", student, 0); //6 lines
+        checkSystemMessage(TEACHER_NAME + " has connected", student, 1);
 
-
-        checkSystemMessage(STUDENT_NAME + " has connected", user, 100); //6 lines
-        checkSystemMessage(TEACHER_NAME + " has connected", student, 100);//6lines
+        // Teacher receives the student's join live, as the 2nd message in its own chat (index 1).
+        checkSystemMessage(STUDENT_NAME + " has connected", user, 1); //6 lines
         // Test chat
 
         String teacherMessage = "TEACHER CHAT MESSAGE";
@@ -154,19 +160,18 @@ class FullTeachingEndToEndEChatTests extends BaseLoggedTest {
         user.getWaiter().until(ExpectedConditions.textToBePresentInElement(msgContent, message));
     }
 
-    private void checkSystemMessage(String message, BrowserUser user, int messagenumber) { //6 lines
-        log.info("Checking system message (\"{}\") for {}", message, user.getClientData());
-        user.getWaiter().until(ExpectedConditions.numberOfElementsToBeMoreThan(By.tagName("app-chat-line"), 0));
+    private void checkSystemMessage(String message, BrowserUser user, int messageIndex) { //6 lines
+        log.info("Checking system message (\"{}\") for {} at index {}", message, user.getClientData(), messageIndex);
+        user.getWaiter().until(ExpectedConditions.numberOfElementsToBeMoreThan(By.tagName("app-chat-line"), messageIndex));
         List<WebElement> messages = user.getDriver().findElements(By.tagName("app-chat-line"));
-        WebElement lastMessage;
-        if (messagenumber >= 0 && messagenumber < messages.size()) {
-            lastMessage = messages.get(messagenumber);
-        } else {
-            lastMessage = messages.get(messages.size() - 1);
-        }
+        WebElement targetMessage = messages.get(messageIndex);
 
-        WebElement msgContent = lastMessage.findElement(By.cssSelector(".system-msg"));
-        user.getWaiter().until(ExpectedConditions.textToBePresentInElement(msgContent, message));
+        WebElement msgContent = targetMessage.findElement(By.cssSelector(".system-msg"));
+        // Assert on the actual DOM content (textContent) rather than the rendered/visible
+        // text: the chat drawer can become momentarily not-displayed (e.g. after a WebRTC
+        // connection drop/reconnect), in which case getText() reports "" even though the
+        // message was delivered and rendered with the correct content.
+        user.getWaiter().until(ExpectedConditions.attributeContains(msgContent, "textContent", message));
     }
 
     private int getNumberMessages(BrowserUser user) {
