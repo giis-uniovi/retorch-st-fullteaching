@@ -23,3 +23,22 @@ updates:
     assignees:
       - "ClaudiodelaRiva"
     open-pull-requests-limit: 20
+
+  - package-ecosystem: npm
+    directory: "/sut/src/main/angular"
+    schedule:
+      interval: weekly
+      day: "friday"
+      time: "00:20"
+      timezone: "Europe/Madrid"
+    rebase-strategy: "disabled"
+    assignees:
+      - "ClaudiodelaRiva"
+    open-pull-requests-limit: 20
+    groups:
+      # Angular requires @angular/* and @angular-devkit/* to stay on the same major
+      # version in lockstep. Ungrouped, the build will fail.
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
