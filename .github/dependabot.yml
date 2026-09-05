@@ -37,8 +37,14 @@ updates:
     open-pull-requests-limit: 20
     groups:
       # Angular requires @angular/* and @angular-devkit/* to stay on the same major
-      # version in lockstep. Ungrouped, the build will fail.
+      # version in lockstep. Ungrouped, the build will fail. typescript is included
+      # too: @angular/compiler-cli pins an exact supported TS range per Angular
+      # release (e.g. Angular 21.2.17 declares ">=5.9 <6.1"), and bumping typescript
+      # alone past that range crashes the Angular CLI outright rather than failing
+      # more legibly (confirmed: typescript 7.0.2 broke `ng build` with "Cannot read
+      # properties of undefined (reading 'Error')").
       angular:
         patterns:
           - "@angular/*"
           - "@angular-devkit/*"
+          - "typescript"
