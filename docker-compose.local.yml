@@ -20,5 +20,7 @@ services:
     ports:
       - "4443:4443"
     environment:
-      # Override public URL to localhost so the browser token points to the exposed port
-      - OPENVIDU_PUBLICURL=https://localhost:4443
+      # Override public host to localhost so the browser token points to the exposed
+      # port. DOMAIN_OR_PUBLIC_IP is a bare hostname (see docker-compose.yml for why
+      # this replaced the old OPENVIDU_PUBLICURL variable).
+      - DOMAIN_OR_PUBLIC_IP=localhost
