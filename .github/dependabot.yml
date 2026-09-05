@@ -11,6 +11,31 @@ updates:
     assignees:
       - "ClaudiodelaRiva"
     open-pull-requests-limit: 20
+    labels:
+      - "dependencies"
+      - "java"
+      - "E2E"
+
+  # SUT backend (Spring Boot). Previously untracked: openvidu-java-client here can
+  # drift arbitrarily far from the openvidu-browser version tracked below, even
+  # though OpenVidu requires client/server/both-SDKs to stay in lockstep - exactly
+  # the kind of mismatch that broke at runtime after openvidu-browser alone got
+  # bumped from 2.3.0 to 2.32.2.
+  - package-ecosystem: maven
+    directory: "/sut"
+    schedule:
+      interval: weekly
+      day: "friday"
+      time: "00:20"
+      timezone: "Europe/Madrid"
+    rebase-strategy: "disabled"
+    assignees:
+      - "ClaudiodelaRiva"
+    open-pull-requests-limit: 20
+    labels:
+      - "dependencies"
+      - "java"
+      - "SUT"
 
   - package-ecosystem: github-actions
     directory: "/"
@@ -35,10 +60,45 @@ updates:
     assignees:
       - "ClaudiodelaRiva"
     open-pull-requests-limit: 20
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "SUT"
     groups:
-      # Angular requires @angular/* and @angular-devkit/* to stay on the same major
-      # version in lockstep. Ungrouped, the build will fail.
+      # Angular requires every @angular/* and @angular-devkit/* package to stay on the
+      # same major version in lockstep - ungrouped, a partial bump breaks the build
+      # (e.g. @angular-devkit/build-angular alone jumping a major over @angular/core,
+      # or vice versa). angular-calendar is included too: it's a third-party package
+      # (outside the @angular/* scope, so an "@angular/*" glob would miss it) whose
+      # major versions track a minimum @angular/core peer version - bumping core to
+      # Angular 22 without it breaks the build (angular-calendar <0.32 imports
+      # ComponentFactoryResolver, which Angular 22 removed). Its own transitive
+      # peers (angular-draggable-droppable, angular-resizable-element) aren't listed
+      # here since they aren't direct package.json dependencies - bumping
+      # angular-calendar itself pulls in compatible versions of those automatically.
+      #
+      # Listed explicitly (not just "@angular/*") because Dependabot's grouping is
+      # best-effort, not atomic: it has already left individual family members (e.g.
+      # @angular/animations, @angular/platform-browser-dynamic,
+      # @angular-devkit/build-angular) out of a grouped update it created for the
+      # rest, and separately opened angular-calendar's own bump as an entirely
+      # unrelated PR instead of folding it into this group. Explicit names remove any
+      # glob-matching ambiguity, but they can't force Dependabot to resolve every
+      # member in the same run - that residual gap is closed by CI: a straggler
+      # produces a version-mismatch build failure that must be fixed (bump the
+      # straggler to match) before merging, same as this one was.
       angular:
         patterns:
-          - "@angular/*"
-          - "@angular-devkit/*"
+          - "@angular/animations"
+          - "@angular/cdk"
+          - "@angular/cli"
+          - "@angular/common"
+          - "@angular/compiler"
+          - "@angular/compiler-cli"
+          - "@angular/core"
+          - "@angular/forms"
+          - "@angular/platform-browser"
+          - "@angular/platform-browser-dynamic"
+          - "@angular/router"
+          - "@angular-devkit/build-angular"
+          - "angular-calendar"
