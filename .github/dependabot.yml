@@ -16,11 +16,8 @@ updates:
       - "java"
       - "E2E"
 
-  # SUT backend (Spring Boot). Previously untracked: openvidu-java-client here can
-  # drift arbitrarily far from the openvidu-browser version tracked below, even
-  # though OpenVidu requires client/server/both-SDKs to stay in lockstep - exactly
-  # the kind of mismatch that broke at runtime after openvidu-browser alone got
-  # bumped from 2.3.0 to 2.32.2.
+  # SUT backend (Spring Boot). openvidu-java-client here must stay in lockstep with
+  # openvidu-browser below - a solo bump broke this at runtime before.
   - package-ecosystem: maven
     directory: "/sut"
     schedule:
@@ -64,36 +61,17 @@ updates:
       - "dependencies"
       - "javascript"
       - "SUT"
+    ignore:
+      # Caps typescript to what @angular/compiler-cli actually supports - grouping
+      # alone let it jump past that range and broke the angular-22 bump. Raise when
+      # compiler-cli's supported range grows (check its peerDependencies).
+      - dependency-name: "typescript"
+        versions: [">=6.1.0"]
     groups:
-      # Angular requires every @angular/* and @angular-devkit/* package to stay on the
-      # same major version in lockstep - ungrouped, a partial bump breaks the build
-      # (e.g. @angular-devkit/build-angular alone jumping a major over @angular/core,
-      # or vice versa). Two more packages are pinned to Angular's own release train
-      # too, and would be invisible to an "@angular/*" glob:
-      #   - angular-calendar: its major versions track a minimum @angular/core peer
-      #     version - bumping core to Angular 22 without it breaks the build
-      #     (angular-calendar <0.32 imports ComponentFactoryResolver, which
-      #     Angular 22 removed). Its own transitive peers (angular-draggable-droppable,
-      #     angular-resizable-element) aren't listed here since they aren't direct
-      #     package.json dependencies - bumping angular-calendar itself pulls in
-      #     compatible versions of those automatically.
-      #   - typescript: @angular/compiler-cli pins an exact supported TS range per
-      #     Angular release (e.g. Angular 21.2.17 declares ">=5.9 <6.1"). Bumping
-      #     typescript alone past that range crashes the Angular CLI outright
-      #     ("Cannot read properties of undefined (reading 'Error')" from `ng build`)
-      #     rather than failing more legibly.
-      #
-      # Both are included explicitly (not just "@angular/*") because Dependabot's
-      # grouping is best-effort, not atomic: it has already left individual family
-      # members (e.g. @angular/animations, @angular/platform-browser-dynamic,
-      # @angular-devkit/build-angular) out of a grouped update it created for the
-      # rest, and separately opened angular-calendar's own bump as an entirely
-      # unrelated PR instead of folding it into this group. Explicit names remove any
-      # glob-matching ambiguity, but they can't force Dependabot to resolve every
-      # member in the same run - that residual gap is closed by CI: a straggler
-      # produces a version-mismatch build failure that must be fixed (bump the
-      # straggler to match, or hold it back to the range Angular actually supports)
-      # before merging, same as this one was.
+      # All @angular/* packages, @angular-devkit/build-angular, angular-calendar (needs
+      # a min @angular/core version) and typescript (range-pinned by compiler-cli) must
+      # move together - listed explicitly since grouping is best-effort and can still
+      # leave a straggler; CI catches that if it happens.
       angular:
         patterns:
           - "@angular/animations"
