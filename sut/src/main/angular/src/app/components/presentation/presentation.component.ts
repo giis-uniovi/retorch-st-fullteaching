@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
 
@@ -6,6 +6,7 @@ import { AuthenticationService } from '../../services/authentication.service';
     selector: 'app-presentation',
     templateUrl: './presentation.component.html',
     styleUrls: ['./presentation.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

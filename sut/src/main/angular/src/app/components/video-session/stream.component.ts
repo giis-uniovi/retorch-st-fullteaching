@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, SimpleChanges, AfterViewInit, OnChanges, DoCheck } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, SimpleChanges, AfterViewInit, OnChanges, DoCheck, ChangeDetectionStrategy } from '@angular/core';
 import { Stream } from 'openvidu-browser';
 
 @Component({
@@ -11,6 +11,7 @@ import { Stream } from 'openvidu-browser';
           }
           <video #videoElement autoplay="true" [muted]="this.muted" [attr.title]="getVideoNameFromStream()" ></video>
         </div>`,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class StreamComponent implements AfterViewInit, OnChanges, DoCheck {

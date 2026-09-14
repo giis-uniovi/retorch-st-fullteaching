@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Session } from '../../classes/session';
@@ -26,6 +26,7 @@ class MyCalendarEvent implements CalendarEvent {
     selector: 'calendar-app',
     templateUrl: './calendar.component.html',
     styleUrls: ['./calendar.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CalendarComponent implements OnInit {

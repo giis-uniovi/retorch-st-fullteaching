@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -21,6 +21,7 @@ import { InterventionAskedPipe } from '../../pipes/intervention-asked.pipe';
     templateUrl: './video-session.component.html',
     styleUrls: ['./video-session.component.css'],
     providers: [InterventionAskedPipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class VideoSessionComponent implements OnInit, AfterViewInit, OnDestroy {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 import { Subscription } from 'rxjs';
@@ -17,6 +17,7 @@ import { AnimationService }      from '../../services/animation.service';
     selector: 'app-file-group',
     templateUrl: './file-group.component.html',
     styleUrls: ['./file-group.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FileGroupComponent implements OnInit, OnDestroy {
