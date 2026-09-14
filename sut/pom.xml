@@ -118,13 +118,17 @@
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
-			<version>3.3.1</version>
+			<version>4.0.0</version>
 		</dependency>
 
+		<!-- Since Tika 4.0.0 this is a POM-only aggregator (no jar of its own) that
+		pulls in the individual tika-parser-*-module jars transitively; type=pom is
+		required or Maven looks for a nonexistent jar and fails dependency resolution. -->
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-parsers-standard-package</artifactId>
-			<version>3.3.1</version>
+			<version>4.0.0</version>
+			<type>pom</type>
 		</dependency>
 		<!-- Read files -->
 
