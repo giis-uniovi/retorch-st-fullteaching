@@ -1,6 +1,7 @@
 package com.fullteaching.backend.filereader;
 
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -11,16 +12,14 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class FileReader {
 
     private static final Logger log = LoggerFactory.getLogger(FileReader.class);
 
     public String parseToPlainText(File file) throws IOException, SAXException, TikaException {
-        try (InputStream fileStream = new FileInputStream(file)) {
+        try (TikaInputStream fileStream = TikaInputStream.get(file)) {
             ContentHandler handler = new BodyContentHandler();
             AutoDetectParser parser = new AutoDetectParser();
             ParseContext context = new ParseContext();

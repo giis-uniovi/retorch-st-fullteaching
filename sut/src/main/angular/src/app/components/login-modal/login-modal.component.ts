@@ -1,4 +1,4 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { environment } from '../../../environments/environment';
@@ -16,6 +16,7 @@ declare const M: any;
     selector: 'login-modal',
     templateUrl: './login-modal.component.html',
     styleUrls: ['./login-modal.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class LoginModalComponent {

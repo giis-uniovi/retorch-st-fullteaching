@@ -353,14 +353,14 @@
                             <div class="col l6 m6 s6 user-date-column">
                               <div class="row no-margin">
                                 <div class="col l6 m6 s6 user-name forum-entry-author" [class.teacher-name]="isEntryTeacher(entry)">{{entry?.user?.nickName}}</div>
-                                <div class="col l6 m6 s6 user-name forum-entry-date">{{entry?.date | timeAgo}}</div>
+                                <div class="col l6 m6 s6 user-name forum-entry-date">{{$safeNavigationMigration(entry?.date) | timeAgo}}</div>
                               </div>
                             </div>
                           </div>
                           @if (entry.comments.length > 0) {
                             <div class="row no-margin last-comment-row">
                               <div class="col">Last comment:</div>
-                              <div class="col">{{getLastEntryComment(entry)?.user?.nickName}}, {{getLastEntryComment(entry)?.date | timeAgo}}</div>
+                              <div class="col">{{getLastEntryComment(entry)?.user?.nickName}}, {{$safeNavigationMigration(getLastEntryComment(entry)?.date) | timeAgo}}</div>
                             </div>
                           }
                           @if (entry.comments.length === 0) {
@@ -402,7 +402,7 @@
                             <div class="col l6 m6 s6 user-date-column">
                               <div class="row no-margin">
                                 <div class="col l6 m6 s6 user-name">{{selectedEntry?.user.nickName}}</div>
-                                <div class="col l6 m6 s6 user-name">{{selectedEntry?.date | date}} - {{selectedEntry?.date | date:'H:mm' }}</div>
+                                <div class="col l6 m6 s6 user-name">{{$safeNavigationMigration(selectedEntry?.date) | date}} - {{$safeNavigationMigration(selectedEntry?.date) | date:'H:mm' }}</div>
                               </div>
                             </div>
                           </div>

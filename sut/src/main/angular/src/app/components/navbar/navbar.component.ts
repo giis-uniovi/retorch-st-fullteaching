@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -10,6 +10,7 @@ import { MaterializeModule } from '../../shared/materialize.module';
     selector: 'navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, MaterializeModule]
 })
 export class NavbarComponent {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { Comment }    from '../../classes/comment';
 import { Entry }      from '../../classes/entry';
@@ -11,6 +11,7 @@ import { AnimationService }      from '../../services/animation.service';
     selector: 'app-comment',
     templateUrl: './comment.component.html',
     styleUrls: ['./comment.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CommentComponent {
