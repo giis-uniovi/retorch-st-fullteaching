@@ -110,3 +110,17 @@ updates:
           - "@angular-devkit/build-angular"
           - "angular-calendar"
           - "typescript"
+    # Being in the "angular" group above does not make typescript's bump stay in
+    # sync with the rest of the group: the 2026-09-21 combined update grouped
+    # typescript 6.0.3 -> 7.0.2 together with the Angular 21 -> 22.1.6 bump, but
+    # @angular/compiler-cli and @angular-devkit/build-angular 22.1.x only accept
+    # typescript ">=6.0 <6.1" as a peer - dependabot doesn't check one grouped
+    # package's peerDependencies against another's version before opening the PR,
+    # it just takes each package to its own latest. That broke `npm install`
+    # outright (ERESOLVE) rather than failing at build time. Block major bumps of
+    # typescript here; move it only by hand, once the Angular release actually
+    # supports the new TS major (check @angular/compiler-cli's peerDependencies
+    # for the target Angular version before bumping).
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
