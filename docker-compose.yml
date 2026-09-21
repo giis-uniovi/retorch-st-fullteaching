@@ -31,7 +31,25 @@ services:
       - KMS_STUN_IP=stun.l.google.com
       - KMS_STUN_PORT=19302
       - OPENVIDU_SECRET=MY_SECRET
-      - OPENVIDU_PUBLICURL=https://full-teaching-${TJOB_NAME}-openvidu-server-kms:4443
+      # OPENVIDU_PUBLICURL was the 2.3.0-era variable name. As of the 2.23.0 image
+      # (now documented as openvidu/openvidu-dev, though still published under the
+      # legacy openvidu-server-kms name too) it is no longer recognized - the
+      # server silently falls back to its own default (DOMAIN_OR_PUBLIC_IP=localhost)
+      # instead of erroring, which left Tomcat's self-signed HTTPS cert set up for
+      # the wrong host and caused it to fall back to binding port 4443 as plain HTTP.
+      # DOMAIN_OR_PUBLIC_IP is the current variable for this: a bare hostname (no
+      # scheme, no port - HTTPS_PORT covers the port, defaulting to 4443 already).
+      - DOMAIN_OR_PUBLIC_IP=full-teaching-${TJOB_NAME}-openvidu-server-kms
+      # The 2.23.0 image bundles BOOT-INF/classes/application-container.properties
+      # with server.ssl.enabled=false and FORCE_PLAIN_HTTP=true baked in (confirmed
+      # by extracting openvidu-server.jar) - it's designed to run plain HTTP by
+      # default. That breaks this app: the browser needs a secure (https/wss)
+      # OpenVidu URL for WebRTC (its hostname isn't "localhost", where Chrome
+      # allows the insecure-context exception), and openvidu-java-client's HTTPS
+      # REST calls fail outright against a plain-HTTP Tomcat. Spring Boot env vars
+      # outrank a jar's bundled properties file, so override both back on.
+      - FORCE_PLAIN_HTTP=false
+      - SERVER_SSL_ENABLED=true
     networks:
       - jenkins_network
     ulimits:

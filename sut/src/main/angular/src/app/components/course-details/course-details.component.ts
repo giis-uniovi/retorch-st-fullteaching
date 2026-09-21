@@ -846,9 +846,12 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         $(e.element).attr('poster', 'assets/images/volume.png');
       }
     })
-    this.publisher.on('videoPlaying', (e: VideoElementEvent) => {
+    // openvidu-browser 2.32.2 renamed this event to 'streamPlaying' and its payload
+    // to StreamManagerEvent, which no longer carries the video element directly
+    // (unlike the old VideoElementEvent) - read it off publisher.videos instead.
+    this.publisher.on('streamPlaying', () => {
       this.recordRadioEnabled = true;
-      this.addRecordingControls(e.element);
+      this.addRecordingControls(this.publisher.videos[0].video);
     });
   }
 
