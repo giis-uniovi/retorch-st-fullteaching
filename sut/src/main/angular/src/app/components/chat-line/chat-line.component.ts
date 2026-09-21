@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { Chatline } from '../../classes/chatline';
 
@@ -6,6 +6,7 @@ import { Chatline } from '../../classes/chatline';
     selector: 'app-chat-line',
     templateUrl: './chat-line.component.html',
     styleUrls: ['./chat-line.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChatLineComponent {

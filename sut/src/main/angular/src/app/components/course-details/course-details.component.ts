@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -33,6 +33,7 @@ import { OpenVidu, LocalRecorder, Publisher, VideoElementEvent } from "openvidu-
     providers: [FilesEditionService],
     templateUrl: './course-details.component.html',
     styleUrls: ['./course-details.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CourseDetailsComponent implements OnInit, OnDestroy {

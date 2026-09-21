@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { Constants } from '../../constants';
@@ -11,6 +11,7 @@ declare const M: any;
     selector: 'app-file-uploader',
     templateUrl: './file-uploader.component.html',
     styleUrls: ['./file-uploader.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FileUploaderComponent implements OnInit, OnChanges, OnDestroy {
