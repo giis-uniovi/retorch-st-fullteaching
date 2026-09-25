@@ -1,8 +1,8 @@
 # Stage 1: Build Angular frontend
 FROM node:22-alpine AS frontend-build
 WORKDIR /app
-COPY src/main/angular/package.json ./
-RUN npm install --legacy-peer-deps
+COPY src/main/angular/package.json src/main/angular/package-lock.json ./
+RUN npm ci
 COPY src/main/angular/ ./
 RUN node_modules/.bin/ng build
 
