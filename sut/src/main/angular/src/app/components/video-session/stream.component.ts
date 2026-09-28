@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, SimpleChanges, AfterViewInit, OnChanges, DoCheck, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, type SimpleChanges, AfterViewInit, OnChanges, DoCheck, ChangeDetectionStrategy } from '@angular/core';
 import { Stream } from 'openvidu-browser';
 
 @Component({
