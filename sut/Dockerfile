@@ -18,8 +18,11 @@ RUN mvn dependency:copy -B \
     -Dartifact=org.jacoco:org.jacoco.cli:0.8.13:jar:nodeps \
     -DoutputDirectory=/app/jacoco
 COPY src/ ./src/
-# Replace pre-built static assets with freshly built Angular output
-COPY --from=frontend-build /app/dist/ ./src/main/resources/static/
+# Replace pre-built static assets with freshly built Angular output.
+# @angular/build:application always nests browser output under dist/browser/
+# (unlike the old @angular-devkit/build-angular:browser builder, which wrote
+# directly to dist/), even with no SSR server entry point configured.
+COPY --from=frontend-build /app/dist/browser/ ./src/main/resources/static/
 RUN mvn package -DskipTests -B
 
 # Stage 3: Runtime
