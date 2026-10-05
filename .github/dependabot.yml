@@ -103,19 +103,27 @@ updates:
       # here since they aren't direct package.json dependencies - bumping
       # angular-calendar itself pulls in compatible versions of those automatically.
       #
-      # Listed explicitly (not just "@angular/*") because Dependabot's grouping is
-      # best-effort, not atomic: it has already left individual family members (e.g.
-      # @angular/animations, @angular/platform-browser-dynamic,
-      # @angular-devkit/build-angular) out of a grouped update it created for the
-      # rest, and separately opened angular-calendar's own bump as an entirely
-      # unrelated PR instead of folding it into this group. Explicit names remove any
-      # glob-matching ambiguity, but they can't force Dependabot to resolve every
-      # member in the same run - that residual gap is closed by CI: a straggler
-      # produces a version-mismatch build failure that must be fixed (bump the
-      # straggler to match) before merging, same as this one was.
+      # @angular/animations, @angular/platform-browser-dynamic and
+      # @angular-devkit/build-angular used to be listed here too, but all three
+      # are npm-deprecated (animations in favor of the native animate.enter/
+      # animate.leave API, platform-browser-dynamic in favor of
+      # @angular/platform-browser, build-angular's webpack builder in favor of
+      # @angular/build) - and deprecated packages are exactly what Dependabot
+      # silently drops from a grouped update, even when explicitly listed in the
+      # group's patterns. Confirmed twice (the 2026-09-21 and 2026-10-01 Angular
+      # bumps both left these same three behind) with newer, compatible versions
+      # of all three already published - up to a week ahead of the second "angular"
+      # PR being opened - which rules out publish-timing as the explanation. Since
+      # none of them could ever be kept in lockstep by Dependabot anyway, they were
+      # removed from the app entirely instead of worked around: the app didn't use
+      # any Angular-animations API, platform-browser-dynamic was only referenced by
+      # a dead legacy src/test.ts, and the build/serve/test targets in angular.json
+      # now use the @angular/build builder directly. @angular/build replaces
+      # @angular-devkit/build-angular in this group - it has the same lockstep
+      # requirement with @angular/core.
       angular:
         patterns:
-          - "@angular/animations"
+          - "@angular/build"
           - "@angular/cdk"
           - "@angular/cli"
           - "@angular/common"
@@ -124,9 +132,7 @@ updates:
           - "@angular/core"
           - "@angular/forms"
           - "@angular/platform-browser"
-          - "@angular/platform-browser-dynamic"
           - "@angular/router"
-          - "@angular-devkit/build-angular"
           - "angular-calendar"
           - "typescript"
       # Isolated from the "angular" group above on purpose: openvidu-browser's
@@ -140,17 +146,17 @@ updates:
       openvidu:
         patterns:
           - "openvidu-browser"
-    # Being in the "angular" group above does not make typescript's bump stay in
-    # sync with the rest of the group: the 2026-09-21 combined update grouped
-    # typescript 6.0.3 -> 7.0.2 together with the Angular 21 -> 22.1.6 bump, but
-    # @angular/compiler-cli and @angular-devkit/build-angular 22.1.x only accept
-    # typescript ">=6.0 <6.1" as a peer - dependabot doesn't check one grouped
-    # package's peerDependencies against another's version before opening the PR,
-    # it just takes each package to its own latest. That broke `npm install`
-    # outright (ERESOLVE) rather than failing at build time. Block major bumps of
-    # typescript here; move it only by hand, once the Angular release actually
-    # supports the new TS major (check @angular/compiler-cli's peerDependencies
-    # for the target Angular version before bumping).
     ignore:
+      # Being in the "angular" group above does not make typescript's bump stay in
+      # sync with the rest of the group: the 2026-09-21 combined update grouped
+      # typescript 6.0.3 -> 7.0.2 together with the Angular 21 -> 22.1.6 bump, but
+      # @angular/compiler-cli and @angular-devkit/build-angular 22.1.x only accept
+      # typescript ">=6.0 <6.1" as a peer - dependabot doesn't check one grouped
+      # package's peerDependencies against another's version before opening the PR,
+      # it just takes each package to its own latest. That broke `npm install`
+      # outright (ERESOLVE) rather than failing at build time. Block major bumps of
+      # typescript here; move it only by hand, once the Angular release actually
+      # supports the new TS major (check @angular/compiler-cli's peerDependencies
+      # for the target Angular version before bumping).
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
