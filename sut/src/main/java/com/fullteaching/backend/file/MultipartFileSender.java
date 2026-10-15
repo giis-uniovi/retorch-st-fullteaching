@@ -316,10 +316,9 @@ public class MultipartFileSender {
         public static boolean accepts(String acceptHeader, String toAccept) {
             if (acceptHeader == null || toAccept == null) return false;
             String[] parts = acceptHeader.split("[,;]");
-            Set<String> acceptValues = new HashSet<>();
-            for (String part : parts) {
-                acceptValues.add(part.strip());
-            }
+            Set<String> acceptValues = Arrays.stream(parts)
+                    .map(String::strip)
+                    .collect(java.util.stream.Collectors.toSet());
             return acceptValues.contains(toAccept)
                     || acceptValues.contains(toAccept.replaceAll("/.*$", "/*"))
                     || acceptValues.contains("*/*");
