@@ -174,7 +174,8 @@ public class FileOperationsService {
     }
 
     private String getFileExtension(String name) {
-        return name.substring(name.lastIndexOf('.') + 1);
+        int i = name.lastIndexOf('.');
+        return i < 0 ? "" : name.substring(i + 1);
     }
 
     public String getEncodedPictureName(String originalFileName) {
