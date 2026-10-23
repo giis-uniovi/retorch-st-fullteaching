@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -122,6 +124,46 @@ class FileControllerTest extends AbstractLoggedControllerUnitTest {
         } catch (Exception e) {
             log.error("Unexpected exception during test execution", e);
             fail("EXCEPTION: //test UNAUTHORIZED");
+        }
+    }
+
+    @Test
+    void extensionlessFileUploadTest() {
+        Course c = CourseTestUtils.newCourseWithCd("Course", loggedUser, null, "this is the info", true);
+        c = CourseTestUtils.createCourseIfNotExist(mvc, c, httpSession);
+
+        FileGroup fg = new FileGroup("Test File Group");
+        fg = FileTestUtils.newFileGroup(mvc, httpSession, fg, c);
+
+        byte[] content = "some readme content".getBytes();
+        MockMultipartFile readme = new MockMultipartFile("data", "README", "text/plain", content);
+
+        try {
+            MvcResult result = mvc.perform(MockMvcRequestBuilders.multipart(UPLOAD_URI.replace("{courseId}", "" + c.getId()) + fg.getId())
+                    .file(readme)
+                    .session((MockHttpSession) httpSession)
+            ).andReturn();
+
+            assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus(), "failure - expected HTTP status 201");
+
+            // The raw response is inspected because FileTestUtils drops "fileExtension" when parsing
+            JSONArray files = new JSONObject(result.getResponse().getContentAsString()).getJSONArray("files");
+            JSONObject uploaded = files.getJSONObject(files.length() - 1);
+
+            assertEquals("README", uploaded.getString("name"));
+            assertEquals("", uploaded.getString("fileExtension"), "failure - a file without extension must report an empty one");
+
+            //The file still downloads with its content unchanged
+            MvcResult download = mvc.perform(get(DOWNLOAD_URI.replace("{courseId}", "" + c.getId()) + uploaded.getLong("id"))
+                    .session((MockHttpSession) httpSession)
+            ).andReturn();
+
+            assertEquals(HttpStatus.OK.value(), download.getResponse().getStatus(), "failure - expected HTTP status 200");
+            assertArrayEquals(content, download.getResponse().getContentAsByteArray(), "failure - downloaded content differs");
+
+        } catch (Exception e) {
+            log.error("Unexpected exception during test execution", e);
+            fail("EXCEPTION: //test extensionless file");
         }
     }
 

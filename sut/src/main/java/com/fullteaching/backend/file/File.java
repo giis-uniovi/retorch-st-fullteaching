@@ -114,7 +114,8 @@ public class File {
     }
 
     public String getFileExtension() {
-        return this.nameIdent.substring(this.nameIdent.lastIndexOf('.') + 1);
+        int i = this.nameIdent.lastIndexOf('.');
+        return i < 0 ? "" : this.nameIdent.substring(i + 1);
     }
 
     //Generates a string which acts as an identifier for the stored file in the system (local, S3...)

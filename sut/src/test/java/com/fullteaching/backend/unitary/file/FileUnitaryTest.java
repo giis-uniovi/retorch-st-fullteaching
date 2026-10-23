@@ -146,6 +146,7 @@ class FileUnitaryTest extends AbstractUnitTest {
         assertEquals(fileName, f1.getName());
 
         assertEquals("doc", f1.getFileExtension());
+        assertEquals("", new File(fileType, "README").getFileExtension());
 	}
 
 }
