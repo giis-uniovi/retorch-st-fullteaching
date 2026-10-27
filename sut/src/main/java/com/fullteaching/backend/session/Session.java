@@ -96,7 +96,7 @@ public class Session {
 
     @Override
     public int hashCode() {
-        return id != 0 ? Long.hashCode(id) : System.identityHashCode(this);
+        return id == 0 ? System.identityHashCode(this) : Long.hashCode(id);
     }
 
     @Override

@@ -262,7 +262,7 @@ public class MultipartFileSender {
 
         public static long sublong(String value, int beginIndex, int endIndex) {
             String substring = value.substring(beginIndex, endIndex);
-            return (!substring.isEmpty()) ? Long.parseLong(substring) : -1;
+            return substring.isEmpty() ? -1 : Long.parseLong(substring);
         }
 
         private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length)
