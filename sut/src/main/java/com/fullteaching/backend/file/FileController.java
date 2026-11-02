@@ -89,24 +89,32 @@ public class FileController {
             return teacherAuthorized;
         }
 
-        FileGroup fg = null;
+        // The group must exist before any file is written to disk
+        FileGroup fg = fileGroupRepository.findById(idFileGroup).orElse(null);
+        if (fg == null) {
+            log.error("File group {} not found", idFileGroup);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        boolean uploaded = false;
         Iterator<String> i = request.getFileNames();
         while (i.hasNext()) {
             String name = i.next();
             log.info(LOG_FILE_NAME, name);
             MultipartFile file = request.getFile(name);
             if (file == null) continue;
-            fg = processUploadedFile(file, idFileGroup);
+            processUploadedFile(file, fg);
+            uploaded = true;
         }
 
-        if (fg == null) {
+        if (!uploaded) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         fileGroupRepository.save(fg);
         return new ResponseEntity<>(fg.findRoot(), HttpStatus.CREATED);
     }
 
-    private FileGroup processUploadedFile(MultipartFile file, long idFileGroup) throws IOException {
+    private void processUploadedFile(MultipartFile file, FileGroup fg) throws IOException {
         String fileName = file.getOriginalFilename();
         if (log.isInfoEnabled()) {
             log.info("File full name: '{}'", LogSanitizer.sanitize(fileName));
@@ -132,14 +140,11 @@ public class FileController {
             customFile.setLink(uploadedFile.getPath());
         }
 
-        FileGroup fg = fileGroupRepository.findById(idFileGroup).orElse(null);
-        assert fg != null;
         fg.getFiles().add(customFile);
         fg.updateFileIndexOrder();
         if (log.isInfoEnabled()) {
             log.info("File succesfully uploaded to path '{}'", LogSanitizer.sanitize(uploadedFile.getPath()));
         }
-        return fg;
     }
 
     private void saveFileProduction(com.fullteaching.backend.file.File customFile, File uploadedFile) {

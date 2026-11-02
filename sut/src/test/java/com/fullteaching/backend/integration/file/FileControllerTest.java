@@ -6,9 +6,17 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +27,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fullteaching.backend.AbstractLoggedControllerUnitTest;
 import com.fullteaching.backend.course.Course;
+import com.fullteaching.backend.file.FileController;
+import com.fullteaching.backend.file.FileRepository;
 import com.fullteaching.backend.file.MimeTypes;
 import com.fullteaching.backend.filegroup.FileGroup;
 import com.fullteaching.backend.utils.CourseTestUtils;
@@ -34,6 +44,9 @@ class FileControllerTest extends AbstractLoggedControllerUnitTest {
 
     private static final MockMultipartFile firstFile = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
     private static final MockMultipartFile secondFile = new MockMultipartFile("data", "other-file-name.txt", "text/plain", "some other type".getBytes());
+
+    @Autowired
+    private FileRepository fileRepo;
 
     @Override
     @BeforeEach
@@ -164,6 +177,33 @@ class FileControllerTest extends AbstractLoggedControllerUnitTest {
         } catch (Exception e) {
             log.error("Unexpected exception during test execution", e);
             fail("EXCEPTION: //test extensionless file");
+        }
+    }
+
+    @Test
+    void fileUploadToMissingFileGroupTest() throws Exception {
+        Course c = CourseTestUtils.newCourseWithCd("Course", loggedUser, null, "this is the info", true);
+        c = CourseTestUtils.createCourseIfNotExist(mvc, c, httpSession);
+
+        long filesBefore = fileRepo.count();
+        Set<String> storedBefore = storedFiles();
+
+        MvcResult result = mvc.perform(MockMvcRequestBuilders.multipart(UPLOAD_URI.replace("{courseId}", "" + c.getId()) + Long.MAX_VALUE)
+                .file(firstFile)
+                .session((MockHttpSession) httpSession)
+        ).andReturn();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus(), "failure - expected HTTP status 404");
+        assertEquals(storedBefore, storedFiles(), "failure - a rejected upload must not leave a file on disk");
+        assertEquals(filesBefore, fileRepo.count(), "failure - a rejected upload must not add a file record");
+    }
+
+    private static Set<String> storedFiles() throws IOException {
+        if (!Files.exists(FileController.FILES_FOLDER)) {
+            return Set.of();
+        }
+        try (Stream<Path> files = Files.list(FileController.FILES_FOLDER)) {
+            return files.map(p -> p.getFileName().toString()).collect(Collectors.toSet());
         }
     }
 
