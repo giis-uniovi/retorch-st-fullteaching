@@ -129,11 +129,9 @@ public class FileReaderController {
         EmailValidator emailValidator = EmailValidator.getInstance();
 
         // Getting all the emails in the document and storing them in a String set
-        for (String word : stringList) {
-            if (emailValidator.isValid(word)) {
-                attenderEmailsValid.add(word);
-            }
-        }
+        stringList.stream()
+                .filter(emailValidator::isValid)
+                .forEach(attenderEmailsValid::add);
 
         CourseAttenderService.AttenderUpdateResult result =
                 courseAttenderService.updateAttenders(c, attenderEmailsValid, attenderEmailsNotRegistered);
