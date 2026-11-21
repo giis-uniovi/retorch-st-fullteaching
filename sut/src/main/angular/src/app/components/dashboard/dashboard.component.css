@@ -17,8 +17,12 @@ li:hover {
   cursor: pointer;
 }
 
-span.title {
+.title {
   font-weight: bold;
+}
+
+a.title {
+  color: inherit;
 }
 
 .session-list-item {
@@ -95,5 +99,11 @@ li.li-warning {
   }
   .dashboard-col{
     margin-top: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-details {
+    animation-duration: 4s;
   }
 }

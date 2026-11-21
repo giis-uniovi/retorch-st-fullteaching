@@ -33,7 +33,18 @@ export class MaterializeDirective implements AfterViewInit, OnDestroy {
     if (!this.materialize) { return; }
 
     this.zone.runOutsideAngular(() => {
-      $(this.el.nativeElement)[this.materialize](this.materializeParams || [{}]);
+      const reduceMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      let params: any = this.materializeParams || [{}];
+      // Reduced motion: a parallax whose responsive threshold is never exceeded stays disabled
+      // (the image is shown without moving on scroll).
+      if (reduceMotion && this.materialize === 'parallax') {
+        params = { responsiveThreshold: Number.MAX_SAFE_INTEGER };
+      }
+      $(this.el.nativeElement)[this.materialize](params);
+      // Reduced motion: no slider autoplay (slides can still be changed with the indicators).
+      if (reduceMotion && this.materialize === 'slider') {
+        $(this.el.nativeElement).slider('pause');
+      }
 
       // For modals: intercept any <a href="#id"> clicks so the modal opens
       // without requiring the Materialize .modal-trigger class on every anchor.

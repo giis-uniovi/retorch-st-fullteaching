@@ -298,10 +298,10 @@ public class BaseLoggedTest {
                     .click();
 
             user.getWaiter().until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//ul[@id='nav-mobile']//a[text() = 'Logout']")));
+                    By.xpath("//ul[@id='nav-mobile']//button[text() = 'Logout']")));
             user.getDriver()
                     .findElement(By.xpath(
-                            "//ul[@id='nav-mobile']//a[text() = 'Logout']"))
+                            "//ul[@id='nav-mobile']//button[text() = 'Logout']"))
                     .click();
         }
         user.setOnSession(false);
@@ -333,8 +333,7 @@ public class BaseLoggedTest {
 
         user.getDriver().findElement(By.cssSelector(cssSelector)).click();
         Wait.waitForPageLoaded(user.getDriver());
-        user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.xpath(
-                        "//div[contains(@class, 'modal-overlay') and contains(@style, 'opacity: 0.5')]")),
+        user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.cssSelector("dialog.modal[open]")),
                 "Dialog not opened");
 
         log.info("Dialog opened using css selector for user {}", user.getClientData());
@@ -346,8 +345,7 @@ public class BaseLoggedTest {
         user.waitUntil(ExpectedConditions.elementToBeClickable(el),
                 "Button for opening the dialog not clickable");
         el.click();
-        user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.xpath(
-                        "//div[contains(@class, 'modal-overlay') and contains(@style, 'opacity: 0.5')]")),
+        user.waitUntil(ExpectedConditions.presenceOfElementLocated(By.cssSelector("dialog.modal[open]")),
                 "Dialog not opened");
         log.info("Dialog  using webelement for user {}", user.getClientData());
     }
@@ -357,16 +355,15 @@ public class BaseLoggedTest {
         log.info("User {} waiting for dialog with id '{}' to be closed",
                 user.getClientData(), dialogId);
         user.waitUntil(ExpectedConditions
-                        .presenceOfElementLocated(By.xpath("//div[@id='" + dialogId
-                                + "' and contains(@class, 'my-modal-class') and contains(@style, 'opacity: 0') and contains(@style, 'display: none')]")),
+                        .presenceOfElementLocated(By.cssSelector("dialog#" + dialogId + ":not([open])")),
                 "Dialog not closed. Reason: " + errorMessage);
         user.waitUntil(
                 ExpectedConditions.invisibilityOfElementLocated(
-                        By.cssSelector(".modal.my-modal-class.open")),
+                        By.cssSelector("dialog.modal[open]")),
                 "Dialog not closed. Reason: " + errorMessage);
         user.waitUntil(
                 ExpectedConditions.numberOfElementsToBe(
-                        By.cssSelector(".modal-overlay"), 0),
+                        By.cssSelector("dialog[open]"), 0),
                 "Dialog not closed. Reason: " + errorMessage);
         log.info("Dialog closed for user {}", user.getClientData());
     }

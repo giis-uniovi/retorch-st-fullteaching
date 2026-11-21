@@ -128,10 +128,10 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
 
         // Teacher accepts intervention
         user.getWaiter().until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//a[contains(@class, 'usr-btn')]")));
+                By.xpath("//button[contains(@class, 'usr-btn')]")));
         log.info("{} accepts student intervention", user.getClientData());
         user.getDriver()
-                .findElement(By.xpath("//a[contains(@class, 'usr-btn')]"))
+                .findElement(By.xpath("//button[contains(@class, 'usr-btn')]"))
                 .click();
         // Check both videos for both users
         student.getWaiter().until(ExpectedConditions.presenceOfElementLocated(
@@ -148,10 +148,10 @@ class FullTeachingTestEndToEndVideoSessionTests extends BaseLoggedTest {
         checkVideoPlaying(user, "div.participant");
         // Teacher stops student intervention
         user.getWaiter().until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//a[contains(@class, 'usr-btn')]")));
+                By.xpath("//button[contains(@class, 'usr-btn')]")));
         log.info("{} canceling student intervention", user.getClientData());
         user.getDriver()
-                .findElement(By.xpath("//a[contains(@class, 'usr-btn')]"))
+                .findElement(By.xpath("//button[contains(@class, 'usr-btn')]"))
                 .click();
         // Wait until only one video
         user.getWaiter().until(ExpectedConditions
