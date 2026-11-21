@@ -10,7 +10,7 @@ that is used as a System Test and as a demonstrator of the
 
 
 
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/presentation.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/presentation.svg" alt="FullTeaching landing page" width="900"/></p>
 
 
 ## What is FullTeaching?
@@ -29,22 +29,22 @@ FullTeaching is an educational web application to make online classes easy for t
 - FullTeaching uses [OpenVidu](http://openvidu.io) technology to provide video-conference capabilities. Teachers can initialize a class and every student invited can connect and see the teacher in real time. FullTeaching also allows students to intervene during the class (the teacher must authorize it first).
 
 *Dashboard: all your courses and your calendar*
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/dashboard.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/dashboard.svg" alt="Dashboard: all your courses and your calendar" width="900"/></p>
 
 *Calendar: here you have all your sessions, with direct access to their specific course*
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/calendar.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/calendar.svg" alt="Calendar: all your sessions, with direct access to their specific course"/></p>
 
 *Classes: ordered by date, teachers can easily add new ones and modify existing ones*
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/sessions.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/sessions.svg" alt="Classes of a course, ordered by date" width="900"/></p>
 
 *Forum: unlimited entries for posting all your questions*
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/forum.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/forum.svg" alt="Forum of a course, with its entries and last comments" width="900"/></p>
 
 *Files: advanced tree structure to keep all the course's files clear and tidy*
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/files.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/files.svg" alt="Files of a course, organised in groups" width="900"/></p>
 
 *Adding students to the course is as simple as pasting their emails. FullTeaching will automatically do the rest*
-<p align="center"><img src="https://github.com/OpenVidu/full-teaching/blob/master/ReadmeImages/addattedners.png?raw=true"/></p>
+<p align="center"><img src="ReadmeImages/addattedners.svg" alt="Adding students to a course by pasting their emails" width="900"/></p>
 
 # Quick start guide
 
