@@ -100,7 +100,7 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
         courseNameInput.sendKeys(editedCourseName);
         user.getDriver().findElement(By.id("submit-put-course-btn")).click();
         waitForDialogClosed("put-delete-course-modal", "Edition of course failed", user);
-        user.waitUntil(ExpectedConditions.textToBe(By.cssSelector("#course-list .course-list-item:last-child div.course-title span"), editedCourseName), "Unexpected course name");
+        user.waitUntil(ExpectedConditions.textToBe(By.cssSelector("#course-list .course-list-item:last-child div.course-title .title"), editedCourseName), "Unexpected course name");
     }
 
     @AccessMode(resID = "loginservice", concurrency = 10, sharing = true, accessMode = "READONLY")
@@ -450,9 +450,9 @@ class FullTeachingEndToEndRESTTests extends BaseLoggedTest {
     private void enterCourseAndNavigateTab(String courseName, String tabId) { //16 lines
         log.info("Entering course {}", courseName);
         //All these tests always create a new course, so we wait for 3-courses in the main page (more than 2)
-        user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("#course-list .course-list-item div.course-title span"), 2), "The number of courses should be 3");
+        user.waitUntil(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("#course-list .course-list-item div.course-title .title"), 2), "The number of courses should be 3");
         List<WebElement> allCourses = user.getDriver()
-                .findElements(By.cssSelector("#course-list .course-list-item div.course-title span"));
+                .findElements(By.cssSelector("#course-list .course-list-item div.course-title .title"));
         WebElement courseSpan = null;
         for (WebElement c : allCourses) {
             if (c.getText().equals(courseName)) {

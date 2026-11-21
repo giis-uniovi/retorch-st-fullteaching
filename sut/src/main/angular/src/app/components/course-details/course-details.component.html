@@ -5,12 +5,12 @@
 @if (this.course) {
   <div class="container course-detail-div">
     <!--POST DIALOG-->
-    <div id="course-details-modal" class="modal my-modal-class course-details-modal" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions2">
+    <dialog id="course-details-modal" class="modal my-modal-class course-details-modal" appModalDialog closedby="none" aria-labelledby="course-details-modal-title" [dialogActions]="actions2">
       @if (processingPost) {
         <div class="loading"></div>
       }
       <div class="modal-content" [class.filtered]="processingPost">
-        <p class="p-bold-modal-header">{{this.postModalTitle}}</p>
+        <p id="course-details-modal-title" class="p-bold-modal-header">{{this.postModalTitle}}</p>
         @if (isCurrentPostMode(['1', '6'])) {
           <h5>{{this.postModalEntry?.title}}</h5>
         }
@@ -53,7 +53,7 @@
                 <div class="row row-mobile">
                   <div class="col s12 center-align">
                     @if (!this.publisher) {
-                      <a (click)="recordVideo(this.getPublisherOptions('video'))" class="waves-effect waves-light btn">Record video</a>
+                      <button type="button" (click)="recordVideo(this.getPublisherOptions('video'))" class="waves-effect waves-light btn">Record video</button>
                     }
                     @if (!this.publisherErrorMessage) {
                       <div>
@@ -110,10 +110,10 @@
             </div>
             <div class="row no-margin-bottom right-align">
               @if (!isCurrentPostMode(['5'])) {
-                <a (click)="courseDetailsForm.reset(); this.cleanRecording()" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</a>
+                <button type="button" commandfor="course-details-modal" command="close" (click)="courseDetailsForm.reset(); this.cleanRecording()" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</button>
               }
               @if (isCurrentPostMode(['5'])) {
-                <a (click)="courseDetailsForm.reset(); this.uploaderModalService.announceUploaderClosed(true);" id="close-upload-modal-btn" class="modal-action modal-close waves-effect btn-flat modal-footer-button">Close</a>
+                <button type="button" commandfor="course-details-modal" command="close" (click)="courseDetailsForm.reset(); this.uploaderModalService.announceUploaderClosed(true);" id="close-upload-modal-btn" class="modal-action modal-close waves-effect btn-flat modal-footer-button">Close</button>
               }
               @if (!isCurrentPostMode(['5', '3'])) {
                 <button id="post-modal-btn" type="submit" class="waves-effect btn-flat modal-footer-button">Send</button>
@@ -122,16 +122,16 @@
           </form>
         </div>
       </div>
-    </div>
+    </dialog>
     <!--POST DIALOG-->
     <!--PUT/DELETE DIALOG-->
     @if (this.authenticationService.isTeacher()) {
-      <div id="put-delete-modal" class="modal my-modal-class course-details-modal" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions3">
+      <dialog id="put-delete-modal" class="modal my-modal-class course-details-modal" appModalDialog closedby="none" aria-labelledby="put-delete-modal-title" [dialogActions]="actions3">
         @if (processingPut) {
           <div class="loading"></div>
         }
         <div class="modal-content" [class.filtered]="processingPut">
-          <p class="p-bold-modal-header">{{this.putdeleteModalTitle}}</p>
+          <p id="put-delete-modal-title" class="p-bold-modal-header">{{this.putdeleteModalTitle}}</p>
           <div class="row no-margin">
             <form materialize #putDeleteForm class="col s12" (ngSubmit)="onPutDeleteSubmit(); putDeleteForm.reset(); this.allowSessionDeletion = false;">
               @if (isCurrentPutdeleteMode(['0'])) {
@@ -191,10 +191,10 @@
               }
               @if (isCurrentPutdeleteMode(['4'])) {
                 <div id="tabs-attenders" class="row no-margin">
-                  <ul class="tabs">
-                    <li class="tab" (click)="attenderTabSelected=0" (keydown.enter)="attenderTabSelected=0"><a [class.active]="attenderTabSelected===0">SIMPLE</a></li>
-                    <li class="tab" (click)="attenderTabSelected=1" (keydown.enter)="attenderTabSelected=1"><a [class.active]="attenderTabSelected===1">MULTIPLE</a></li>
-                    <li class="tab" (click)="attenderTabSelected=2" (keydown.enter)="attenderTabSelected=2"><a [class.active]="attenderTabSelected===2">FILE UPLOAD</a></li>
+                  <ul class="tabs" role="tablist" aria-label="Add attenders mode">
+                    <li class="tab" role="tab" [attr.aria-selected]="attenderTabSelected===0" [attr.tabindex]="attenderTabSelected===0 ? 0 : -1" (click)="attenderTabSelected=0" (keydown)="onTabKeydown($event)"><a [class.active]="attenderTabSelected===0">SIMPLE</a></li>
+                    <li class="tab" role="tab" [attr.aria-selected]="attenderTabSelected===1" [attr.tabindex]="attenderTabSelected===1 ? 0 : -1" (click)="attenderTabSelected=1" (keydown)="onTabKeydown($event)"><a [class.active]="attenderTabSelected===1">MULTIPLE</a></li>
+                    <li class="tab" role="tab" [attr.aria-selected]="attenderTabSelected===2" [attr.tabindex]="attenderTabSelected===2 ? 0 : -1" (click)="attenderTabSelected=2" (keydown)="onTabKeydown($event)"><a [class.active]="attenderTabSelected===2">FILE UPLOAD</a></li>
                   </ul>
                   <div [hidden]="attenderTabSelected !== 0" class="row no-margin att-row-padding">
                     <div class="input-field col s12">
@@ -203,7 +203,7 @@
                     </div>
                   </div>
                   <div [hidden]="attenderTabSelected !== 1" class="row no-margin att-row-padding">
-                    <i materialize="tooltip" class="material-icons tooltipped att-info-tooltip" data-position="right" data-delay="65" data-html="true" data-tooltip="<p class='att-tooltip-text'>We always separate by <b>WHITE SPACES</b><br>and <b>NEW LINES</b>. If there's any other<br>combination of characters that should<br>be taken into account as separator,<br>include it here</p>">info</i>
+                    <i class="material-icons att-info-tooltip" role="img" aria-label="Separator help" title="We always separate by WHITE SPACES and NEW LINES. If there is any other combination of characters that should be taken into account as separator, include it here">info</i>
                     <div class="input-field col l4 m4 s6">
                       <input [(ngModel)]="inputAttenderSeparator" name="inputAttenderSeparator" id="input-attender-separator" type="text" class="validate">
                       <label for="inputAttenderSeparator">SEPARATOR</label>
@@ -214,7 +214,7 @@
                     </div>
                   </div>
                   <div [hidden]="attenderTabSelected !== 2" class="row no-margin att-row-padding">
-                    <i id="tooltip-file" materialize="tooltip" class="material-icons tooltipped att-info-tooltip" data-position="right" data-delay="65" data-html="true" data-tooltip="<p class='att-tooltip-text'>We will automatically find and add<br>to the course all the <b>EMAILS</b> in the file</p>">info</i>
+                    <i id="tooltip-file" class="material-icons att-info-tooltip" role="img" aria-label="File upload help" title="We will automatically find and add to the course all the EMAILS in the file">info</i>
                     <app-file-uploader (completeFileUpload)="fileReaderUploadCompleted($event)" (uploadStarted)="fileReaderUploadStarted($event)" [uniqueID]="2" [URLUPLOAD]="this.URL_FILE_READER_UPLOAD + this.course.id" [isMultiple]="false" [typeOfFile]="'file'" [buttonText]="'Upload file'"></app-file-uploader>
                   </div>
                 </div>
@@ -222,14 +222,14 @@
               <div class="row no-margin-bottom right-align">
                 @if (isCurrentPutdeleteMode(['0'])) {
                   <div class="valign-wrapper delete-div">
-                    <a id="delete-session-btn" (click)="this.deleteSession(); putDeleteForm.reset(); this.allowSessionDeletion = false;" class="waves-effect btn-flat modal-footer-button float-to-left" [class.disabled]="!this.allowSessionDeletion">Delete</a>
+                    <button type="button" id="delete-session-btn" (click)="this.deleteSession(); putDeleteForm.reset(); this.allowSessionDeletion = false;" class="waves-effect btn-flat modal-footer-button float-to-left" [class.disabled]="!this.allowSessionDeletion" [disabled]="!this.allowSessionDeletion">Delete</button>
                     <div class="float-to-left">
                       <input #deleteCheckbox type="checkbox" class="filled-in" id="delete-checkbox" name="delete-checkbox" (change)="this.allowSessionDeletion = deleteCheckbox.checked"/>
                       <label for="delete-checkbox" id="label-delete-checkbox">Allow deletion?</label>
                     </div>
                   </div>
                 }
-                <a (click)="putDeleteForm.reset(); this.allowSessionDeletion = false; this.allowForumEdition = false; this.uploaderModalService.announceUploaderClosed(true);" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</a>
+                <button type="button" commandfor="put-delete-modal" command="close" (click)="putDeleteForm.reset(); this.allowSessionDeletion = false; this.allowForumEdition = false; this.uploaderModalService.announceUploaderClosed(true);" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</button>
                 @if (!((this.putdeleteModalMode === 4) && (this.attenderTabSelected === 2))) {
                   <button id="put-modal-btn" type="submit" class="waves-effect btn-flat modal-footer-button" [class.disabled]="isCurrentPutdeleteMode(['1']) && (!this.allowForumEdition)">Send</button>
                 }
@@ -237,7 +237,7 @@
             </form>
           </div>
         </div>
-      </div>
+      </dialog>
     }
     <!--PUT/DELETE DIALOG-->
     <div class="row valign-wrapper">
@@ -249,26 +249,26 @@
       <div id="tabs-course-details" class="row">
         <!-- Tab header icons -->
         <div class="col s12 no-padding-lateral">
-          <ul class="tabs tabs-fixed-width">
-            <li class="tab" id="md-tab-label-0-0" (click)="tabId=0; changeUrlTab(0)" (keydown.enter)="tabId=0; changeUrlTab(0)"><a [class.active]="tabId===0"><i id="info-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Course info">home</i></a></li>
-            <li class="tab" id="md-tab-label-0-1" (click)="tabId=1; changeUrlTab(1)" (keydown.enter)="tabId=1; changeUrlTab(1)"><a [class.active]="tabId===1"><i id="sessions-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Sessions">school</i></a></li>
-            <li class="tab" id="md-tab-label-0-2" (click)="tabId=2; changeUrlTab(2)" (keydown.enter)="tabId=2; changeUrlTab(2)"><a [class.active]="tabId===2"><i id="forum-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Forum">forum</i></a></li>
-            <li class="tab" id="md-tab-label-0-3" (click)="tabId=3; changeUrlTab(3)" (keydown.enter)="tabId=3; changeUrlTab(3)"><a [class.active]="tabId===3"><i id="files-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Files">description</i></a></li>
-            <li class="tab" id="md-tab-label-0-4" (click)="tabId=4; changeUrlTab(4)" (keydown.enter)="tabId=4; changeUrlTab(4)"><a [class.active]="tabId===4"><i id="attenders-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Attenders">supervisor_account</i></a></li>
+          <ul class="tabs tabs-fixed-width" role="tablist" aria-label="Course sections">
+            <li class="tab" id="md-tab-label-0-0" role="tab" aria-label="Course info" [attr.aria-selected]="tabId===0" [attr.tabindex]="tabId===0 ? 0 : -1" [attr.aria-controls]="tabId===0 ? 'md-tab-content-0-0' : null" (click)="tabId=0; changeUrlTab(0)" (keydown)="onTabKeydown($event)"><a [class.active]="tabId===0"><i id="info-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Course info">home</i></a></li>
+            <li class="tab" id="md-tab-label-0-1" role="tab" aria-label="Sessions" [attr.aria-selected]="tabId===1" [attr.tabindex]="tabId===1 ? 0 : -1" [attr.aria-controls]="tabId===1 ? 'md-tab-content-0-1' : null" (click)="tabId=1; changeUrlTab(1)" (keydown)="onTabKeydown($event)"><a [class.active]="tabId===1"><i id="sessions-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Sessions">school</i></a></li>
+            <li class="tab" id="md-tab-label-0-2" role="tab" aria-label="Forum" [attr.aria-selected]="tabId===2" [attr.tabindex]="tabId===2 ? 0 : -1" [attr.aria-controls]="tabId===2 ? 'md-tab-content-0-2' : null" (click)="tabId=2; changeUrlTab(2)" (keydown)="onTabKeydown($event)"><a [class.active]="tabId===2"><i id="forum-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Forum">forum</i></a></li>
+            <li class="tab" id="md-tab-label-0-3" role="tab" aria-label="Files" [attr.aria-selected]="tabId===3" [attr.tabindex]="tabId===3 ? 0 : -1" [attr.aria-controls]="tabId===3 ? 'md-tab-content-0-3' : null" (click)="tabId=3; changeUrlTab(3)" (keydown)="onTabKeydown($event)"><a [class.active]="tabId===3"><i id="files-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Files">description</i></a></li>
+            <li class="tab" id="md-tab-label-0-4" role="tab" aria-label="Attenders" [attr.aria-selected]="tabId===4" [attr.tabindex]="tabId===4 ? 0 : -1" [attr.aria-controls]="tabId===4 ? 'md-tab-content-0-4' : null" (click)="tabId=4; changeUrlTab(4)" (keydown)="onTabKeydown($event)"><a [class.active]="tabId===4"><i id="attenders-tab-icon" materialize="tooltip" class="material-icons tooltipped" data-position="top" data-delay="65" data-tooltip="Attenders">supervisor_account</i></a></li>
           </ul>
         </div>
         <!--Course Info Tab-->
         @if (tabId===0) {
-          <div id="md-tab-content-0-0" class="md-tab-body md-tab-active">
+          <div id="md-tab-content-0-0" class="md-tab-body md-tab-active" role="tabpanel" aria-labelledby="md-tab-label-0-0">
             @if (processingCourseInfo) {
               <div class="loading"></div>
             }
             <div class="tab-template-content" [class.filtered]="processingCourseInfo">
               <div class="row no-margin">
                 @if (this.authenticationService.isTeacher() && !this.welcomeTextEdition) {
-                  <a (click)="this.welcomeTextEdition = true" class="right" [title]="'Edit info'">
+                  <button type="button" (click)="this.welcomeTextEdition = true" class="plain-btn right" [title]="'Edit info'" aria-label="Edit info">
                     <i id="edit-course-info" class="material-icons add-element-icon">edit</i>
-                  </a>
+                  </button>
                 }
               </div>
               @if (!this.welcomeTextEdition && this.course.courseDetails.info) {
@@ -282,9 +282,9 @@
                   <div class="ql-editor ql-editor-custom" [innerHTML]="this.welcomeText"></div>
                 </div>
                 <div id="textEditorRowButtons" class="row no-margin-bottom right-align">
-                  <a (click)="this.closeUpdateCourseInfo()" class="waves-effect btn-flat modal-footer-button">Cancel</a>
+                  <button type="button" (click)="this.closeUpdateCourseInfo()" class="waves-effect btn-flat modal-footer-button">Cancel</button>
                   <button id="send-info-btn" (click)="this.updateCourseInfo(); this.closeUpdateCourseInfo()" class="waves-effect btn-flat modal-footer-button">Send</button>
-                  <a (click)="this.welcomeTextPreview = !this.welcomeTextPreview; this.previewButton = (this.welcomeTextPreview ? 'edit' : 'preview');" class="left waves-effect btn-flat modal-footer-button">{{this.previewButton}}</a>
+                  <button type="button" (click)="this.welcomeTextPreview = !this.welcomeTextPreview; this.previewButton = (this.welcomeTextPreview ? 'edit' : 'preview');" class="left waves-effect btn-flat modal-footer-button">{{this.previewButton}}</button>
                 </div>
               </div>
               @if (!this.course.courseDetails.info && !this.welcomeTextEdition) {
@@ -295,7 +295,7 @@
           }<!--/Course Info Tab-->
           <!--Sessions Tab-->
           @if (tabId===1) {
-            <div id="md-tab-content-0-1" class="md-tab-body md-tab-active">
+            <div id="md-tab-content-0-1" class="md-tab-body md-tab-active" role="tabpanel" aria-labelledby="md-tab-label-0-1">
               <div class="tab-template-content">
                 <div class="row no-margin">
                   @if (this.authenticationService.isTeacher()) {
@@ -309,7 +309,7 @@
                     <div>
                       <li class="session-data">
                         <div class="row no-margin">
-                          <div (click)="goToSessionVideo(session)" (keydown.enter)="goToSessionVideo(session)" [class.session-ready]="this.isSessionReady(session)" class="col l7 m6 s6">
+                          <div role="button" tabindex="0" (click)="goToSessionVideo(session)" (keydown.enter)="goToSessionVideo(session)" (keydown.space)="$event.preventDefault(); goToSessionVideo(session)" [class.session-ready]="this.isSessionReady(session)" class="col l7 m6 s6">
                             <div class="session-title">{{session.title}}</div>
                             <div class="session-description">{{session.description}}</div>
                           </div>
@@ -339,13 +339,13 @@
             }<!--/Sessions Tab-->
             <!--Forum Tab-->
             @if (tabId===2 && courseLoaded) {
-              <div id="md-tab-content-0-2" class="md-tab-body md-tab-active">
+              <div id="md-tab-content-0-2" class="md-tab-body md-tab-active" role="tabpanel" aria-labelledby="md-tab-label-0-2">
                 <div class="tab-template-content row no-margin" [class.tab-template-content-2]="!this.course.courseDetails?.forum.activated || !this.course.courseDetails?.forum.entries.length > 0">
                   <!--Forum view-->
                   <ul [class.hide]="this.fadeAnim === 'commentsShown'" class="entries-side-view row no-margin">
                     @if (this.course.courseDetails?.forum.activated) {
                       @for (entry of this.course.courseDetails?.forum.entries; track entry; let last2 = $last) {
-                        <li (mousedown)="this.fadeAnim = 'commentsHidden';" (click)="this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" (keydown.enter)="this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" class="entry-title waves-effect" [class.teacher-forum]="isEntryTeacher(entry)">
+                        <li role="button" tabindex="0" (mousedown)="this.fadeAnim = 'commentsHidden';" (click)="this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" (keydown.enter)="this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" (keydown.space)="$event.preventDefault(); this.selectedEntry = entry; this.fadeAnim = 'commentsShown';" class="entry-title waves-effect" [class.teacher-forum]="isEntryTeacher(entry)">
                           <div class="row no-margin entry-row-sep">
                             <div class="col l6 m6 s6">
                               <span class="forum-entry-title">{{entry.title}}</span>
@@ -395,7 +395,7 @@
                   @if (this.course.courseDetails?.forum.activated && this.fadeAnim === 'commentsShown') {
                     <div id="row-of-comments" class="row no-margin">
                       <div class="row no-margin-lateral">
-                        <a (click)="this.fadeAnim = 'commentsHidden'" (keydown.enter)="this.fadeAnim = 'commentsHidden'" aria-label="Back to entries list"><i id="entries-sml-btn" class="material-icons center-align col l1 m1 s1 no-padding-lateral">arrow_back</i></a>
+                        <button type="button" (click)="this.fadeAnim = 'commentsHidden'" class="plain-btn" aria-label="Back to entries list"><i id="entries-sml-btn" class="material-icons center-align col l1 m1 s1 no-padding-lateral">arrow_back</i></button>
                         <div class="col l10 m10 s10 no-padding-lateral">
                           <div class="row no-margin comment-section-title">
                             <div class="col l6 m6 s6">{{selectedEntry?.title}}</div>
@@ -437,7 +437,7 @@
               }<!--/Forum Tab-->
               <!--Files Tab-->
               @if (tabId===3) {
-                <div id="md-tab-content-0-3" class="md-tab-body md-tab-active">
+                <div id="md-tab-content-0-3" class="md-tab-body md-tab-active" role="tabpanel" aria-labelledby="md-tab-label-0-3">
                   <div class="tab-template-content row no-margin">
                     @if (this.authenticationService.isTeacher()) {
                       <div class="row no-margin">
@@ -467,7 +467,7 @@
                 }<!--/Files Tab-->
                 <!--Attenders Tab-->
                 @if (tabId===4) {
-                  <div id="md-tab-content-0-4" class="md-tab-body md-tab-active">
+                  <div id="md-tab-content-0-4" class="md-tab-body md-tab-active" role="tabpanel" aria-labelledby="md-tab-label-0-4">
                     <div class="tab-template-content">
                       @if (this.authenticationService.isTeacher()) {
                         <div class="row no-margin">

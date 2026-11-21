@@ -871,7 +871,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     } else {
       this.recorder = new LocalRecorder(this.publisher.stream);
       this.recorder.record();
-      document.getElementById('record-start-stop').innerHTML = 'Finish';
+      document.getElementById('record-start-stop').textContent = 'Finish';
       document.getElementById('record-pause-resume').style.display = 'inline-block';
     }
     this.recording = !this.recording;
@@ -880,11 +880,11 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   pauseResumeRecording() {
     if (this.paused) {
       this.recorder.resume();
-      document.getElementById('record-pause-resume').innerHTML = 'Pause';
+      document.getElementById('record-pause-resume').textContent = 'Pause';
       document.getElementById('post-video').getElementsByTagName('video')[0].play();
     } else {
       this.recorder.pause();
-      document.getElementById('record-pause-resume').innerHTML = 'Resume';
+      document.getElementById('record-pause-resume').textContent = 'Resume';
       document.getElementById('post-video').getElementsByTagName('video')[0].pause();
     }
     this.paused = !this.paused;
@@ -949,13 +949,46 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     return options;
   }
 
+  private createControlButton(id: string, title: string, label: string): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = id;
+    button.className = 'btn waves-effect button-small button-small-margin';
+    button.title = title;
+    button.textContent = label;
+    return button;
+  }
+
+  /** Keyboard support for the role="tab" list items: arrows/Home/End move and activate, Enter/Space activate. */
+  onTabKeydown(event: KeyboardEvent): void {
+    const tab = event.currentTarget as HTMLElement;
+    const tabs = Array.from(tab.parentElement.children).filter(c => c.getAttribute('role') === 'tab') as HTMLElement[];
+    const index = tabs.indexOf(tab);
+    let target: HTMLElement;
+    switch (event.key) {
+      case 'ArrowRight': target = tabs[(index + 1) % tabs.length]; break;
+      case 'ArrowLeft': target = tabs[(index - 1 + tabs.length) % tabs.length]; break;
+      case 'Home': target = tabs[0]; break;
+      case 'End': target = tabs[tabs.length - 1]; break;
+      case 'Enter':
+      case ' ': target = tab; break;
+      default: return;
+    }
+    event.preventDefault();
+    target.focus();
+    target.click();
+  }
+
   private addRecordingControls(videoElement: HTMLVideoElement): void {
     const dataNode = document.createElement('div');
     dataNode.id = 'recording-controls';
-    dataNode.innerHTML =
-      '<a id="record-start-stop" class="btn waves-effect button-small button-small-margin" title="Start/End recording">Start</a>' +
-      '<a id="record-pause-resume" class="btn waves-effect button-small button-small-margin" title="Pause/Resume recording" style="display: none">Pause</a>' +
-      '<a id="record-cancel" class="btn waves-effect button-small button-small-margin" title="Cancel recording">Cancel</a>';
+    const pauseResume = this.createControlButton('record-pause-resume', 'Pause/Resume recording', 'Pause');
+    pauseResume.style.display = 'none';
+    dataNode.append(
+      this.createControlButton('record-start-stop', 'Start/End recording', 'Start'),
+      pauseResume,
+      this.createControlButton('record-cancel', 'Cancel recording', 'Cancel')
+    );
     videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
     document.getElementById('record-start-stop').addEventListener('click', this.startStopRecording.bind(this));
     document.getElementById('record-pause-resume').addEventListener('click', this.pauseResumeRecording.bind(this));
@@ -972,9 +1005,12 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   private addPostRecordingControls(videoElement: HTMLVideoElement): void {
     const dataNode = document.createElement('div');
     dataNode.id = 'recording-post-controls';
-    dataNode.innerHTML =
-      '<a id="record-post-repeat" class="btn waves-effect button-small button-small-margin" title="Repeat recording">Repeat</a>' +
-      '<button id="record-post-send" class="btn waves-effect button-small button-small-margin" title="Send entry" type="submit">Send</button>';
+    const sendButton = this.createControlButton('record-post-send', 'Send entry', 'Send');
+    sendButton.type = 'submit';
+    dataNode.append(
+      this.createControlButton('record-post-repeat', 'Repeat recording', 'Repeat'),
+      sendButton
+    );
     videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
     let recordTypeAux = this.recordType;
     document.getElementById('record-post-repeat').addEventListener('click', this.repeatRecording.bind(this, recordTypeAux));
