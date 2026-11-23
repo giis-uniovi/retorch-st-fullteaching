@@ -85,3 +85,50 @@ ul li {
 i.material-icons {
     transition: all .2s ease-out;
 }
+
+
+/* Logout entries are buttons (they do not navigate) styled like the Materialize list links */
+.nav-action-btn {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.dropdown-menu-button .nav-action-btn {
+  background-color: #375646;
+  color: white;
+  font-size: 16px;
+  line-height: 22px;
+  padding: 14px 16px;
+}
+
+.dropdown-menu-button .nav-action-btn:hover,
+.dropdown-menu-button .nav-action-btn:focus {
+  background-color: #375646;
+  color: #61ffae;
+}
+
+.sidenav li > .nav-action-btn {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  line-height: 48px;
+  padding: 0 32px;
+}
+
+.sidenav li > .nav-action-btn:hover,
+.sidenav li > .nav-action-btn:focus {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #navigation-bar {
+    transition: none;
+  }
+}

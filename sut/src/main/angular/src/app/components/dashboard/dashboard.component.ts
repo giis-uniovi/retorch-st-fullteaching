@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
   }
 
   goToCourseDetail(id): void {
-    if (document.querySelector('.modal-overlay')) {
+    if (document.querySelector('dialog.modal[open]')) {
       return;
     }
     this.router.navigate(['/courses', id, 0]);

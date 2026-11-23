@@ -5,12 +5,12 @@
 @if (this.courses) {
   <div>
     <!--POST COURSE DIALOG-->
-    <div id="course-modal" class="modal my-modal-class course-modal" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions1">
+    <dialog id="course-modal" class="modal my-modal-class course-modal" appModalDialog closedby="none" aria-labelledby="course-modal-title" [dialogActions]="actions1">
       @if (processingPost) {
         <div class="loading"></div>
       }
       <div class="modal-content" [class.filtered]="processingPost">
-        <p class="p-bold-modal-header">New course</p>
+        <p id="course-modal-title" class="p-bold-modal-header">New course</p>
         <div class="row no-margin">
           <form materialize #courseForm class="col s12" (ngSubmit)="onCourseSubmit(); courseForm.reset();">
             <div class="row no-margin">
@@ -23,29 +23,29 @@
               <div class="row">
                 <div class="input-field file-field col s12">
                   <div>
-                    <img class="circle" src="../assets/images/default_session_image.png" alt="">
+                    <img class="circle" src="../assets/images/default_session_image.png" alt="" width="96" height="96" loading="lazy">
                     <input type="file" name="inputPostCourseImage" id="inputPostCourseImage">
                   </div>
                 </div>
               </div>
             </div>
             <div class="row right-align row-mobile">
-              <a (click)="courseForm.reset();" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</a>
+              <button type="button" commandfor="course-modal" command="close" (click)="courseForm.reset();" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</button>
               <button type="submit" id="submit-post-course-btn" class="waves-effect btn-flat modal-footer-button">Send</button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+    </dialog>
     <!--POST COURSE DIALOG-->
     <!--PUT/DELETE COURSE DIALOG-->
     @if (this.courses.length > 0 && this.authenticationService.isLoggedIn() && this.authenticationService.isTeacher()) {
-      <div id="put-delete-course-modal" class="modal my-modal-class course-modal" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions4">
+      <dialog id="put-delete-course-modal" class="modal my-modal-class course-modal" appModalDialog closedby="none" aria-labelledby="put-delete-course-modal-title" [dialogActions]="actions4">
         @if (processingPut) {
           <div class="loading"></div>
         }
         <div class="modal-content" [class.filtered]="processingPut">
-          <p class="p-bold-modal-header">Modify course</p>
+          <p id="put-delete-course-modal-title" class="p-bold-modal-header">Modify course</p>
           <div class="row no-margin">
             <form materialize #putDeleteCourseForm class="col s12" (ngSubmit)="onPutDeleteCourseSubmit(); putDeleteCourseForm.reset(); this.allowCourseDeletion = false;">
               <div class="row no-margin">
@@ -58,7 +58,7 @@
                 <div class="row">
                   <div class="input-field file-field col s12">
                     <div>
-                      <img class="circle" src="../assets/images/default_session_image.png" alt="Course">
+                      <img class="circle" src="../assets/images/default_session_image.png" alt="Course" width="96" height="96" loading="lazy">
                       <input type="file" name="inputPutCourseImage" id="inputPutCourseImage">
                     </div>
                   </div>
@@ -66,19 +66,19 @@
               </div>
               <div class="row no-margin-bottom right-align">
                 <div class="valign-wrapper delete-div">
-                  <a id="delete-course-btn" (click)="this.pendingDelete = true; this.allowCourseDeletion = false;" class="waves-effect btn-flat modal-footer-button float-to-left" [class.disabled]="!this.allowCourseDeletion">Delete</a>
+                  <button type="button" id="delete-course-btn" (click)="this.pendingDelete = true; this.allowCourseDeletion = false;" class="waves-effect btn-flat modal-footer-button float-to-left" [class.disabled]="!this.allowCourseDeletion" [disabled]="!this.allowCourseDeletion">Delete</button>
                   <div class="float-to-left">
                     <input #deleteCheckbox type="checkbox" class="filled-in" id="delete-checkbox" name="delete-checkbox" (change)="this.allowCourseDeletion = deleteCheckbox.checked"/>
                     <label for="delete-checkbox" id="label-delete-checkbox">Allow deletion?</label>
                   </div>
                 </div>
-                <a (click)="putDeleteCourseForm.reset(); this.allowCourseDeletion = false;" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</a>
+                <button type="button" commandfor="put-delete-course-modal" command="close" (click)="putDeleteCourseForm.reset(); this.allowCourseDeletion = false;" class="modal-action modal-close waves-effect btn-flat modal-footer-button cancel-modal-btn">Cancel</button>
                 <button type="submit" id="submit-put-course-btn" class="waves-effect btn-flat modal-footer-button">Send</button>
               </div>
             </form>
           </div>
         </div>
-      </div>
+      </dialog>
     }
     <!--PUT/DELETE COURSE DIALOG-->
     <div class="container container-ul margins-top-bottom">
@@ -99,19 +99,19 @@
               <li class="li-warning"><app-error-message [errorTitle]="'You do not have any courses'" [errorContent]="'You can add one by clicking on the icon above'" [customClass]="'warning'" [closable]="false"></app-error-message></li>
             }
             @for (course of courses; track course; let i = $index) {
-              <li class="collection-item course-list-item" (click)="goToCourseDetail(course.id)" (keydown.enter)="goToCourseDetail(course.id)">
+              <li class="collection-item course-list-item" (click)="goToCourseDetail(course.id)">
                 <div class="row session-list-item valign-wrapper">
                   <div class="col l4 m3 s3 valign center-align">
-                    <img materialize="materialbox" class="circle materialboxed sessionImage" src={{this.getImage(course)}} alt="{{course?.title}}">
+                    <img materialize="materialbox" class="circle materialboxed sessionImage" src={{this.getImage(course)}} alt="{{course?.title}}" width="70" height="70" loading="lazy">
                   </div>
                   <div class="col l6 m7 s7 valign course-title">
-                    <span class="title">{{course?.title}}</span>
+                    <a class="title" [routerLink]="['/courses', course.id, 0]" (click)="$event.stopPropagation()">{{course?.title}}</a>
                   </div>
                   <div class="col l2 m2 s2 right-align no-padding-lateral">
                     @if (this.authenticationService.isLoggedIn() && this.authenticationService.isTeacher()) {
-                      <a (click)="$event.stopPropagation(); this.changeUpdatedCourse(course); this.animationService.animateIfSmall(); actions4.emit({action:'modal', params:['open']})" [title]="'Modify course'">
+                      <button type="button" class="plain-btn" (click)="$event.stopPropagation(); this.changeUpdatedCourse(course); this.animationService.animateIfSmall(); actions4.emit({action:'modal', params:['open']})" [title]="'Modify course'" aria-label="Modify course">
                         <i class="material-icons course-put-icon">mode_edit</i>
-                      </a>
+                      </button>
                     }
                   </div>
                 </div>

@@ -331,11 +331,18 @@ i {
   }
 
   #course-details-modal {
-    max-height: none !important;
+    max-height: 100% !important;
   }
 
   #put-delete-modal {
-    max-height: none !important;
+    max-height: 100% !important;
+  }
+
+  /* Native <dialog> in the top layer: keep it fixed to the viewport and scrollable */
+  dialog.modal.my-modal-class {
+    position: fixed !important;
+    max-height: 100% !important;
+    overflow-y: auto;
   }
 
   .modal.my-modal-class .modal-footer{
@@ -867,4 +874,69 @@ a.cal-event-title {
 #post-video video {
   width: 50%;
   max-height: 270px;
+}
+/* Native <dialog> replacing the Materialize modals (class "modal"). The browser provides the
+   top layer, the inert page, focus handling and ::backdrop. */
+dialog.modal {
+  border: 0;
+  color: inherit;
+  max-width: none;
+  top: 10%;
+  bottom: auto;
+  margin: 0 auto;
+  padding: 0;
+}
+
+dialog.modal[open] {
+  display: block;
+}
+
+dialog:modal {
+  /* Stops scroll gestures in the dialog from chaining to the page behind it */
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  /* ::backdrop is not a scroll container by default, so it would ignore overscroll-behavior */
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Elements that used to be <a> without href and are now <button>: look like the old links */
+.plain-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  line-height: inherit;
+  color: #039be5;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+.plain-btn:focus {
+  background: none;
+}
+
+/* Materialize removes the outline from every button:focus; restore it for keyboard users */
+button:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 2px solid #375646;
+  outline-offset: 2px;
+}
+
+/* Reduced motion: parallax and slider autoplay are disabled in MaterializeDirective and the navbar
+   slide in navbar.component.css. Spinners are feedback, so they keep running but much more slowly. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .loading,
+  .rotating {
+    animation-duration: 4s;
+  }
 }

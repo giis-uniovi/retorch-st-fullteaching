@@ -1,4 +1,4 @@
-<div id="login-modal" class="modal my-modal-class" materialize="modal" [materializeParams]="[{dismissible: false}]" [materializeActions]="actions">
+<dialog id="login-modal" class="modal my-modal-class" appModalDialog closedby="none" [attr.aria-label]="loginView ? 'Log in' : 'Sign up'" [dialogActions]="actions">
 
   @if (submitProcessing) {
     <div class="loading"></div>
@@ -14,7 +14,7 @@
 
         <div class="row row-mobile">
           <div class="input-field col s12">
-            <input [(ngModel)]="email" name="email" id="email" type="email" class="validate" required autocomplete="email">
+            <input [(ngModel)]="email" name="email" id="email" type="email" class="validate" required autocomplete="username" spellcheck="false">
             <label for="email" data-error="Not an e-mail format!">Email</label>
           </div>
         </div>
@@ -22,7 +22,7 @@
         @if (!loginView) {
           <div class="row row-mobile">
             <div class="input-field col s12">
-              <input [(ngModel)]="nickName" name="nickName" id="nickName" type="text" class="validate" required>
+              <input [(ngModel)]="nickName" name="nickName" id="nickName" type="text" class="validate" required autocomplete="name">
               <label for="nickName">Name</label>
             </div>
           </div>
@@ -30,7 +30,7 @@
 
         <div class="row row-mobile">
           <div class="input-field col s12">
-            <input [(ngModel)]="password" name="password" id="password" type="password" class="validate" required>
+            <input [(ngModel)]="password" name="password" id="password" type="password" class="validate" required [attr.autocomplete]="loginView ? 'current-password' : 'new-password'">
             <label for="password">Password</label>
           </div>
         </div>
@@ -38,7 +38,7 @@
         @if (!loginView) {
           <div class="row">
             <div class="input-field col s12">
-              <input [(ngModel)]="confirmPassword" name="confirmPassword" id="confirmPassword" type="password" class="validate">
+              <input [(ngModel)]="confirmPassword" name="confirmPassword" id="confirmPassword" type="password" class="validate" autocomplete="new-password">
               <label for="confirmPassword">Confirm password</label>
             </div>
           </div>
@@ -59,12 +59,12 @@
             <button type="submit" id="log-in-btn" class="waves-effect waves-light btn-flat white-text acceptColor-back">Log in</button>
           }
           @if (!loginView && !this.captchaValidated) {
-            <a id="disabled-signup-btn" materialize="tooltip" data-position="bottom" data-delay="65" data-html="true" data-tooltip="Click on <b><i>I'm not a robot</i></b> above" class="btn-flat">Sign up</a>
+            <button type="button" id="disabled-signup-btn" aria-disabled="true" title="Click on 'I'm not a robot' above" class="btn-flat">Sign up</button>
           }
           @if (!loginView && this.captchaValidated) {
             <button type="submit" id="sign-up-btn" class="waves-effect waves-light btn-flat white-text signUpColor">Sign up</button>
           }
-          <a (click)="setLoginView(true); myForm.reset(); this.fieldsIncorrect = false;" class="modal-action modal-close waves-effect waves-light btn-flat white-text cancelColor-back">Close</a>
+          <button type="button" commandfor="login-modal" command="close" (click)="setLoginView(true); myForm.reset(); this.fieldsIncorrect = false;" class="modal-action modal-close waves-effect waves-light btn-flat white-text cancelColor-back">Close</button>
         </div>
 
       </form>
@@ -74,11 +74,11 @@
 
   <div class="modal-footer" [class.filtered]="submitProcessing">
     @if (loginView) {
-      <div class="right-align">Not registered yet?<a (click)="setLoginView(false)" class="waves-effect btn-flat modal-footer-button">Sign up</a></div>
+      <div class="right-align">Not registered yet?<button type="button" (click)="setLoginView(false)" class="waves-effect btn-flat modal-footer-button">Sign up</button></div>
     }
     @if (!loginView) {
-      <div class="right-align">Already registered?<a (click)="setLoginView(true)" class="waves-effect btn-flat modal-footer-button">Log in</a></div>
+      <div class="right-align">Already registered?<button type="button" (click)="setLoginView(true)" class="waves-effect btn-flat modal-footer-button">Log in</button></div>
     }
   </div>
 
-</div>
+</dialog>

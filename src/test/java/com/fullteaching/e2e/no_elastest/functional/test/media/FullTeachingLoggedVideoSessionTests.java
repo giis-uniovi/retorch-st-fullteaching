@@ -251,7 +251,7 @@ class FullTeachingLoggedVideoSessionTests extends BaseLoggedTest {
         Click.element(user.getDriver(), session.findElement(SESSION_LIST_SESSION_EDIT_ICON));
         modal = Wait.notTooMuch(user.getDriver()).until(ExpectedConditions.visibilityOfElementLocated(SESSION_LIST_EDIT_MODAL));
         Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("label")));
-        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("a")));
+        Click.element(user.getDriver(), modal.findElement(SESSION_LIST_EDIT_MODAL_DELETE_DIV).findElement(By.tagName("button")));
         Wait.waitForPageLoaded(user.getDriver());//13 lines
         sessionTitles = SessionNavigationUtilities.getFullSessionList(user.getDriver()); //7 lines
         assertFalse(sessionTitles.contains(sessionName), "Session has not been deleted");

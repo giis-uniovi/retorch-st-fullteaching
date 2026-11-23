@@ -74,3 +74,9 @@ i.material-icons {
     min-width: 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-calendar:before {
+    animation-duration: 4s;
+  }
+}
