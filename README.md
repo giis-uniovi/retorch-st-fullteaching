@@ -10,6 +10,8 @@ that is used as a System Test and as a demonstrator of the
 
 *FullTeaching* is an educational platform developed as a demonstrator of the [ElasTest EU Project](https://elastest.eu/).
 
+<p align="center"><img src="img/hero-fullteaching.svg" alt="FullTeaching: the teacher dashboard (courses and calendar) on desktop and mobile" width="900"/></p>
+
 ## Quick Start
 
 To run FullTeaching integrated with the RETORCH scheduling:
@@ -36,7 +38,7 @@ Content below is the original FullTeaching README.file
 
 [![Build Status](https://travis-ci.org/pabloFuente/full-teaching.png?branch=master)](https://travis-ci.org/pabloFuente/full-teaching)
 
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/presentation.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/presentation.svg" alt="FullTeaching landing page" width="900"/></p>
 
 
 ## What is FullTeaching?
@@ -55,22 +57,22 @@ FullTeaching is an educational web application to make online classes easy for t
 - FullTeaching uses [OpenVidu](http://openvidu.io) technology to provide video-conference capabilities. Teachers can initialize a class and every student invited can connect and see the teacher in real time. FullTeaching also allows students to intervene during the class (the teacher must authorize it first).
 
 *Dashboard: all your courses and your calendar*
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/dashboard.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/dashboard.svg" alt="Dashboard: all your courses and your calendar" width="900"/></p>
 
 *Calendar: here you have all your sessions, with direct access to their specific course*
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/calendar.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/calendar.svg" alt="Calendar: all your sessions, with direct access to their specific course"/></p>
 
 *Classes: ordered by date, teachers can easily add new ones and modify existing ones*
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/sessions.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/sessions.svg" alt="Classes of a course, ordered by date" width="900"/></p>
 
 *Forum: unlimited entries for posting all your questions*
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/forum.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/forum.svg" alt="Forum of a course, with its entries and last comments" width="900"/></p>
 
 *Files: advanced tree structure to keep all the course's files clear and tidy*
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/files.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/files.svg" alt="Files of a course, organised in groups" width="900"/></p>
 
 *Adding students to the course is as simple as pasting their emails. FullTeaching will automatically do the rest*
-<p align="center"><img src="https://github.com/pabloFuente/full-teaching/blob/master/ReadmeImages/addattedners.png?raw=true"/></p>
+<p align="center"><img src="sut/ReadmeImages/addattedners.svg" alt="Adding students to a course by pasting their emails" width="900"/></p>
 
 # Quick start guide
 
@@ -169,3 +171,9 @@ Go to `http://localhost:5000/` and there you have it!
   - You may have to change permissions in order to execute the scripts.
 
 *These instructions have been tested for Ubuntu 14.04 and Ubuntu 16.04*
+
+---
+
+<p align="center">
+  <a href="https://giis.uniovi.es/"><img src="img/giis-footer.svg" alt="GIIS - Software Engineering Research Group, University of Oviedo" height="28"/></a>
+</p>
