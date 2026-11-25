@@ -25,7 +25,7 @@ public final class Constants {
 
     public static final String COURSES_DASHBOARD_TITLE_CLASS = "dashboard-title";
 
-    public static final String FIRST_COURSE_XPATH = "/html/body/app/div/main/app-dashboard/div/div[3]/div/div[1]/ul/li[1]";
+    public static final String FIRST_COURSE_XPATH = "//ul[@id='course-list']/li[1]";
     public static final String GO_TO_COURSE_XPATH = "/div[2]"; /*use with XCOURSE_XPATH+GOTOCOURSE_XPATH*/
     public static final String COURSE_LIST_COURSE_TITLE_CLASS = "course-title";
     public static final String COURSE_LIST_CLASS = "dashboard-col";
@@ -65,7 +65,7 @@ public final class Constants {
 
     public static final String EDIT_DESCRIPTION_SAVE_BUTTON_ID = "send-info-btn";
 
-    public static final String USERNAME_XPATH = "/html/body/app/div/main/app-settings/div/div[3]/div[2]/ul/li[2]/div[2]";
+    public static final String USERNAME_XPATH = "//app-settings//li[div[@class='setting-title' and normalize-space()='Name']]/div[contains(@class,'setting-content')]";
     public static final String LOGIN_MENU_XPATH = "/html/body/app/div/header/navbar/div/nav/div/ul/li[2]/a";
 
     public static final String ENABLE_FORUM_BUTTON_ID = "label-forum-checkbox";

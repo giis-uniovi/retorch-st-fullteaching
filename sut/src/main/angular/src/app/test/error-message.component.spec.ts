@@ -28,4 +28,11 @@ describe('ErrorMessageComponent', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.textContent).toContain('Please try again');
   });
+
+  it('should announce itself to assistive technology with role=alert', () => {
+    const fixture = TestBed.createComponent(ErrorMessageComponent);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.card-panel')?.getAttribute('role')).toBe('alert');
+  });
 });

@@ -19,7 +19,7 @@
           <!-- Dropdown Content -->
           <ul id="dropdown1" class="dropdown-content">
             <li class="divider"></li>
-            <li class="dropdown-menu-button"><a id="logout-button" class="waves-effect" (click)="logout()">Logout</a></li>
+            <li class="dropdown-menu-button"><button type="button" id="logout-button" class="waves-effect nav-action-btn" (click)="logout()">Logout</button></li>
             <li class="divider"></li>
             <li class="dropdown-menu-button"><a id="contact-button" class="waves-effect">Contact</a></li>
           </ul>
@@ -35,7 +35,7 @@
           <li><a routerLink="/settings" class="waves-effect">Settings</a></li>
           <li class="divider"></li>
           <li><a class="waves-effect">Contact</a></li>
-          <li><a class="waves-effect" (click)="logout()">Logout</a></li>
+          <li><button type="button" class="waves-effect nav-action-btn" (click)="logout()">Logout</button></li>
         </ul>
       }
       @if (this.authenticationService.isLoggedIn()) {

@@ -210,7 +210,7 @@ class CourseTeacherTest extends BaseLoggedTest {
             //Write the new Title.
             editor = driver.findElement(By.className("ql-editor"));
             jse.executeScript("arguments[0].innerHTML = '<h1>New Title</h1><h2>New SubHeading</h2><p>This is the normal content</p>'", editor);
-            driver.findElement(By.xpath("//*[@id=\"textEditorRowButtons\"]/a[2]")).click();
+            driver.findElement(By.xpath("//*[@id=\"textEditorRowButtons\"]/button[3]")).click();
             user.waitUntil(ExpectedConditions.visibilityOfElementLocated(By.className("ql-editor-custom")), "Element that was waiting doesn't found");
             WebElement preview = Wait.notTooMuch(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className("ql-editor-custom")));
             //check heading TO-DO : Error here, the type of font is not saved

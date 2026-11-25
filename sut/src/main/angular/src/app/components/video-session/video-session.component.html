@@ -2,23 +2,23 @@
   <div id="video-session-div">
     <a id="side-menu-button" class="sidenav-trigger" data-target="slide-out"><i id="fixed-icon" class="material-icons video-icon" (onclick)="document.getElementsByTagName('body')[0].style.overflowY = 'hidden'">menu</i></a>
     <div id="div-header-buttons" class="row no-margin">
-      <div class="col s12 m12 l12 no-padding-right"><a class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="toggleFullScreen()"><i class="material-icons">{{fullscreenIcon}}</i></a></div>
+      <div class="col s12 m12 l12 no-padding-right"><button type="button" class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="toggleFullScreen()" aria-label="Toggle full screen"><i class="material-icons">{{fullscreenIcon}}</i></button></div>
       <div class="col s12 m12 l12 no-padding-right">@if (this.authenticationService.isStudent() && !this.myStudentAccessGranted) {
-        <a class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="askForIntervention()"><i class="material-icons">{{interventionIcon}}</i></a>
+        <button type="button" class="btn-floating btn-large waves-effect waves-light red floating-button" (click)="askForIntervention()" aria-label="Ask for intervention"><i class="material-icons">{{interventionIcon}}</i></button>
       }</div>
       @if (this.authenticationService.isTeacher()) {
         <div class="row no-margin">
           @for (userData of this.userData | interventionAskedFilter ; track userData; let i = $index) {
             <div class="col s12 m12 l12 no-padding-right">
               @if (!studentAccessGranted || userData.accessGranted) {
-                <a  materialize="tooltip" data-position="left" data-delay="65" [attr.data-tooltip]="userData.name" class="btn-floating btn-large waves-effect floating-button white usr-btn" (click)="grantIntervention(!studentAccessGranted, userData)" [style.border-color]="userData.color">
+                <button type="button" materialize="tooltip" data-position="left" data-delay="65" [attr.data-tooltip]="userData.name" [attr.aria-label]="userData.name" class="btn-floating btn-large waves-effect floating-button white usr-btn" (click)="grantIntervention(!studentAccessGranted, userData)" [style.border-color]="userData.color">
                   @if (this.studentAccessGranted) {
                     <i class="material-icons" [style.color]="userData.color">cancel</i>
                   }
                   @if (!this.studentAccessGranted) {
                     <img class="circle responsive-img" [src]="userData.picture" [alt]="userData.name">
                   }
-                </a>
+                </button>
               }
             </div>
           }
@@ -41,12 +41,12 @@
         <div class="session-bottom-div valign-wrapper" (mouseenter)="this.controlsShown = true"  (mouseleave)="this.controlsShown = false">
           <div id="div-video-control" [class.div-video-control-shown]="this.playPauseIcon==='play_arrow'" [class.fade-in-controls]="this.controlsShown" [class.fade-out-controls]="!this.controlsShown">
             <div class="box-video-control">
-              <a class="btn-floating waves-effect video-control" (click)="togglePlayPause()">
+              <button type="button" class="btn-floating waves-effect video-control" (click)="togglePlayPause()" aria-label="Play or pause">
                 <i class="material-icons video-control-icon">{{this.playPauseIcon}}</i>
-              </a>
-              <a class="btn-floating waves-effect video-control" (click)="toggleMute()">
+              </button>
+              <button type="button" class="btn-floating waves-effect video-control" (click)="toggleMute()" aria-label="Mute or unmute">
                 <i class="material-icons video-control-icon">{{this.volumeMuteIcon}}</i>
-              </a>
+              </button>
               <input id="slider-volume" name="slider-volume" type="range" min="0" max="1" step="0.01" [(ngModel)]="this.volumeLevel" (ngModelChange)="changeVolume($event)"/>
             </div>
           </div>

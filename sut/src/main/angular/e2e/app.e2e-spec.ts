@@ -190,7 +190,7 @@ describe('angular-cli-project App', function() {
       deletionAllow.click();
 
       // Get and click the button to delete the course
-      browser.driver.findElement(by.css('div.delete-div a.btn-flat')).then(function(deleteButton) {
+      browser.driver.findElement(by.css('div.delete-div button.btn-flat')).then(function(deleteButton) {
         deleteButton.click().then(function() {
           browser.waitForAngular();
 
