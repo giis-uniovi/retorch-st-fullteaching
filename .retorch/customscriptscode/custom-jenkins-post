@@ -1,2 +1,2 @@
-        archiveArtifacts artifacts: 'target/coverage/jacoco-report/coverage.xml', allowEmptyArchive: true
-        publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: false, reportDir: 'target/coverage/jacoco-report', reportFiles: 'index.html', reportName: 'FullCoverageReport'])
+      archiveArtifacts artifacts: 'target/coverage/jacoco-report/coverage.xml', allowEmptyArchive: true
+      publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: false, reportDir: 'target/coverage/jacoco-report', reportFiles: 'index.html', reportName: 'FullCoverageReport'])

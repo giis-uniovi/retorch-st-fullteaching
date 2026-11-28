@@ -148,8 +148,8 @@ pipeline {
       archiveArtifacts artifacts: 'artifacts/*.csv', onlyIfSuccessful: true
       archiveArtifacts artifacts: 'artifacts/usageprofile/*.html', allowEmptyArchive: true
       publishHTML(target: [reportDir: 'artifacts/usageprofile', reportFiles: 'usageprofile.html', reportName: 'RETORCH Usage Profile', keepAll: true, alwaysLinkToLastBuild: true, allowMissing: true])
-        archiveArtifacts artifacts: 'target/coverage/jacoco-report/coverage.xml', allowEmptyArchive: true
-        publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: false, reportDir: 'target/coverage/jacoco-report', reportFiles: 'index.html', reportName: 'FullCoverageReport'])
+      archiveArtifacts artifacts: 'target/coverage/jacoco-report/coverage.xml', allowEmptyArchive: true
+      publishHTML(target: [allowMissing: true, alwaysLinkToLastBuild: true, keepAll: false, reportDir: 'target/coverage/jacoco-report', reportFiles: 'index.html', reportName: 'FullCoverageReport'])
       archiveArtifacts artifacts: 'target/testlogs/**/*.*', onlyIfSuccessful: false
       archiveArtifacts artifacts: 'target/containerlogs/**/*.*', onlyIfSuccessful: false
     }// EndAlways
