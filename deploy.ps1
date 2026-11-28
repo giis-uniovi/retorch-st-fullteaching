@@ -1,10 +1,12 @@
-# deploy-sut.ps1  -  Deploy full-teaching SUT stack (Windows)
-# Usage:  .\deploy-sut.ps1            (uses local.env, TJOB_NAME=local)
-#         .\deploy-sut.ps1 -Down      (stop)
+# deploy.ps1  -  Deploy (or tear down) the FullTeaching SUT locally (Windows). Run from the project root directory.
+# Usage:  .\deploy.ps1             (uses local.env, TJOB_NAME=local; builds the image and deploys)
+#         .\deploy.ps1 -NoBuild    (skip the image build)
+#         .\deploy.ps1 -Down       (tear down the local deployment)
 # Requires: Docker Desktop running
 
 param(
-    [switch]$Down
+    [switch]$Down,
+    [switch]$NoBuild
 )
 
 $ScriptDir     = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -34,9 +36,13 @@ if ($nets -notcontains $Network) {
 } else { OK "Already exists" }
 
 # 2. Build full-teaching image from sut/
-Step "Building full-teaching image from sut/"
-docker compose -f $ComposeFile -f $LocalOverride --env-file $EnvFile build full-teaching 2>&1 | Out-Null
-OK "Done"
+if ($NoBuild) {
+    Step "Skipping the image build (-NoBuild)"
+} else {
+    Step "Building full-teaching image from sut/"
+    docker compose -f $ComposeFile -f $LocalOverride --env-file $EnvFile build full-teaching 2>&1 | Out-Null
+    OK "Done"
+}
 
 # 3. Start stack
 Step "Starting SUT containers (project: $TJobName)"
@@ -50,7 +56,7 @@ for ($i = 1; $i -le 18; $i++) {
     if (docker logs "full-teaching-$TJobName" 2>&1 | Select-String "Started Application") {
         OK "App ready at https://localhost:5000"
         Write-Host "`n    Run test: mvn test -Dtest=FullTeachingEndToEndEChatTests -DTJOB_NAME=$TJobName -DSUT_URL=https://localhost:5000" -ForegroundColor Yellow
-        Write-Host "    To stop:  .\deploy-sut.ps1 -Down`n" -ForegroundColor Yellow
+        Write-Host "    To stop:  .\deploy.ps1 -Down`n" -ForegroundColor Yellow
         exit 0
     }
     Write-Host "    $([int]($i*5))s..."

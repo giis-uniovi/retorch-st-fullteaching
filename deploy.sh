@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
-# deploy-sut.sh  -  Deploy full-teaching SUT stack (Linux/Mac)
-# Usage:   ./deploy-sut.sh          (uses local.env, TJOB_NAME=local)
-#          ./deploy-sut.sh down     (stop)
+# deploy.sh  -  Deploy (or tear down) the FullTeaching SUT locally (Linux/Mac). Run from the project root directory.
+# Usage:   ./deploy.sh               (uses local.env, TJOB_NAME=local; builds the image and deploys)
+#          ./deploy.sh --no-build    (skip the image build)
+#          ./deploy.sh --down        (tear down the local deployment)
 # Requires: Docker with Compose plugin
 
-ACTION="${1:-up}"
+DOWN=false
+SKIP_BUILD=false
+for arg in "$@"; do
+    case "$arg" in
+        --down) DOWN=true ;;
+        --no-build) SKIP_BUILD=true ;;
+        *) echo "Unknown argument: $arg. Valid options: --no-build, --down"; exit 1 ;;
+    esac
+done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/local.env"
@@ -18,7 +27,7 @@ step() { printf "\n\033[36m==> %s\033[0m\n" "$*"; }
 ok()   { printf "    \033[32mOK: %s\033[0m\n" "$*"; }
 fail() { printf "    \033[31mFAIL: %s\033[0m\n" "$*"; exit 1; }
 
-if [ "$ACTION" = "down" ] || [ "${1:-}" = "down" ]; then
+if [ "$DOWN" = true ]; then
     step "Stopping SUT stack ($TJOB_NAME)"
     docker compose -f "$COMPOSE_FILE" -f "$LOCAL_OVERRIDE" --env-file "$ENV_FILE" -p "$TJOB_NAME" down > /dev/null 2>&1
     ok "Stack stopped"
@@ -34,9 +43,13 @@ else
 fi
 
 # 2. Build full-teaching image from sut/
-step "Building full-teaching image from sut/"
-docker compose -f "$COMPOSE_FILE" -f "$LOCAL_OVERRIDE" --env-file "$ENV_FILE" build full-teaching 2>&1 | tail -2
-ok "Done"
+if [ "$SKIP_BUILD" = true ]; then
+    step "Skipping the image build (--no-build)"
+else
+    step "Building full-teaching image from sut/"
+    docker compose -f "$COMPOSE_FILE" -f "$LOCAL_OVERRIDE" --env-file "$ENV_FILE" build full-teaching 2>&1 | tail -2
+    ok "Done"
+fi
 
 # 3. Start stack
 step "Starting SUT containers (project: $TJOB_NAME)"
@@ -50,7 +63,7 @@ for i in $(seq 1 18); do
     if docker logs "full-teaching-$TJOB_NAME" 2>&1 | grep -q "Started Application"; then
         ok "App ready at https://localhost:5000"
         printf "\n    Run test: mvn test -Dtest=FullTeachingEndToEndEChatTests -DTJOB_NAME=%s -DSUT_URL=https://localhost:5000\n" "$TJOB_NAME"
-        printf "    To stop:  ./deploy-sut.sh down\n\n"
+        printf "    To stop:  ./deploy.sh --down\n\n"
         exit 0
     fi
     printf "    %ds...\n" "$((i*5))"
