@@ -93,13 +93,12 @@ mvn test -Dtest="<TestClass>#<testMethod>"
 ```
 
 The target of the tests is resolved in this order: the `SUT_URL` system property, the `SUT_URL` environment variable and, if
-none is set, the default local URL (`https://localhost:5000`). To test another deployment:
+none is set, the `app.url` system property (default `https://localhost:5000`). To test another deployment:
 
 ```bash
-mvn test -DSUT_URL=https://localhost:5000
+mvn test -DSUT_URL=https://my-host:5000 -Dtjob_name=<name>
 ```
 
-The CI pipeline also passes `-DTJOB_NAME=<tjob>` (the name of the TJob running the tests) together with `-DSUT_URL`.
 
 The test classes are in `com.fullteaching.e2e.no_elastest.functional.test`. For a deployment made with `deploy.sh` the SUT
 URL is the default one, so `mvn test` is enough. Set `SELENOID_PRESENT` to run the browsers in a Selenoid / Selenium Grid instead
