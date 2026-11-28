@@ -1,1 +1,36 @@
 echo "This COI-setup dont have any kind of specific commands"
+
+# Selenium / Selenoid housekeeping and checks (formerly part of the generic coi-setup template)
+SEL_VIDEO_DIR="/opt/selenoid/video/"
+SEL_LOG_DIR="/opt/selenoid/logs/"
+
+remove_old_files() {
+    dir=$1
+    days=$2
+    "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "Removing older files ($days days) in $dir! The number of files prior to remove:"
+    find "$dir" | wc -l
+    find "$dir" -mindepth 1 -maxdepth 1 -mtime +$days -exec rm -rf {} \;
+    "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "Removing older files ($days days) in $dir! The number of files after remove:"
+    find "$dir" | wc -l
+}
+
+# Remove older videos (older than 15 days) and logs (older than 7 days)
+remove_old_files "$SEL_VIDEO_DIR" 15
+remove_old_files "$SEL_LOG_DIR" 7
+
+# Check that a running container whose name contains the given text exists, otherwise abort the COI set-up
+check_container_running() {
+    local search_term="$1"
+    local container_id
+    container_id=$(docker ps --filter "name=$search_term" --filter "status=running" -q)
+    if [ -n "$container_id" ]; then
+        "$SCRIPTS_FOLDER/printLog.sh" "DEBUG" "COI-set-up" "Found running container containing '$search_term' in the name."
+    else
+        "$SCRIPTS_FOLDER/printLog.sh" "ERROR" "COI-set-up" "No running container name matches '$search_term'. Aborting."
+        exit 1
+    fi
+}
+
+check_container_running "selenium-hub"
+check_container_running "chrome-video"
+check_container_running "chrome-node"
